@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+	<meta charset="utf-8">
+	<title>ChatApp</title>
+</head>
+
+<body class="chat">
+	<form id='message-form'>
+		<input name='message'
+			type="text" placeholder="Message"
+			autofocus autocomplete="off" />
+		<button type="submit">Send</button>
+	</form>
+	<!-- <script src="/socket.io/socket.io.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+	<script>
+       
+		//var socket = io();
+        var socket = io('http://localhost:5000/');
+        //var socket = io('https://devapi.uplyfther.com/');
+
+		// connection with server
+		socket.on('connect', function () {
+			console.log('Connected to Server');
+			const cognitoUserId = 'a3f458d2-10a1-70cc-d6e3-0550a9c75624';  // You should dynamically pass the user ID here
+            socket.emit('registerUser', cognitoUserId);
+		});
+
+		// socket.on('rideStatus',
+		// 	function (message) {
+		// 		console.log(message);
+		// 	});
+
+		// message listener from server
+		socket.on('newMessage',
+			function (message) {
+			console.log(message);
+			}
+		);
+
+		// socket.emit('chatMessageEnc',"U2FsdGVkX18nJIY3Ok8gIyL3Wcexy9hpGq4D4eMMmcqMSLhKWH0dgtSgVLNMXkcSxJkgm0EpBXQ03j9erztc7mc/7u6P7NkEsshUJ4Eg7ILVkvHLWcsYKI4/zCpxh76JxXWkzj7kcfMNkj4s9RNGa6rS7ee5EsGmHmlEDuuaOQq5tjW1gi6W6JRG3wqZECoejYX/gJJ2IXWogf0kVcE+FA=="
+		// );
+		// socket.on('chatMessageEnc',
+		// 	function (message) {
+		// 		console.log("chat_Message",message);
+		// 	}
+		// );
+
+		
+
+		
+
+
+			
+
+		// add event listener to form
+		document.getElementById('message-form')
+			.addEventListener('submit',
+				function (e) {
+					// prevent the form from submitting
+					e.preventDefault();
+					
+					// emit message from user side
+					socket.emit('createMessage',
+						{
+							to: 'john@ds',
+							text: document
+								.querySelector(
+									'input[name=message]'
+								).value
+						});		
+
+					
+				});
+
+		// when disconnected from server
+		socket.on('disconnect', function () {
+			console.log('Disconnected from server');
+		});
+	</script>
+</body>
+
+</html>

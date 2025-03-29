@@ -1,0 +1,483 @@
+import React, {useEffect, useRef} from 'react';
+import {
+  FlatList,
+  Image,
+  Linking,
+  RefreshControl,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {useSelector} from 'react-redux';
+import LinearGradient from 'react-native-linear-gradient';
+
+import {styles} from './styles';
+import ProfileCard from './ProfileCard';
+import UserCard from './UserCard';
+import DashboardTitle from './DashboardTitle';
+
+import {Images} from '../../../utils';
+import {scaledValue} from '../../../utils/design.utils';
+import {formatDate} from '../../../utils/constant.utils';
+
+import OptionMenuSheet from '../../../components/OptionMenuSheet';
+import GText from '../../../components/GText';
+import HeaderButton from '../../../components/HeaderButton';
+import GImage from '../../../components/GImage';
+
+import {useAppDispatch, useAppSelector} from '../../../redux/store/storeUtils';
+import {
+  get_previous_interacted_matches,
+  get_saved_profile,
+  getSingleUserData,
+} from '../../../redux/slices/profileSlice';
+import {
+  cancel_meeting,
+  get_upComing_meeting_list,
+  join_meeting,
+  setUpComingMeetingList,
+} from '../../../redux/slices/bookMeetingSlice';
+
+import useMatchingProfiles from '../../../hooks/useMatchingProfiles';
+
+import {colors} from '../../../../assets/colors';
+
+const DashboardScreen = ({navigation, route}) => {
+  const savedProfileData = useSelector(state => state.profile.savedProfile);
+  const userData = useAppSelector(state => state.auth.user);
+  const dispatch = useAppDispatch();
+  const refRBSheet = useRef();
+  const {
+    matchingProfileData,
+    matchingProfileRefreshData,
+    matchingProfileLoading,
+  } = useMatchingProfiles();
+  const previousInteractedMatches = useSelector(
+    state => state.profile.previousInteractedMatches,
+  );
+  const upComingMeetingList = useSelector(
+    state => state.meetings.upComingMeetingList,
+  );
+
+  useEffect(() => {
+    configureHeader();
+  }, [userData]);
+
+  useEffect(() => {
+    getSaved_profile_hit();
+
+    if (matchingProfileData?.length < 1) {
+      matchingProfileRefreshData({
+        limit: 1000,
+      });
+    }
+  }, []);
+
+  const getSaved_profile_hit = () => {
+    const input = {
+      offset: 0,
+    };
+    dispatch(getSingleUserData());
+    dispatch(get_saved_profile(input));
+    dispatch(get_upComing_meeting_list(input));
+    dispatch(get_previous_interacted_matches(input));
+  };
+
+  const configureHeader = () => {
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{flexDirection: 'row'}}>
+          <HeaderButton
+            icon={Images.searchIcon}
+            onPress={() =>
+              navigation.navigate('StackScreens', {
+                screen: 'SearchScreen',
+              })
+            }
+            iconStyle={styles.headerRightIconStyle}
+          />
+
+          <HeaderButton
+            icon={Images.bellIcon}
+            onPress={() => {
+              navigation.navigate('StackScreens', {
+                screen: 'NotificationScreen',
+              });
+            }}
+            iconStyle={styles.bellIconStyle}
+          />
+        </View>
+      ),
+      headerLeft: () => (
+        <View style={styles.headerLeftView}>
+          <TouchableOpacity
+            disabled={true}
+            activeOpacity={0.8}
+            style={styles.headerTextView}>
+            <Image source={Images.mapPin} style={styles.headerIcons} />
+            <GText
+              text={`${userData?.city || userData?.location}`}
+              style={styles.locationText}
+            />
+            {/* <Image source={Images.arrowDown} style={styles.headerIcons} /> */}
+          </TouchableOpacity>
+          <GText text="Discover" style={styles.headerText} />
+        </View>
+      ),
+    });
+  };
+
+  const reportAsList = [
+    {
+      id: 1,
+      title: 'Reschedule Meeting',
+      textColor: '#007AFF',
+      action: () => {
+        navigation?.navigate('StackScreens', {
+          screen: 'BookMeeting',
+          params: {
+            mentorData: upComingMeetingList[0]?.userdetail,
+            otherUserData: {
+              cognitoUserId: upComingMeetingList[0]?.userdetail?.cognitoUserId,
+            },
+            meetingData: upComingMeetingList[0],
+          },
+        });
+      },
+    },
+    {
+      id: 2,
+      title: 'Cancel Meeting',
+      textColor: '#FF3B30',
+      action: () => {
+        cancel_meeting_hit();
+      },
+    },
+  ];
+
+  const renderItem = ({item, index}) => {
+    console.log(item);
+
+    return (
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={styles.cardContainer(index)}
+        onPress={() => {
+          navigation?.navigate('StackScreens', {
+            screen: 'ProfileScreen',
+            params: {
+              searchUserData: {
+                ...item?.cognitoUserIdSave,
+                isRequestSent: item?.isRequestSent,
+                isMeetingEnable: item?.isMeetingEnable,
+                rating: item?.rating,
+                isSaved: true,
+              },
+              screen: 'SavedProfile',
+              itemIndex: index,
+              setUserListData: {},
+              userListData: '',
+            },
+          });
+        }}>
+        <GImage
+          image={item?.cognitoUserIdSave?.profilePic}
+          style={styles.userImage}
+          resizeMode="contain"
+        />
+        <LinearGradient
+          colors={[colors.imperialPurple, colors.darkShadeImperialPurple]}
+          start={{x: 0, y: 0}}
+          end={{x: 0, y: 1}}
+          style={styles.gradient}>
+          <View style={[styles.userDetailsView]}>
+            <View style={{flexDirection: 'row'}}>
+              <GText
+                beVietnamSemiBold
+                text={`${item?.cognitoUserIdSave?.fullName?.split(' ')[0]}, ${
+                  item?.cognitoUserIdSave?.age
+                }`}
+                style={styles.userName}
+              />
+            </View>
+
+            <GText
+              beVietnamBold
+              text={
+                item?.cognitoUserIdSave?.location ||
+                item?.cognitoUserIdSave.city
+              }
+              style={styles.userLocation}
+            />
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
+    );
+  };
+
+  const cancel_meeting_hit = () => {
+    const input = {
+      meetingId: upComingMeetingList[0]?._id,
+      cognitoUserId: upComingMeetingList[0]?.userdetail?.cognitoUserId,
+    };
+
+    const filteredData = upComingMeetingList.filter(
+      item => item?._id !== upComingMeetingList[0]?._id,
+    );
+
+    dispatch(cancel_meeting(input)).then(res => {
+      if (cancel_meeting.fulfilled.match(res)) {
+        dispatch(setUpComingMeetingList(filteredData));
+      }
+    });
+  };
+
+  const joinMeeting = i => {
+    console.log(i);
+
+    const input = {
+      meetingId: i?._id,
+      cognitoUserId: i?.userdetail?.cognitoUserId,
+      date: i?.date,
+      slot: i?.slot24,
+    };
+    console.log(input);
+
+    dispatch(join_meeting(input)).then(res => {
+      if (join_meeting.fulfilled.match(res)) {
+        Linking.openURL(
+          userData?.userType === 1
+            ? res?.payload?.start_url
+            : res?.payload?.join_url,
+        );
+      }
+    });
+  };
+
+  return (
+    <>
+      <FlatList
+        data={[1]}
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={false}
+            onRefresh={() => {
+              matchingProfileRefreshData({
+                limit: 1000,
+              });
+              getSaved_profile_hit();
+            }}
+          />
+        }
+        showsVerticalScrollIndicator={false}
+        renderItem={() => {
+          return (
+            <>
+              <DashboardTitle
+                title="🤩 Upcoming Meetings"
+                style={styles.upcomingText}
+                rightText={upComingMeetingList?.length > 1 && 'View all'}
+                onPress={() =>
+                  navigation.navigate('StackScreens', {
+                    screen: 'UpComingMeetings',
+                  })
+                }
+              />
+              {upComingMeetingList?.length > 0 ? (
+                <>
+                  <ProfileCard
+                    meetingOnPress={() => {
+                      joinMeeting(upComingMeetingList[0]);
+                    }}
+                    firstName={
+                      upComingMeetingList[0]?.userdetail?.fullName.split(' ')[0]
+                    }
+                    item={upComingMeetingList[0]}
+                    lastName={
+                      upComingMeetingList[0]?.userdetail?.fullName.split(' ')[1]
+                    }
+                    userImage={upComingMeetingList[0]?.userdetail?.profilePic}
+                    content={upComingMeetingList[0]?.meetingTitle}
+                    date={`${upComingMeetingList[0]?.day}, ${formatDate(
+                      upComingMeetingList[0]?.date,
+                    )}`}
+                    time={upComingMeetingList[0]?.slot}
+                    videoImg={Images.videoCamera}
+                    videoText={
+                      upComingMeetingList[0]?.mode == 'videoCall'
+                        ? 'Video Call'
+                        : 'Audio Call'
+                    }
+                    onPressMenu={() => refRBSheet.current.open()}
+                  />
+                </>
+              ) : (
+                <View style={styles.meetingEmptyPlaceHolderView}>
+                  <GText
+                    medium
+                    text={'No upcoming meetings yet'}
+                    style={styles.emptyPlaceHolderText}
+                  />
+                  <GText
+                    text={
+                      'Schedule a meeting with your mentor or mentee to connect.'
+                    }
+                    style={styles.emptyPlaceHolderDescription}
+                  />
+                </View>
+              )}
+
+              <DashboardTitle
+                title="Matching your Profile ✨"
+                style={styles.matchingProfileHeader}
+              />
+              {matchingProfileLoading ? (
+                <GText
+                  text={'Loading matching profiles...'}
+                  style={styles.loadingProfilesText}
+                />
+              ) : matchingProfileData?.length > 0 ? (
+                <>
+                  <Text style={styles.peopleSimilarInterestText}>
+                    People with <Text style={styles.similarText}>similar</Text>{' '}
+                    interests around you
+                  </Text>
+                  <View>
+                    <FlatList
+                      data={matchingProfileData}
+                      showsHorizontalScrollIndicator={false}
+                      horizontal
+                      renderItem={({item, index}) => {
+                        return (
+                          <UserCard
+                            userDetailStyle={styles.userCardDetailStyle}
+                            itemData={item}
+                            userName={`${item?.fullName.split(' ')[0]}, ${
+                              item?.age
+                            }`}
+                            label={`${item.matchPercentage}% Match`}
+                            index={index}
+                            onPress={() =>
+                              navigation?.navigate('StackScreens', {
+                                screen: 'ProfileScreen',
+                                params: {
+                                  searchUserData: {},
+                                  screen: '',
+                                  itemIndex: index,
+                                },
+                              })
+                            }
+                          />
+                        );
+                      }}
+                    />
+                  </View>
+                </>
+              ) : (
+                <View style={styles.matchingProfileEmptyPlaceHolder}>
+                  <GText
+                    medium
+                    text={'No Matching Profiles Found'}
+                    style={styles.matchingEmptyPlaceHolderText}
+                  />
+                  <GText
+                    style={styles.matchingEmptyPlaceHolderDescription}
+                    text={
+                      'It looks like there are no profiles that match your interests. Adjust your interests to see matching profiles or check back later for new ones.'
+                    }
+                  />
+                </View>
+              )}
+
+              {previousInteractedMatches?.length > 0 && (
+                <>
+                  <DashboardTitle
+                    title="Previously Interacted"
+                    style={styles.previouslyInteractedText}
+                  />
+                  <View style={styles.userCardMainView}>
+                    <FlatList
+                      data={previousInteractedMatches}
+                      showsHorizontalScrollIndicator={false}
+                      horizontal
+                      renderItem={({item, index}) => {
+                        return (
+                          <UserCard
+                            userName={`${
+                              item?.userdetail?.fullName.split(' ')[0]
+                            }, ${item?.userdetail?.age}`}
+                            onPress={() =>
+                              navigation?.navigate('StackScreens', {
+                                screen: 'ProfileScreen',
+                                params: {
+                                  searchUserData: {
+                                    ...item?.userdetail,
+                                    isRequestSent: item?.isRequestSent,
+                                    isMeetingEnable: item?.isMeetingEnable,
+                                    rating: item?.rating,
+                                  },
+                                  screen: 'PreviousInteracted',
+                                  itemIndex: index,
+                                },
+                              })
+                            }
+                            itemData={item?.userdetail}
+                            location={
+                              item?.userdetail?.location ||
+                              item?.userdetail?.city
+                            }
+                            index={index}
+                          />
+                        );
+                      }}
+                    />
+                  </View>
+                </>
+              )}
+
+              {savedProfileData?.length > 0 && (
+                <View style={styles.savedProfileView}>
+                  <DashboardTitle
+                    title="Saved Profiles"
+                    style={styles.previouslyInteractedText}
+                    rightText="View all"
+                    onPress={() =>
+                      navigation.navigate('StackScreens', {
+                        screen: 'SavedProfiles',
+                      })
+                    }
+                  />
+                  <View>
+                    <FlatList
+                      data={savedProfileData}
+                      renderItem={renderItem}
+                      showsHorizontalScrollIndicator={false}
+                      horizontal
+                      contentContainerStyle={{
+                        columnGap: scaledValue(16),
+                        alignSelf: 'center',
+                      }}
+                    />
+                  </View>
+                </View>
+              )}
+            </>
+          );
+        }}
+      />
+      <OptionMenuSheet
+        refRBSheet={refRBSheet}
+        options={reportAsList}
+        onChoose={val => {
+          val.action();
+          refRBSheet.current.close();
+        }}
+        onPressCancel={() => refRBSheet.current.close()}
+      />
+    </>
+  );
+};
+
+export default DashboardScreen;

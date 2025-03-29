@@ -1,0 +1,161 @@
+import {Dimensions, StyleSheet} from 'react-native';
+import {scaledHeightValue, scaledValue} from '../../../utils/design.utils';
+import {colors} from '../../../../assets/colors';
+const deviceW = Dimensions.get('window').width;
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.offWhite,
+  },
+  headerView: {
+    height: scaledValue(48),
+    flexDirection: 'row',
+    marginHorizontal: scaledValue(20),
+    justifyContent: 'space-between',
+    marginBottom: scaledValue(34),
+    alignItems: 'center',
+  },
+  leftArrow: {
+    height: scaledValue(40),
+    width: scaledValue(40),
+    tintColor: colors.themeColor,
+  },
+  bellIcon: {
+    height: scaledValue(48),
+    width: scaledValue(48),
+  },
+  searchView: {
+    height: scaledValue(48),
+    width: scaledValue(234),
+    borderWidth: scaledValue(1.5),
+    borderColor: colors.themeColor,
+    borderRadius: scaledValue(40),
+    // opacity: scaledValue(0.3),
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  searchImage: {
+    height: scaledValue(20),
+    width: scaledValue(20),
+    tintColor: colors.darkPurple,
+    marginRight: scaledValue(14),
+  },
+  searchViewInput: {
+    marginLeft: scaledValue(16),
+    color: colors.Gray,
+  },
+  contentView: {
+    width: deviceW - 40,
+    alignSelf: 'center',
+    flex: 1,
+  },
+  interestsHeader: {
+    fontSize: scaledValue(19),
+    lineHeight: scaledHeightValue(22.8),
+    letterSpacing: scaledValue(19 * -0.03),
+  },
+  yourInterestsCardView: {
+    marginBottom: scaledValue(24),
+    marginTop: scaledValue(16),
+  },
+  yourInterestsColumnWrapper: {flexDirection: 'row', flexWrap: 'wrap'},
+  interestsCard: {
+    borderWidth: scaledValue(1),
+    borderColor: colors.themeColor,
+    borderRadius: scaledValue(8),
+    paddingHorizontal: scaledValue(8),
+    height: scaledValue(26),
+    justifyContent: 'center',
+  },
+  interestsTitle: {
+    fontSize: scaledValue(14),
+    color: colors.themeColor,
+    lineHeight: scaledValue(18.2),
+    letterSpacing: scaledValue(14 * -0.02),
+  },
+  peopleSimilarInterestText: {
+    fontSize: scaledValue(14),
+    lineHeight: scaledValue(18.2),
+    letterSpacing: scaledValue(14 * -0.02),
+    marginBottom: scaledValue(22),
+    color: colors.lightSlateGray,
+    marginHorizontal: scaledValue(20),
+  },
+  cardContainer: index => ({
+    width: scaledValue(160),
+    height: scaledValue(120),
+    alignItems: 'center',
+    borderRadius: scaledValue(16),
+    marginRight: index % 2 !== 0 ? scaledValue(0) : scaledValue(16),
+  }),
+  gradient: {
+    position: 'absolute',
+    height: '50%',
+    width: '100%',
+    borderBottomLeftRadius: scaledValue(16),
+    borderBottomRightRadius: scaledValue(16),
+    bottom: 0,
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  userImage: {
+    borderRadius: scaledValue(16),
+    width: scaledValue(160),
+    height: scaledValue(120),
+  },
+  userDetailsView: {
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: scaledValue(13),
+  },
+  userName: {
+    fontSize: scaledValue(14),
+    color: colors.white,
+    lineHeight: scaledValue(18.2),
+    letterSpacing: scaledValue(14 * -0.02),
+  },
+  age: {
+    fontSize: scaledValue(14),
+    color: colors.white,
+    lineHeight: scaledValue(18.2),
+    letterSpacing: scaledValue(14 * -0.02),
+  },
+  userLocation: {
+    fontSize: scaledValue(12),
+    color: colors.white,
+    textTransform: 'uppercase',
+    lineHeight: scaledValue(15.6),
+    opacity: scaledValue(0.5),
+  },
+  labelView: {
+    position: 'absolute',
+    bottom: 0,
+    paddingVertical: scaledValue(4),
+    borderTopRightRadius: scaledValue(8),
+    borderTopLeftRadius: scaledValue(8),
+    width: scaledValue(80),
+    alignItems: 'center',
+  },
+  labelText: {
+    fontSize: scaledValue(11),
+    lineHeight: scaledValue(14.3),
+    color: colors.white,
+  },
+  circularView: {
+    height: scaledValue(27.6),
+    width: scaledValue(27.6),
+    borderRadius: scaledValue(50),
+    backgroundColor: colors.themeColor,
+    position: 'absolute',
+    top: scaledValue(8),
+    right: scaledValue(7.4),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  saved: {
+    height: scaledValue(13.8),
+    width: scaledValue(13.8),
+  },
+});

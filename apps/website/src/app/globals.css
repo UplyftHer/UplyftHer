@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sen:wght@400..800&display=swap');
+
+:root {
+    --senfont: "Sen", serif;
+    --playfair: "Playfair Display", serif; 
+    --blackcolor: #252525; 
+    --grdientcolor: radial-gradient(55.38% 71.43% at 50% 100%, #DA7575 0%, #A45EB0 100%); 
+  }
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--senfont);
+    font-optical-sizing: auto;
+}
+body{
+    background: #FFF4EC !important;
+}
+a{
+    text-decoration: none !important;
+}
+
+
+
+/* Terms And Conditions Pages  */
+
+.PolicySec{
+    padding: 150px 0px 100px 0px;
+}
+.TermsData{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+.termhead{
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+.termhead h2 {
+    text-align: center;
+}
+.termhead h2 span{
+    font-family: var(--playfair);
+    font-size: 72px;
+    font-weight: 500;
+    line-height: 80px;
+    letter-spacing: -0.07em;
+    background: var(--grdientcolor);
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    padding: 10px;
+}
+.termhead h6{
+    font-family: var(--senfont);
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 26px;
+    letter-spacing: -0.07em;
+    color: var(--blackcolor);
+}
+
+.grdtcolr{
+    background: var(--grdientcolor);
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    font-weight: 500;
+    font-family: var(--senfont);
+}
+
+.polcyDiv{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.polcyDiv h4{
+    font-family: var(--senfont);
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 26px;
+    letter-spacing: -0.07em;
+    color: var(--blackcolor);
+    margin: 0;
+}
+.polcyDiv h6{
+    font-family: var(--senfont);
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 26px;
+    letter-spacing: -0.07em;
+    color: var(--blackcolor);
+    margin: 0;
+}
+.polcyDiv p{
+    font-family: var(--senfont);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 26px;
+    letter-spacing: -0.07em;
+    color: var(--blackcolor);
+    margin: 0;
+}
+.polcyDiv ul{
+    margin: 0;
+}
+.polcyDiv ul li{
+    font-family: var(--senfont);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 26px;
+    letter-spacing: -0.07em;
+    color: var(--blackcolor);
+    margin: 0;
+}
+
+/* Terms And Conditions Pages  */

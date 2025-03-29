@@ -1,0 +1,15 @@
+.DS_Store
+node_modules
+.turbo
+*.log
+.next
+dist
+dist-ssr
+*.local
+.env
+.cache
+server/dist
+public/dist
+
+apps/mobileApp/android/app/google-services.json
+apps/mobileApp/src/constants/index.js

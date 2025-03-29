@@ -1,0 +1,16 @@
+{
+  "name": "UplyftHer",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "clean": "turbo run clean",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "check-types": "turbo run check-types"
+  },
+  "packageManager": "pnpm@10.6.5",
+  "devDependencies": {
+    "turbo": "^2.4.4"
+  }
+}

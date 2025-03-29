@@ -1,0 +1,1706 @@
+.HeroSection{
+    background: linear-gradient(0deg, #E7CFBC, #E7CFBC),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4));
+    position: relative;
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+}
+.HeroSection::after{
+    position: absolute;
+    content: " ";
+    top: 32%;
+    left: 50%;
+    transform: translate(-50% ,-50%);
+    width: 100%;
+    height: 100%;
+    background: url(/Images/heroLines.png)no-repeat;
+    background-size: 100% 100%;
+    z-index: -1
+}
+.HeroMentorDiv{
+    display: flex;
+    flex-direction: column;
+    padding-top: 185px;
+}
+.MentorTopHero{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.LftHero h1{
+    font-family: var(--senfont);
+    font-size: 72px;
+    font-weight: 400;
+    line-height: 80px;
+    letter-spacing: -0.07em;
+    color: var(--blackcolor);
+}
+.LftHero h1 span{
+    font-family: var(--playfair);
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    background: var(--grdientcolor);
+    color: transparent;
+    background-clip: text;
+    padding: 8px;
+}
+.RytHero{
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+.RytHero p{
+    font-family: var(--senfont);
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 33.6px;
+    letter-spacing: -0.04em;
+    color: #252525CC;
+    max-width: 526px;
+}
+.DownlodeBtn{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.HeroMetorPicture{
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    top: 80px;
+    justify-content: center;
+}
+
+/* UpliftGrowthSec */
+
+.UpliftGrowthSec{
+    padding: 200px 0px 100px 0px;
+}
+
+.GrowthBeginData{
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+}
+.TopGrowthDiv{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+}
+.lftgrowthbeg {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.lftgrowthbeg .whyspan span{
+    border: 1px solid #966B9D;
+    width: 153px;
+    height: 47px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 62px;
+    cursor: pointer;
+    font-family: var(--senfont);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 19.2px;
+    letter-spacing: -0.05em;
+    color: #966B9D;
+}
+.lftgrowthbeg .whyspan span:hover{
+    background: #966B9D;
+    color: #FFF4EC;
+}
+.growthTexted {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.growthTexted h2{
+    font-family: var(--senfont);
+    font-size: 64px;
+    font-weight: 400;
+    line-height: 69.12px;
+    letter-spacing: -0.07em;
+    color: #3E3E3E;    
+}
+.growthTexted h2 span:first-child{
+    color: #966B9D;    
+}
+.growthTexted h2 span:last-child{
+    font-family: var(--playfair);
+    font-size: 80px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 65.4px;
+    color: #3E3E3E;    
+}
+.growthTexted p{
+    font-family: var(--senfont);
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 31.6px;
+    letter-spacing: -0.04em;
+    color: #252525CC;
+    margin: 0;
+    max-width: 530px;
+}
+.Rytgrowthbeg {
+    text-align: end;
+}
+.BottomGrowthDiv {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.ThreeGrothCard{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 20px;
+}
+.GrowthCard{
+    background: 
+    linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), 
+    linear-gradient(0deg, #EEDACA, #EEDACA);
+    border-radius: 20px;
+    padding: 32px;
+    height: 431px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    overflow: hidden;
+}
+.growcardText{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 300px;
+    min-height: 166px;
+}
+.growcardText h6{
+    font-family: var(--senfont);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 32.4px;
+    letter-spacing: -0.05em;
+    color: #000000;
+    margin: 0;
+}
+.growcardText p{
+    font-family: var(--senfont);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: -0.04em;
+    color: #252525CC;
+    margin: 0;
+}
+
+.MentorMatchDiv{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0px;
+    position: relative;
+}
+.MentorMatchDiv::after{
+    position: absolute;
+    content: " ";
+    background-color: #FFF4EC;
+    box-shadow: 0px 4px 24px 0px #00000040;
+    background-image: url(/Images/gift.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 25px 28px; /* Adjust icon size */
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50% , -50%);
+    padding: 20px;
+}
+.MentorMatchDiv .avtarmatch img{
+    border: 6.67px solid #FFF4EC80;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+
+
+.growImg {
+    text-align: center;
+}
+.perftment img{
+    width: 100%;
+    height: 100%;
+}
+.TwoGrowthCard{
+    display: grid;
+    grid-template-columns: 48% 48%;
+    grid-gap: 50px;
+}
+
+.NetworkCard{
+    background: 
+    linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), 
+    linear-gradient(0deg, #EEDACA, #EEDACA);
+    border-radius: 20px;
+    max-width: 630px;
+    padding: 32px 0px 20px 0px;
+    min-height: 367px;
+}
+.NetworkTexed{
+    padding: 0px 32px 32px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 566px;
+}
+.NetworkTexed h4{
+    font-family: var(--senfont);
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 34.4px;
+    letter-spacing: -0.05em;
+    color: #000000;
+    margin: 0;
+}
+.NetworkTexed p{
+    font-family: var(--senfont);
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 26px;
+    letter-spacing: -0.04em;
+    color: #252525CC;
+    margin: 0;
+}
+.networkImages img {
+    width: 100%;
+}
+.guidancareerCard{
+    background: 
+    linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), 
+    linear-gradient(0deg, #EEDACA, #EEDACA);
+    border-radius: 20px;
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+.careertexed {
+    max-width: 250px;
+}
+.careertexed h4{
+    font-family: var(--senfont);
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 30.4px;
+    letter-spacing: -0.05em;
+    color: #000000;
+    margin: 0;
+}
+.careertexed p{
+    font-family: var(--senfont);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: -0.04em;
+    margin: 0;
+    color: #252525CC;
+}
+.Rytcarer {
+    height: 100%;
+    display: flex;
+    align-items: end;
+}
+
+/* UpliftGrowthSec */
+
+
+/* .ServiceSec */
+
+.ServiceSec{
+    padding: 100px 0px;
+    position: relative;
+    background: radial-gradient(55.38% 71.43% at 50% 100%, #DA7575 0%, #A45EB0 100%);
+    min-height: 376px;
+}
+.ServiceSec::after{
+    position: absolute;
+    content: " ";
+    background: url(/Images/servafter.png) no-repeat;
+    background-size: 100% 100%;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100px;
+}
+
+.ServicesData{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+}
+.ServiceItems{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px 0px;
+}
+.ServiceItems h4{
+    font-family: var(--playfair);
+    font-size: 72px;
+    font-weight: 600;
+    line-height: 72px;
+    color: #FFF4EC;
+}
+.ServiceItems p{
+    font-family: var(--senfont);
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 38.4px;
+    color: #FFF4EC;
+    margin: 0;
+}
+
+
+/* .ServiceSec */
+
+/* UpliftedWomenSec */
+.UpliftedWomenSec{
+    padding: 100px 0px;
+}
+.TestimonialDiv{
+    display: grid;
+    grid-template-columns: 50% 50%;
+    width: 100%;
+}
+.TestimonialText{
+    width: 100%;
+    max-width: 566px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    position: relative;
+    left: 230px;
+}
+.TestimonialText h2{
+    font-family: var(--senfont);
+    font-size: 52px;
+    font-weight: 400;
+    line-height: 49.12px;
+    letter-spacing: -0.07em;
+    color: #3E3E3E;
+}
+.TestimonialText h2 span{
+    font-family: var(--playfair);
+    font-size: 70px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 76.4px;
+    color: #966B9D;
+}
+.TestimonialText p{
+    font-family: var(--senfont);
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 30.6px;
+    letter-spacing: -0.04em;
+    color: #252525CC;
+}
+
+
+/* UpliftedWomenSec */
+
+
+
+
+
+/* SneakPeekSec */
+
+.SneakPeekSec{
+    padding: 100px 0px;
+}
+.SneakPeekData{
+    background: url(/Images/sneakPeekBgg.png) no-repeat;
+    background-size: 100% 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    padding: 80px 0px;
+    min-height: 555px;
+    z-index: 1;
+}
+.SneakPeekData::after{
+    position: absolute;
+    content: " ";
+    background: url(/Images/sneakafter.png) no-repeat;
+    background-size: 100% 100%;
+    width: 913px;
+    height: 779px;
+    top: -100px;
+    left: 15px;
+    z-index: -1;
+}
+.RytSneekText {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+}
+.RytSneekText h2{
+    font-family: var(--senfont);
+    font-size: 40px;
+    font-weight: 400;
+    line-height: 56px;
+    letter-spacing: -0.07em;
+    color: #3E3E3E;
+}
+.RytSneekText h2 span{
+    font-family: var(--playfair);
+    font-size: 70px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 98px;
+}
+
+/* SneakPeekSec */
+
+
+/* ReqstReadySec */
+
+.ReqstReadySec{
+    background: 
+    linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), 
+    radial-gradient(55.38% 71.43% at 50% 100%, #DA7575 0%, #A45EB0 100%);
+    position: relative;
+    min-height: 617px;
+    display: flex;
+    align-items: center;
+
+}
+.ReqstReadySec::after{
+    position: absolute;
+    content: " ";
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: url(/Images/readyafter.png) no-repeat;
+    background-size: 100% 100%;
+}
+.ReqstReadySec::before{
+    position: absolute;
+    content: " ";
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: url(/Images/readybefore.png) no-repeat;
+    background-size: 100% 100%;
+}
+
+.ReqstData{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+.lftReqst h3{
+    font-family: var(--senfont);
+    font-size: 44px;
+    font-weight: 400;
+    line-height: 51.84px;
+    letter-spacing: -0.07em;
+    color: #FFFFFF;
+    margin: 0;
+}
+.lftReqst h3 span{
+    font-family: var(--playfair);
+    font-size: 62px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 70.76px;
+
+}
+
+.RytReqst {
+    max-width: 484px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+}
+.RytReqst p{
+    font-family: var(--senfont);
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 30.6px;
+    letter-spacing: -0.04em;
+    color: #FFFFFF;
+}
+.RytReqst p span{
+    font-weight: 600;
+}
+.RytReqst a{
+    background: #F2B880;
+    padding: 18px 28px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 12px;
+    font-family: var(--senfont);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 22.8px;
+    letter-spacing: -0.03em;
+    color: var(--blackcolor);
+}
+.RytReqst a svg{
+    font-size: 22px;
+}
+.RytReqst a:hover{
+    opacity: 0.9;
+}
+
+
+
+
+/* ReqstReadySec */
+
+
+/* FooterSec */
+.FooterSec{
+    background: #E7CFBC;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 64px 0px 0px 0px;
+}
+.LftFooter{
+    padding: 0px 0px 20px 208px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+.logFt{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.logFt p{
+    max-width: 496px;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: -0.05em;
+    color: #3E3E3E;
+    margin: 0;
+}
+.FtDownlodeBtn{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.lftbotom{
+    max-width: 389px;
+}
+.lftbotom p{
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    color: var(--blackcolor);   
+    margin: 0;
+}
+
+.RytFooter{
+    border-width: 1px 0px 0px 1px;
+    border-style: solid;
+    border-color: #3E3E3E;
+    padding: 64px 170px 64px 108px;
+    border-radius: 128px 0px 0px 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 100px;
+    justify-content: end;
+}
+.TopRytFt{
+    display: flex;
+    justify-content: space-between;
+}
+.ContFt{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.ContFt span , .FollowusDiv span{
+    font-family: var(--senfont);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 18.2px;
+    letter-spacing: 0.04em;
+    color: #3E3E3E;   
+}
+.ContFt a{
+    font-family: var(--senfont);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 20.8px;
+    letter-spacing: -0.02em;
+    color: #3E3E3E;   
+}
+.FollowusDiv{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.FollowusDiv .social{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.FollowusDiv .social a{
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    border: 1px solid #966B9D;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+.FollowusDiv .social a svg{
+    color: #3E3E3E;
+    font-size: 20px;
+}
+.FollowusDiv .social a:hover{
+    background: #966B9D;
+}
+.FollowusDiv .social a:hover svg{
+    color: #FFFFFF;
+}
+.BottomFt{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.BottomFt a{
+    font-family: var(--senfont);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 18.2px;
+    letter-spacing: 0.04em;
+    color: #3E3E3E;   
+}
+.BottomFt a:hover{
+    color: #966B9D;
+}
+
+
+
+/* FooterSec */
+
+/* Responsive  */
+@media only screen and (max-width: 1599px){
+
+    .LftHero h1 {
+        font-size: 60px;
+        line-height: 69px;
+    }
+    .RytHero p {
+        font-size: 22px;
+        line-height: 27.6px;
+        max-width: 455px;
+    }
+    .DownlodeBtn a img {
+        max-width: 148px;
+        max-height: 57px;
+    }
+    .RytHero {
+        gap: 15px;
+    }
+    .growthTexted {
+        gap: 10px;
+    }
+    .growthTexted h2 {
+        font-size: 50px;
+        line-height: 64.12px;
+    }
+    .growthTexted h2 span:last-child {
+        font-size: 71px;
+        line-height: 52.4px;
+    }
+    .growthTexted p {
+        font-size: 19px;
+        line-height: 25.6px;
+        max-width: 430px;
+    }
+    .lftgrowthbeg .whyspan span {
+        width: 142px;
+        height: 45px;
+        font-size: 14px;
+        line-height: 16.2px;
+    }
+    .growcardText h6 {
+        font-size: 22px;
+        line-height: 26.4px;
+    }
+    .growcardText p {
+        font-size: 16px;
+        line-height: 20px;
+    }
+    .growcardText {
+        width: 260px;
+        gap: 8px;
+    }
+    .NetworkTexed h4 {
+        font-size: 25px;
+        line-height: 30.4px;
+    }
+    .NetworkTexed p {
+        font-size: 18px;
+        line-height: 24px;
+    }
+    .careertexed h4 {
+        font-size: 22px;
+        line-height: 27.4px;
+    }
+    .careertexed p {
+        font-size: 16px;
+        line-height: 21px;
+    }
+    .careertexed {
+        max-width: 214px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .ServiceItems h4 {
+        font-size: 55px;
+        line-height: 60px;
+    }
+    .ServiceItems p {
+        font-size: 20px;
+        line-height: 20.4px;
+    }
+    .ServiceItems img {
+        width: 50px;
+        height: 50px;
+    }
+    .TestimonialText h2 {
+        font-size: 37px;
+        line-height: 40.12px;
+    }
+    .TestimonialText h2 span {
+        font-size: 55px;
+        line-height: 59.4px;
+    }
+    .TestimonialText p {
+        font-size: 18px;
+        line-height: 24.6px;
+        margin: 0;
+    }
+    .TestimonialText {
+        max-width: 450px;
+        gap: 20px;
+        left: 110px;
+    }
+    .TestimonialDiv {
+        grid-template-columns: 40% 60%;
+    }
+    .LftFooter {
+        padding: 0px 0px 20px 140px;
+        gap: 20px;
+    }
+    .logFt p {
+        font-size: 18px;
+        max-width: 435px;
+    }
+    .lftReqst h3 {
+        font-size: 38px;
+        line-height: 46.84px;
+    }
+    .lftReqst h3 span {
+        font-size: 55px;
+        line-height: 54.76px;
+    }
+    .RytReqst p {
+        font-size: 21px;
+        line-height: 28.6px;
+    }
+    .FtDownlodeBtn a img {
+        max-width: 150px;
+        height: 57px;
+    }
+    .RytFooter {
+        gap: 80px;
+    }
+    .RytSneekText h2 span {
+        font-size: 59px;
+        line-height: 74px;
+    }
+    .RytSneekText h2 {
+        font-size: 32px;
+        line-height: 40px;
+        margin: 0;
+    }
+    .SneakPeekData {
+        min-height: 500px;
+    }
+    .SneakPeekData::after {
+        width: 885px;
+        height: 720px;
+    }
+
+}
+
+@media only screen and (max-width: 1399px){
+
+    .LftHero h1 {
+        font-size: 52px;
+        line-height: 60px;
+    }
+    .RytHero p {
+        font-size: 20px;
+        line-height: 24.6px;
+        max-width: 392px;
+    }
+    .HeroMetorPicture img {
+        max-width: 180px;
+        height: 200px;
+    }
+    .Rytgrowthbeg img {
+        max-width: 180px;
+        height: 200px;
+    }
+    .growthTexted h2 {
+        font-size: 42px;
+        line-height: 60.12px;
+    }
+    .growthTexted p {
+        font-size: 16px;
+        line-height: 22.6px;
+        max-width: 395px;
+    }
+    .NetworkCard {
+        max-width: 520px;
+        min-height: 350px;
+    }
+    .NetworkTexed {
+        max-width: 460px;
+    }
+    .Rytcarer img {
+        width: 100%;
+        height: 180px;
+    }
+    .careertexed h4 {
+        font-size: 20px;
+        line-height: 24.4px;
+    }
+    .careertexed {
+        gap: 18px;
+    }
+    .ServiceItems h4 {
+        font-size: 45px;
+        line-height: 50px;
+    }
+    .ServiceItems p {
+        font-size: 16px;
+        line-height: 10.4px;
+    }
+    .ServiceSec {
+        padding: 80px 0px;
+        max-height: 345px;
+        min-height: 345px;
+    }
+    .TestimonialText h2 {
+        font-size: 35px;
+    }
+    .TestimonialText h2 span {
+        font-size: 48px;
+        line-height: 52.4px;
+    }
+    .TestimonialText p {
+        font-size: 16px;
+        line-height: 22.6px;
+    }
+    .TestimonialText {
+        max-width: 400px;
+        gap: 16px;
+        left: 80px;
+    }
+    .TestimonialDiv {
+        grid-template-columns: 35% 65%;
+    }
+    .SneakPeekData {
+        min-height: 455px;
+    }
+    .SneakPeekData::after {
+        width: 840px;
+        height: 660px;
+        top: -80px;
+    }
+    .RytSneekText h2 span {
+        font-size: 51px;
+        line-height: 57px;
+    }
+    .RytSneekText h2 {
+        font-size: 28px;
+        line-height: 37px;
+    }
+    .RytSneekText {
+        gap: 36px;
+    }
+    .RytReqst p {
+        font-size: 18px;
+        line-height: 23.6px;
+    }
+    .lftReqst h3 {
+        font-size: 35px;
+        line-height: 42.84px;
+    }
+    .lftReqst h3 span {
+        font-size: 47px;
+        line-height: 47.76px;
+    }
+    .RytReqst a {
+        padding: 16px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 18.8px;
+        letter-spacing: -0.03em;
+        color: var(--blackcolor);
+    }
+    .ReqstReadySec {
+        min-height: 565px;
+    }
+    .logFt p {
+        font-size: 16px;
+        max-width: 400px;
+        line-height: 21px;
+    }
+    .RytFooter {
+        padding: 64px 100px 64px 70px;
+        gap: 70px;
+    }
+    .ContFt a {
+        font-size: 14px;
+        line-height: 16.8px;
+    }
+    .ContFt span, .FollowusDiv span {
+        line-height: 42.2px;
+    }
+    .FollowusDiv .social a {
+        width: 42px;
+        height: 42px;
+    }
+    .FollowusDiv .social a svg {
+        font-size: 18px;
+    }
+    .BottomFt a {
+        font-size: 12px;
+        line-height: 10.2px;
+    }
+
+}
+
+
+@media only screen and (max-width: 1199px){
+
+    .HeroSection {
+        min-height: 80vh;
+    }
+    .HeroMentorDiv {
+        padding-top: 160px;
+    }
+    .LftHero h1 {
+        font-size: 42px;
+        line-height: 45px;
+        margin: 0;
+    }
+    .RytHero {
+        gap: 6px;
+    }
+    .RytHero p {
+        font-size: 18px;
+        line-height: 20.6px;
+        max-width: 320px;
+    }
+    .DownlodeBtn a img {
+        max-width: 130px;
+        max-height: 47px;
+    }
+    .HeroMetorPicture img {
+        max-width: 152px;
+        height: 170px;
+    }
+    .growthTexted h2 {
+        font-size: 35px;
+        line-height: 50.12px;
+    }
+    .growthTexted h2 span:last-child {
+        font-size: 61px;
+        line-height: 50.4px;
+    }
+    .growthTexted p {
+        max-width: 380px;
+    }
+    .Rytgrowthbeg img {
+        max-width: 165px;
+        height: 180px;
+    }
+    .GrowthCard {
+        padding: 15px;
+        height: 335px;
+        gap: 20px;
+    }
+    .growcardText {
+        width: 240px;
+        min-height: 145px;
+    }
+    .growcardText h6 {
+        font-size: 20px;
+        line-height: 22.4px;
+    }
+    .growcardText p {
+        font-size: 14px;
+        line-height: 20px;
+    }
+    .growImg .mentmatch {
+        width: 100%;
+        max-width: 200px;
+        height: 115px;
+    }
+    .growImg .mentclendr{
+        width: 100%;
+        height: 90px;
+        max-width: 200px;
+    }
+    .TwoGrowthCard {
+        grid-gap: 25px;
+    }
+    .NetworkCard {
+        /* max-width: 100%; */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .guidancareerCard {
+        padding: 20px;
+    }
+    .NetworkTexed {
+        padding: 0px 20px 32px 20px;
+        max-width: 412px;
+    }
+    .NetworkTexed h4 {
+        font-size: 22px;
+        line-height: 24.4px;
+    }
+    .NetworkTexed p {
+        font-size: 16px;
+        line-height: 20px;
+    }
+    .networkImages img {
+        height: 110px;
+    }
+    .careertexed h4 {
+        font-size: 16px;
+        line-height: 20.4px;
+    }
+    .careertexed p {
+        font-size: 14px;
+        line-height: 20px;
+    }
+    .Rytcarer img {
+        height: 146px;
+        max-width: 220px;
+        margin: auto;
+    }
+    .SneakPeekData::after {
+        width: 750px;
+        height: 590px;
+    }
+    .SneakPeekData {
+        min-height: 385px;
+    }
+    .RytSneekText h2 span {
+        font-size: 45px;
+        line-height: 45px;
+    }
+    .LftFooter {
+        padding: 0px 0px 20px 70px;
+        gap: 14px;
+    }
+    .logFt p {
+        font-size: 14px;
+        max-width: 380px;
+        line-height: 18px;
+    }
+    .FtDownlodeBtn a img {
+        max-width: 120px;
+        height: 47px;
+    }
+    .logFt img {
+        width: 125px;
+        height: 57px;
+    }
+    .lftbotom p {
+        font-size: 11px;
+        line-height: 16px;
+    }
+    .RytFooter {
+        padding: 50px 100px 50px 70px;
+        gap: 55px;
+    }
+
+}
+
+@media only screen and (max-width: 991px){
+
+    .HeroMetorPicture img {
+        max-width: 152px;
+        height: 150px;
+    }
+    .DownlodeBtn a img {
+        max-width: 120px;
+        max-height: 42px;
+    }
+    .LftHero h1 {
+        font-size: 34px;
+        line-height: 37px;
+    }
+    .RytHero p {
+        font-size: 16px;
+        line-height: 18.6px;
+        max-width: 290px;
+    }
+    .HeroMetorPicture {
+        top: 45px;
+    }
+    .UpliftGrowthSec {
+        padding: 140px 0px 100px 0px;
+    }
+    .growthTexted h2 {
+        font-size: 30px;
+        line-height: 42.12px;
+    }
+    .growthTexted h2 span:last-child {
+        font-size: 50px;
+        line-height: 45.4px;
+    }
+    .growthTexted p {
+        max-width: 330px;
+        font-size: 14px;
+        line-height: 20.6px;
+    }
+    .Rytgrowthbeg img {
+        max-width: 150px;
+        height: 155px;
+    }
+    .ThreeGrothCard {
+        grid-template-columns: 1fr 1fr;
+        order: 2;
+    }
+    .guidancareerCard {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .careertexed h4 {
+        font-size: 20px;
+        line-height: 22.4px;
+    }
+    .ServiceItems h4 {
+        font-size: 32px;
+        line-height: 38px;
+    }
+    .ServiceItems p {
+        font-size: 12px;
+        line-height: 6.4px;
+    }
+    .ServiceItems img {
+        width: 40px;
+        height: 40px;
+    }
+    .ServiceSec {
+        padding: 90px 0px;
+        max-height: 300px;
+        min-height: 300px;
+    }
+    .TestimonialDiv {
+        grid-template-columns: 100%;
+        grid-row-gap: 50px;
+    }
+    .TestimonialText {
+        max-width: 450px;
+        gap: 10px;
+        left: 50px;
+    }
+    .UpliftedWomenSec {
+        padding: 80px 0px;
+    }
+    .SneakPeekData {
+        min-height: 330px;
+    }
+    .SneakPeekData::after {
+        width: 645px;
+        height: 520px;
+        left: -60px;
+        top: -60px;
+    }
+    .RytSneekText h2 span {
+        font-size: 38px;
+        line-height: 24px;
+    }
+    .RytSneekText h2 {
+        font-size: 24px;
+        line-height: 34px;
+    }
+    .RytSneekText {
+        gap: 25px;
+    }
+    .RytFooter {
+        padding: 50px 40px 50px 50px;
+        gap: 50px;
+    }
+    .FooterSec {
+        padding: 40px 0px 0px 0px;
+    }
+    .BottomFt a {
+        font-size: 10px;
+    }
+    .FtDownlodeBtn a img {
+        max-width: 110px;
+        height: 42px;
+    }
+
+}
+
+@media only screen and (max-width: 767px){
+
+    .MentorTopHero {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .LftHero h1 {
+        text-align: center;
+    }
+    .RytHero {
+        gap: 0px;
+        align-items: center;
+    }
+    
+    .RytHero p {
+        font-size: 18px;
+        line-height: 18.6px;
+        max-width: 380px;
+        text-align: center;
+    }
+    .TopGrowthDiv {
+        grid-template-columns: 1fr;
+    }
+    .TwoGrowthCard {
+        grid-template-columns: 1fr;
+        order: 2;
+    }
+    .NetworkCard {
+        min-height: 310px;
+    }
+    .NetworkTexed {
+        padding: 0px;
+        margin: 0 auto;
+        text-align: center;
+    }
+    .NetworkTexed h4 {
+        font-size: 25px;
+        line-height: 28.4px;
+    }
+    .NetworkTexed p {
+        font-size: 18px;
+        line-height: 22px;
+    }
+    .guidancareerCard {
+        gap: 35px;
+    }
+    .careertexed {
+        max-width: 412px;
+        margin: 0 auto;
+        text-align: center;
+        gap: 8px;
+    }
+    .Rytcarer img {
+        height: 180px;
+        max-width: 270px;
+        margin: 0 auto;
+    }
+    .careertexed h4 {
+        font-size: 25px;
+        line-height: 28.4px;
+    }
+    .careertexed p {
+        font-size: 18px;
+        line-height: 22px;
+    }
+    .ThreeGrothCard {
+        grid-template-columns: 1fr;
+        order: 1;
+    }
+    .growcardText {
+        width: 100%;
+        min-height: 100px;
+        text-align: center;
+    }
+    .GrowthCard {
+        padding: 25px;
+        height: 310px;
+        gap: 6px;
+        justify-content: space-between;
+    }
+    .growcardText h6 {
+        font-size: 25px;
+        line-height: 28.4px;
+    }
+    .growcardText p {
+        font-size: 18px;
+        line-height: 21px;
+    }
+    .perftment img {
+        width: 70%;
+    }
+    .ServiceSec::after {
+        height: 65px;
+    }
+    .ServiceItems {
+        padding: 35px 0px;
+    }
+    .UpliftedWomenSec {
+        padding: 50px 0px;
+    }
+    .SneakPeekData::after {
+        width: 600px;
+        height: 470px;
+        left: -80px;
+    }
+    .SneakPeekData {
+        min-height: 265px;
+        grid-template-columns: 45% 55%;
+    }
+    .DownlodeBtn {
+        flex-direction: column;
+    }
+    .RytSneekText h2 {
+        font-size: 22px;
+        line-height: 30px;
+        text-align: center;
+    }
+    .ReqstData {
+        grid-template-columns: 1fr;
+        grid-row-gap: 50px;
+    }
+    .ReqstReadySec::before , .ReqstReadySec::after {
+        height: 60px;
+    }
+    .lftReqst {
+        text-align: center;
+    }
+    .lftReqst h3 span br {
+        display: none;
+    }
+    .lftReqst h3 {
+        font-size: 32px;
+        line-height: 25.84px;
+    }
+    .lftReqst h3 span {
+        font-size: 41px;
+        line-height: 40.76px;
+    }
+    .RytReqst {
+        max-width: 100%;
+        align-items: center;
+        gap: 15px;
+        text-align: center;
+    }
+    .FooterSec {
+        grid-template-columns: 1fr;
+    }
+    .logFt {
+       flex-direction: row;
+        justify-content: space-around;
+    }
+    .FtDownlodeBtn {
+        justify-content: center;
+        gap: 50px;
+    }
+    .lftbotom {
+        margin: 0 auto;
+    }
+    .LftFooter {
+        padding: 0px 0px 20px 30px;
+        gap: 30px;
+    }
+    .RytFooter {
+        padding: 40px 80px 35px 100px;
+        gap: 50px;
+    }
+    .FollowusDiv .social a {
+        width: 38px;
+        height: 38px;
+    }
+    .FollowusDiv .social a svg {
+        font-size: 16px;
+    }
+
+}
+
+@media only screen and (max-width: 610px){
+
+    .HeroMentorDiv {
+        padding-top: 130px;
+    }
+    .DownlodeBtn {
+        flex-direction: row;
+    }
+    .TestimonialText {
+        max-width: 340px;
+        left: 25px;
+    }
+    .TestimonialText h2 {
+        font-size: 27px;
+        line-height: 32.12px;
+    }
+    .TestimonialText h2 span {
+        font-size: 41px;
+        line-height: 40.4px;
+    }
+    .TestimonialText p {
+        font-size: 14px;
+        line-height: 18.6px;
+    }
+    .SneakPeekData::after {
+        width: 550px;
+        height: 435px;
+        left: -65px;
+        top: -65px;
+    }
+    .SneakPeekSec {
+        padding: 50px 0px 100px 0px;
+    }
+    .SneakPeekData {
+        max-height: 252px;
+        padding: 55px 0px;
+    }
+    .lftReqst h3 {
+        font-size: 28px;
+        line-height: 18.84px;
+    }
+    .lftReqst h3 span {
+        font-size: 35px;
+        line-height: 35.76px;
+    }
+    .RytReqst p {
+        font-size: 16px;
+        line-height: 20.6px;
+    }
+    .RytReqst a {
+        padding: 12px 16px;
+        font-size: 12px;
+        line-height: 16.8px;
+    }
+    .RytReqst a svg {
+        font-size: 20px;
+    }
+    .ReqstReadySec {
+        min-height: 500px;
+    }
+    .RytReqst {
+        gap: 8px;
+    }
+    .ReqstData {
+        grid-row-gap: 40px;
+    }
+    
+}
+
+@media only screen and (max-width: 510px){
+
+    .NetworkCard {
+        max-width: 475px;
+    }
+
+}
+
+@media only screen and (max-width: 480px){
+
+    .HeroMentorDiv {
+        padding-top: 100px;
+    }
+    .LftHero h1 {
+        font-size: 27px;
+        line-height: 30px;
+    }
+    .RytHero p {
+        font-size: 16px;
+        line-height: 16.6px;
+        max-width: 350px;
+    }
+    .MentorTopHero {
+        gap: 10px;
+    }
+    .RytHero {
+        gap: 15px;
+    }
+    .HeroMetorPicture img {
+        max-width: 135px;
+        height: 130px;
+    }
+    .UpliftGrowthSec {
+        padding: 120px 0px 80px 0px;
+    }
+    .growthTexted h2 {
+        font-size: 25px;
+        line-height: 40.12px;
+    }
+    .growthTexted h2 span:last-child {
+        font-size: 42px;
+        line-height: 35.4px;
+    }
+    .growthTexted p {
+        font-size: 16px;
+        line-height: 18.6px;
+    }
+    .growthTexted {
+        gap: 0px;
+    }
+    .Rytgrowthbeg img {
+        max-width: 140px;
+        height: 160px;
+    }
+    .growcardText h6 {
+        font-size: 20px;
+        line-height: 26.4px;
+    }
+    .growcardText p {
+        font-size: 16px;
+        line-height: 18px;
+    }
+    .GrowthCard {
+        height: 280px;
+    }
+    .perftment img {
+        width: 65%;
+    }
+    .NetworkTexed h4 {
+        font-size: 20px;
+        line-height: 26.4px;
+    }
+    .NetworkTexed p {
+        font-size: 16px;
+        line-height: 22px;
+    }
+    .careertexed h4 {
+        font-size: 20px;
+        line-height: 26.4px;
+    }
+    .careertexed p {
+        font-size: 16px;
+        line-height: 18px;
+    }
+    .SneakPeekData::after {
+        display: none;
+    }
+    .SneakPeekData {
+        min-height: 236px;
+        grid-template-columns: 1% 99%;
+    }
+    .RytSneekText {
+        align-items: center;
+    }
+    .UpliftedWomenSec {
+        padding: 35px 0px;
+    }
+    .TestimonialText h2 {
+        font-size: 22px;
+        line-height: 25.12px;
+    }
+    .TestimonialText h2 span {
+        font-size: 38px;
+        line-height: 36.4px;
+    }
+    .RytFooter {
+        padding: 40px 20px 35px 45px;
+        gap: 40px;
+    }
+    .ServiceSec {
+        max-height: 100%;
+        min-height: 100%;
+        height: 100%;
+    }
+    .ServicesData {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 50px;
+    }
+    .ServiceItems {
+        padding: 10px 0px;
+    }
+    .SneakPeekSec {
+        padding: 50px 0px 55px 0px;
+    }
+    .ServiceSec::after {
+        height: 40px;
+    }
+    .logFt {
+        flex-direction: column;
+        align-items: center;
+    }
+    .logFt p {
+        text-align: center;
+    }
+    .lftbotom p {
+        font-size: 10px;
+        line-height: 15px;
+        text-align: center;
+    }
+    .NetworkCard {
+        max-width: 435px;
+    }
+
+
+
+}
+
+@media only screen and (max-width: 410px){
+
+    .NetworkCard {
+        max-width: 375px;
+    }
+    .NetworkTexed h4 {
+        font-size: 16px;
+        line-height: 20.4px;
+    }
+    .NetworkTexed p {
+        font-size: 16px;
+        line-height: 20px;
+        padding: 0px 20px;
+    }
+    .careertexed h4 {
+        font-size: 16px;
+        line-height: 20.4px;
+    }
+    .careertexed p {
+        font-size: 14px;
+        line-height: 16px;
+    }
+
+
+
+}
+
+@media only screen and (max-width: 375px){
+
+    .NetworkCard {
+        max-width: 350px;
+    }
+    
+
+}

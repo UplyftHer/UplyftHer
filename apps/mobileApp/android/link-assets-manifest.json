@@ -1,0 +1,122 @@
+{
+    "migIndex": 1,
+    "data": [
+      {
+        "path": "assets/fonts/BeVietnam-Bold.ttf",
+        "sha1": "6f9220a5a39f3c0788f3b39b47ba35e5584c129a"
+      },
+      {
+        "path": "assets/fonts/BeVietnam-BoldItalic.ttf",
+        "sha1": "a62d20dfc3276cab44e514dd2cc5b42c95b59025"
+      },
+      {
+        "path": "assets/fonts/BeVietnam-ExtraBold.ttf",
+        "sha1": "7544fc9ef536f6d4083b36d2e45f01cde42b5920"
+      },
+      {
+        "path": "assets/fonts/BeVietnam-ExtraBoldItalic.ttf",
+        "sha1": "cce59205a7ec15712f6c7cda84f896eaf786ac03"
+      },
+      {
+        "path": "assets/fonts/BeVietnam-Italic.ttf",
+        "sha1": "0c268f45141531707ea5da2efab989d9ae3e6381"
+      },
+      {
+        "path": "assets/fonts/BeVietnam-Light.ttf",
+        "sha1": "99c6a580d5fd82b4c4815696cec1db2f34b9d215"
+      },
+      {
+        "path": "assets/fonts/BeVietnam-LightItalic.ttf",
+        "sha1": "c36979a448d4c2dc16e6750430489762c1ac0333"
+      },
+      {
+        "path": "assets/fonts/BeVietnam-Medium.ttf",
+        "sha1": "9ca2b036babbc23d7c5982d065bb2d63484cf2c8"
+      },
+      {
+        "path": "assets/fonts/BeVietnam-MediumItalic.ttf",
+        "sha1": "a7f8fe16d2e778e9c510a1ec1ae2dee8c595ad11"
+      },
+      {
+        "path": "assets/fonts/BeVietnam-Regular.ttf",
+        "sha1": "de50e375a10b547ecac818f85834f7e13fe24624"
+      },
+      {
+        "path": "assets/fonts/BeVietnam-SemiBold.ttf",
+        "sha1": "3a54b9d56ce22f2f4be01e54c2c964fa97ab67b9"
+      },
+      {
+        "path": "assets/fonts/SUSE-Bold.ttf",
+        "sha1": "c984072338e2031aa3efb2d696741a5636ebb949"
+      },
+      {
+        "path": "assets/fonts/SUSE-ExtraBold.ttf",
+        "sha1": "2d5a88e350cf7eaa408be839c6b49361f206eab5"
+      },
+      {
+        "path": "assets/fonts/SUSE-ExtraLight.ttf",
+        "sha1": "0ad83e9fa9e8390fde2f6e5be33dbd26836f62f8"
+      },
+      {
+        "path": "assets/fonts/SUSE-Light.ttf",
+        "sha1": "3f43b7bcf281c6a2e2f7e567d9b9f007008e10c6"
+      },
+      {
+        "path": "assets/fonts/SUSE-Medium.ttf",
+        "sha1": "b77b4c7650fa17f39d6e56f248d6b9a243fd54aa"
+      },
+      {
+        "path": "assets/fonts/SUSE-Regular.ttf",
+        "sha1": "b5dcd37f3156bdc949976f36ace4afce528e041e"
+      },
+      {
+        "path": "assets/fonts/SUSE-SemiBold.ttf",
+        "sha1": "08fa45fc6f94dd5d7954965005aa78cf2a727bab"
+      },
+      {
+        "path": "assets/fonts/SUSE-Thin.ttf",
+        "sha1": "0e580ae0c639cc1b06ba555ec15aa4f5a9f1eef8"
+      },
+      {
+        "path": "assets/fonts/Satoshi-Black.otf",
+        "sha1": "d92baad4dab9ca55bc72f1a8a0a6de72829e709f"
+      },
+      {
+        "path": "assets/fonts/Satoshi-BlackItalic.otf",
+        "sha1": "2fada5e2f31f7e2f252d458094603daca66f4a0a"
+      },
+      {
+        "path": "assets/fonts/Satoshi-Bold.otf",
+        "sha1": "57a9e1c24984708865f7d0c31a03773912fb975f"
+      },
+      {
+        "path": "assets/fonts/Satoshi-BoldItalic.otf",
+        "sha1": "c279f41805b46f030eb4a1d55ceaf7c4cacd1a39"
+      },
+      {
+        "path": "assets/fonts/Satoshi-Italic.otf",
+        "sha1": "1ee38a9969b628781bc30ed690f6571aca189451"
+      },
+      {
+        "path": "assets/fonts/Satoshi-Light.otf",
+        "sha1": "3b1b977f00db442bdf30f63603112e6e251b7dda"
+      },
+      {
+        "path": "assets/fonts/Satoshi-LightItalic.otf",
+        "sha1": "782b6239e9a537ffcd574fb26b69201b67b96dc2"
+      },
+      {
+        "path": "assets/fonts/Satoshi-Medium.otf",
+        "sha1": "704faccb5fff19f25c0b914d42d135ab75794a24"
+      },
+      {
+        "path": "assets/fonts/Satoshi-MediumItalic.otf",
+        "sha1": "89936e7345cfa18dadc048e3a9266947c7f12839"
+      },
+      {
+        "path": "assets/fonts/Satoshi-Regular.otf",
+        "sha1": "7dcb59994f2bee1a4ef1f6c079ba0e99b409878b"
+      }
+    ]
+  }
+  

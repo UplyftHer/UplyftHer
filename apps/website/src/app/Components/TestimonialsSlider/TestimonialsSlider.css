@@ -1,0 +1,180 @@
+.TestiCard{
+    background: #FFFFFF;
+    box-shadow: 0px 0px 2px 0px #0000001A , inset 0px 0px 2px 0px #0000001A;
+    border-radius: 52px;
+    padding: 28px;
+    display: flex !important;
+    flex-direction: column;
+    gap: 15px;
+    width: 414px !important;
+    margin: 0 auto;
+}
+.testimg{
+    border-radius: 24px;
+}
+.testimg img{
+    border-radius: 24px;
+    object-fit: cover;
+}
+.TestiText{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.TestiText h6{
+    font-family: var(--senfont);
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 26.6px;
+    letter-spacing: -0.04em;
+    color: #252525CC;
+    margin: 0;
+}
+.TestiText p{
+    font-family: var(--playfair);
+    font-size: 18px;
+    font-style: italic;
+    font-weight: 500;
+    line-height: 20.6px;
+    letter-spacing: -0.02em;
+    color: #C98686;
+    margin: 0;
+}
+
+
+.TestiSlider .custom-arrow {
+    width: 51px;
+    height: 51px;
+    border: 1.44px solid #8E8E8E;
+    border-radius: 18px;
+    top: 80%;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.TestiSlider .custom-arrow:hover {
+    border: 1px solid #966B9D;
+    background: #966B9D;
+}
+.TestiSlider .custom-arrow:hover svg {
+    color: #FFF4EC;
+}
+.TestiSlider .custom-arrow svg, .TestiSlider .custom-arrow svg {
+    color: #8E8E8E;
+}
+.TestiSlider .custom-prev {
+    left: -75%;
+}
+.TestiSlider .custom-next {
+    left: -67%;
+    right: inherit;
+}
+
+/* Responsive  */
+
+@media only screen and (max-width: 1599px){
+
+    .TestiSlider .custom-arrow {
+        top: 70%;
+    }
+    .TestiSlider .custom-prev {
+        left: -55%;
+    }
+    .TestiSlider .custom-next {
+        left: -47%;
+    }
+    .TestiText h6 {
+        font-size: 18px;
+        line-height: 24.6px;
+    }
+    .TestiText p {
+        font-size: 16px;
+        line-height: 16.6px;
+    }
+    .TestiText {
+        gap: 15px;
+    }
+
+}
+
+@media only screen and (max-width: 1399px){
+
+    .TestiSlider .custom-prev {
+        left: -45%;
+    }
+    .TestiSlider .custom-next {
+        left: -37%;
+    }
+    .TestiCard {
+        border-radius: 30px;
+        padding: 20px;
+        width: 371px !important;
+    }
+    .testimg img {
+        width: 100%;
+    }
+
+}
+
+@media only screen and (max-width: 991px){
+
+    .TestiSlider .custom-arrow {
+        top: -30%;
+    }
+    .TestiSlider .custom-prev {
+        left: inherit;
+        right: 18%;
+    }
+    .TestiSlider .custom-next {
+        left: inherit;
+        right: 10%;
+    }
+
+
+}
+@media only screen and (max-width: 767px){
+
+    .TestiCard {
+        border-radius: 30px;
+        padding: 20px;
+        width: 330px !important;
+    }
+
+
+}
+@media only screen and (max-width: 610px){
+
+    .TestiSlider .custom-prev {
+        right: 20%;
+    }
+    .TestiSlider .custom-arrow {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+    }
+
+
+}
+@media only screen and (max-width: 480px){
+
+    .TestiSlider .custom-arrow {
+        top: -10%;
+    }
+    .TestiSlider .custom-arrow {
+        width: 35px;
+        height: 35px;
+        border-radius: 6px;
+    }
+    .TestiSlider .custom-arrow svg, .TestiSlider .custom-arrow svg {
+        width: 14px;
+        height: 14px;
+    }
+    .TestiText h6 {
+        font-size: 16px;
+        line-height: 21.6px;
+    }
+
+
+}
