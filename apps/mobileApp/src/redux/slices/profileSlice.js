@@ -261,9 +261,6 @@ export const send_connect_request = createAsyncThunk(
     try {
       dispatch(setLoading(true));
       const response = await API({
-        // headers: {
-        //   // 'Content-Type': 'multipart/form-data',
-        // },
         route: `profile/sendConnectRequest`,
         body: credentials,
         method: 'POST',
@@ -278,6 +275,41 @@ export const send_connect_request = createAsyncThunk(
       } else if (response?.data?.status === 0) {
         showToast(0, response?.data?.message);
       }
+      if (response?.data?.status !== 1) {
+        return rejectWithValue(response?.data);
+      }
+
+      return response?.data?.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error);
+    }
+  },
+);
+
+export const send_unconnect_request = createAsyncThunk(
+  'api/profile/sendUnConnectRequest',
+  async (credentials, {rejectWithValue, dispatch, getState}) => {
+    console.log(getState()?.auth?.user);
+    const authData = getState()?.auth?.user;
+
+    try {
+      dispatch(setLoading(true));
+      const response = await API({
+        route: `profile/sendUnConnectRequest`,
+        body: credentials,
+        method: 'POST',
+      });
+      dispatch(setLoading(false));
+      console.log(
+        'send_connect_request_response=>>',
+        JSON.stringify(response?.data),
+      );
+      // if (response?.data?.status === 1) {
+      //   showToast(1, 'Request sent successfully!');
+      // } else if (response?.data?.status === 0) {
+      showToast(response?.data?.status, response?.data?.message);
+      // }
       if (response?.data?.status !== 1) {
         return rejectWithValue(response?.data);
       }

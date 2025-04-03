@@ -1,12 +1,15 @@
 import {
   Animated,
   Dimensions,
+  Easing,
   Image,
+  Modal,
+  Platform,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import {styles} from './styles';
 import GButton from '../../../components/GButton';
@@ -22,6 +25,14 @@ import {
 import {scaledHeightValue, scaledValue} from '../../../utils/design.utils';
 import useMatchingProfiles from '../../../hooks/useMatchingProfiles';
 import {showToast} from '../../../components/Toast';
+import Swiper from 'react-native-swiper';
+import GTextButton from '../../../components/GTextButton';
+import {colors} from '../../../../assets/colors';
+import fonts from '../../../utils/fonts';
+import {BlurView} from '@react-native-community/blur';
+import FirstTutorial from '../TutorialScreens/firstTutorial';
+import SecondTutorial from '../TutorialScreens/secondTutorial';
+import ThirdTutorial from '../TutorialScreens/thirdTutorial';
 
 const UserContent = ({
   item,
@@ -30,6 +41,7 @@ const UserContent = ({
   screen,
   animateCard,
   send_connect_request_hit,
+  send_unconnect_request_hit,
   opacityAnim,
   scaleAnim,
   slideAnim,
@@ -112,6 +124,58 @@ const UserContent = ({
       }
     });
   };
+
+  const {width, height} = Dimensions.get('window');
+
+  // const data = [
+  //   {id: '1', name: 'Item 1'},
+  //   {id: '2', name: 'Item 2'},
+  //   {id: '3', name: 'Item 3'},
+  // ];
+
+  const tutorialScreens = [
+    {
+      id: '1',
+      title: 'Welcome!',
+      description: 'This is the first step of the tutorial.',
+    },
+    {
+      id: '2',
+      title: 'FlatList Tutorial',
+      description: 'Here, you can see a list of items.',
+    },
+    {
+      id: '3',
+      title: 'Tap Items',
+      description: 'Click on an item to interact with it.',
+    },
+    {
+      id: '4',
+      title: 'Welcome!',
+      description: 'This is the first step of the tutorial.',
+    },
+    {
+      id: '5',
+      title: 'FlatList Tutorial',
+      description: 'Here, you can see a list of items.',
+    },
+  ];
+
+  const [tutorialVisible, setTutorialVisible] = useState(true);
+  const [currentModalIndex, setCurrentMOdalIndex] = useState(0);
+  const swiperRef = useRef(null);
+
+  const handleNext = () => {
+    if (currentModalIndex < tutorialScreens.length - 1) {
+      swiperRef.current.scrollBy(1);
+      setCurrentMOdalIndex(currentModalIndex + 1);
+    } else {
+      setTutorialVisible(false); // Close tutorial when last screen is reached
+    }
+  };
+
+  console.log(insets.bottom, Platform.OS);
+
   return (
     <View style={styles.renderContainer}>
       <Animated.View
@@ -130,28 +194,54 @@ const UserContent = ({
           fullImageStyle={styles.userImg}
           content={() => (
             <>
+              {/* {tutorialVisible && (
+                <Modal
+                  transparent
+                  animationType="fade"
+                  // statusBarTranslucent
+                  style={{height: '100%'}}>
+                  <BlurView
+                    style={{width, height}}
+                    blurType="light"
+                    blurAmount={2.5}
+                    reducedTransparencyFallbackColor="white">
+                    <View style={styles.tutorialContainer}>
+                      <Swiper
+                        ref={swiperRef}
+                        loop={false}
+                        scrollEnabled={false}
+                        showsPagination={true}
+                        dotStyle={styles.dot}
+                        activeDotStyle={styles.activeDot}
+                        onIndexChanged={index => setCurrentMOdalIndex(index)}>
+                        <ThirdTutorial
+                          setTutorialVisible={setTutorialVisible}
+                        />
+                        <SecondTutorial />
+                        <FirstTutorial />
+                      </Swiper>
+                    </View>
+                  </BlurView>
+                </Modal>
+              )} */}
               <LinearGradient
                 colors={['#4B164C00', '#4B164C90', '#4B164C']}
                 start={{x: 0, y: 0}}
                 end={{x: 0, y: 1}}
                 style={styles.gradient}>
-                <View style={{position: 'absolute'}}>
+                <View
+                  style={{
+                    position: 'absolute',
+                    // backgroundColor: 'red',
+                    height: '100%',
+                  }}>
                   <GButton
                     activeOpacity={1}
                     textStyle={styles.buttonText}
                     title={`🎉 ${item?.matchPercentage || 0}% Match`}
                     style={styles.button}
                   />
-                  <TouchableOpacity
-                    activeOpacity={0.9}
-                    onPress={() => {
-                      if (screen != 'BlockList') {
-                        navigation?.navigate('PublicReviewScreen', {
-                          userData: item,
-                          screen: screen,
-                        });
-                      }
-                    }}
+                  <View
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
@@ -181,7 +271,7 @@ const UserContent = ({
                         }}
                       />
                     )}
-                  </TouchableOpacity>
+                  </View>
 
                   <GText
                     beVietnamSemiBold
@@ -230,53 +320,69 @@ const UserContent = ({
 
                   {/* </Animated.View> */}
 
-                  {screen === 'PreviousInteracted' ||
-                  screen === 'InBox' ? null : (
-                    <View style={styles.roundedRect(insets)}>
-                      <View style={styles.rectView}>
-                        <TouchableOpacity
-                          activeOpacity={0.7}
-                          onPress={() => animateCard('previous', false)}
-                          style={styles.rejectView}>
-                          <Image
-                            source={Images.rejectImage}
-                            style={styles.rejectImage}
-                          />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          activeOpacity={0.7}
-                          onPress={() => {
-                            send_connect_request_hit(item?.cognitoUserId);
-                          }}
-                          style={styles.acceptedView}>
-                          <Image
-                            source={Images.checkCircle}
-                            style={styles.acceptedImage}
-                          />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          activeOpacity={0.7}
-                          onPress={() => {
-                            saved_profile_hit(item);
-                          }}
-                          style={styles.saveView}>
-                          <Image
-                            source={
-                              savedUser ? Images.bookmarkFill : Images.bookmark
+                  <View
+                    style={{
+                      position: 'absolute',
+                      alignSelf: 'center',
+                      bottom: 0,
+                      marginBottom:
+                        insets.bottom === 0
+                          ? insets.bottom + scaledValue(42)
+                          : insets.bottom + scaledValue(15),
+                    }}>
+                    {screen === 'PreviousInteracted' ||
+                    screen === 'InBox' ? null : (
+                      <View style={styles.roundedRect(insets)}>
+                        <View style={styles.rectView}>
+                          <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={() =>
+                              send_unconnect_request_hit(item?.cognitoUserId)
                             }
-                            style={styles.saveImage}
-                          />
-                        </TouchableOpacity>
+                            style={styles.rejectView}>
+                            <Image
+                              source={Images.rejectImage}
+                              style={styles.rejectImage}
+                            />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={() => {
+                              send_connect_request_hit(item?.cognitoUserId);
+                            }}
+                            style={styles.acceptedView}>
+                            <Image
+                              source={Images.checkCircle}
+                              style={styles.acceptedImage}
+                            />
+                          </TouchableOpacity>
+
+                          <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={() => {
+                              saved_profile_hit(item);
+                            }}
+                            style={styles.saveView}>
+                            <Image
+                              source={
+                                savedUser
+                                  ? Images.bookmarkFill
+                                  : Images.bookmark
+                              }
+                              style={styles.saveImage}
+                            />
+                          </TouchableOpacity>
+                        </View>
                       </View>
-                    </View>
-                  )}
+                    )}
+                  </View>
                 </View>
               </LinearGradient>
             </>
           )}
         />
       </Animated.View>
+
       {/* <BottomSheet
         refRBSheet={refRBSheet}
         navigation={navigation}

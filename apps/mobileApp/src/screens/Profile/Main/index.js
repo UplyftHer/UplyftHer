@@ -2,6 +2,7 @@ import {
   Image,
   ImageBackground,
   ScrollView,
+  StatusBar,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -235,6 +236,11 @@ const Profile = ({navigation}) => {
       bounces={false}
       showsVerticalScrollIndicator={false}
       style={styles.scrollView}>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="light-content"
+      />
       <ImageBackground
         source={Images.profile_background}
         style={styles.imageBackground}>

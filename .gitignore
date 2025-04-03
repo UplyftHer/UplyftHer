@@ -11,8 +11,14 @@ dist-ssr
 server/dist
 public/dist
 
-apps/mobileApp/android/app/google-services.json
 apps/mobileApp/src/constants/index.js
+# /src/constants/index.js
+google-services.json
+GoogleService-Info.plist
+Podfile.lock
+yarn.lock
+package-lock.json
+Gemfile.lock
 
 # OSX
 #

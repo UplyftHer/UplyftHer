@@ -634,7 +634,7 @@ const authController = {
                 {
                     if(!invitationCode)
                     {
-                        return res.json({ status: 0, message: "Invalid invitation Code!" });
+                        return res.json({ status: 0, message: "We couldn't find an account associated with your credentials. Please create an account before proceeding." });
                     }
                     // Check invitation code
                     let checkAdminInvitationCode = await AdminInvitationCode.findOne({email,invitationCode});

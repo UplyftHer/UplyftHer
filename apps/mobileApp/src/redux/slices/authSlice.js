@@ -14,6 +14,7 @@ const initialState = {
   onBoarding: false,
   industryList: [],
   interestsList: [],
+  showTutorial: true,
 };
 
 export const sign_up = createAsyncThunk(
@@ -298,6 +299,52 @@ export const edit_user_profile = createAsyncThunk(
   },
 );
 
+export const edit_user_location = createAsyncThunk(
+  'User/editProfile',
+  async (credentials, {rejectWithValue, dispatch, getState}) => {
+    const authState = getState()?.auth;
+
+    console.log('edit_profile_api_credentials', credentials);
+    try {
+      dispatch(setLoading(true));
+
+      const response = await API({
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        route: 'profile/editProfile',
+        body: credentials,
+        method: 'POST',
+        multiPart: true,
+      });
+
+      dispatch(setLoading(false));
+      if (response?.data?.status === 1) {
+        showToast(response?.data?.status, 'Location changed successfully!');
+      } else if (response?.data?.status === 0) {
+        showToast(response?.data?.status, response?.data?.message);
+      }
+
+      if (response?.data?.status !== 1) {
+        return rejectWithValue(response?.data);
+      }
+      console.log('response?.data?.data', response?.data?.data);
+
+      return response?.data?.data;
+    } catch (error) {
+      dispatch(setLoading(false));
+      console.log('edit_profile_response_error==>', error?.message);
+      if (error?.message === 'Network Error') {
+        showToast(0, validationError[error?.message]);
+      }
+
+      showToast(0, validationError[error.response.data?.message]);
+
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+
 export const logout_user = createAsyncThunk(
   '/api/profile/logout',
   async (credentials, {rejectWithValue, dispatch}) => {
@@ -447,6 +494,9 @@ const authSlice = createSlice({
       state.onBoarding = action.payload;
       // console.log('setOnBoarding =>', action.payload);
     },
+    setShowTutorial: (state, action) => {
+      state.showTutorial = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(sign_in.pending, state => {
@@ -532,6 +582,12 @@ const authSlice = createSlice({
   },
 });
 
-export const {logout, updateUser, setAppLangauage, setUserData, setOnBoarding} =
-  authSlice.actions;
+export const {
+  logout,
+  updateUser,
+  setAppLangauage,
+  setUserData,
+  setOnBoarding,
+  setShowTutorial,
+} = authSlice.actions;
 export default authSlice.reducer;

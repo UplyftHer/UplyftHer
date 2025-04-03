@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   FlatList,
   Image,
@@ -18,14 +18,14 @@ import UserCard from './UserCard';
 import DashboardTitle from './DashboardTitle';
 
 import {Images} from '../../../utils';
-import {scaledValue} from '../../../utils/design.utils';
+import {scaledHeightValue, scaledValue} from '../../../utils/design.utils';
 import {formatDate} from '../../../utils/constant.utils';
 
 import OptionMenuSheet from '../../../components/OptionMenuSheet';
 import GText from '../../../components/GText';
 import HeaderButton from '../../../components/HeaderButton';
 import GImage from '../../../components/GImage';
-
+import countriescities from '../../../../assets/countriescities.json';
 import {useAppDispatch, useAppSelector} from '../../../redux/store/storeUtils';
 import {
   get_previous_interacted_matches,
@@ -40,14 +40,34 @@ import {
 } from '../../../redux/slices/bookMeetingSlice';
 
 import useMatchingProfiles from '../../../hooks/useMatchingProfiles';
-
+import Modal from 'react-native-modal';
 import {colors} from '../../../../assets/colors';
+import GradientButton from '../../../components/GradientButton';
+import GradientBorderButton from '../../../components/GradientBorderButton';
+import GOptions from '../../../components/GOptions';
+import SubLocations from '../../../components/SubLocations';
+import {
+  edit_user_location,
+  edit_user_profile,
+  get_cities_api,
+} from '../../../redux/slices/authSlice';
 
 const DashboardScreen = ({navigation, route}) => {
   const savedProfileData = useSelector(state => state.profile.savedProfile);
+  const [showModal, setShowModal] = useState(false);
   const userData = useAppSelector(state => state.auth.user);
+  const [subCity, setSubCity] = useState([]);
+  const [countryId, setCountryId] = useState();
+  const refRBSheetCountry = useRef();
+  const refRBSheetCity = useRef();
   const dispatch = useAppDispatch();
   const refRBSheet = useRef();
+
+  const [field, setField] = useState({
+    city: '',
+    country: '',
+  });
+
   const {
     matchingProfileData,
     matchingProfileRefreshData,
@@ -73,6 +93,21 @@ const DashboardScreen = ({navigation, route}) => {
       });
     }
   }, []);
+
+  const getCitiesData = item => {
+    setCountryId(item?.iso2);
+    const input = {
+      countryId: item?.iso2,
+    };
+
+    dispatch(get_cities_api(input)).then(res => {
+      if (get_cities_api.fulfilled.match(res)) {
+        console.log('res.payload', JSON.stringify(res.payload));
+
+        setSubCity(res.payload);
+      }
+    });
+  };
 
   const getSaved_profile_hit = () => {
     const input = {
@@ -112,7 +147,10 @@ const DashboardScreen = ({navigation, route}) => {
       headerLeft: () => (
         <View style={styles.headerLeftView}>
           <TouchableOpacity
-            disabled={true}
+            hitSlop={{top: 20, bottom: 20, left: 50, right: 50}}
+            onPress={() => {
+              setShowModal(true);
+            }}
             activeOpacity={0.8}
             style={styles.headerTextView}>
             <Image source={Images.mapPin} style={styles.headerIcons} />
@@ -120,7 +158,7 @@ const DashboardScreen = ({navigation, route}) => {
               text={`${userData?.city || userData?.location}`}
               style={styles.locationText}
             />
-            {/* <Image source={Images.arrowDown} style={styles.headerIcons} /> */}
+            <Image source={Images.arrowDown} style={styles.headerIcons} />
           </TouchableOpacity>
           <GText text="Discover" style={styles.headerText} />
         </View>
@@ -253,6 +291,42 @@ const DashboardScreen = ({navigation, route}) => {
         );
       }
     });
+  };
+
+  const edit_user_profile_hit = () => {
+    const api_credential = {
+      fullName: userData?.fullName,
+      age: userData?.age,
+      country: field?.country,
+      city: field?.city,
+      occupation: userData?.occupation,
+      industry: userData?.industry,
+      organizationName: userData?.organizationName,
+      interests: JSON.stringify(userData?.interests),
+      bio: userData?.bio,
+      userType: userData?.userType,
+      preference: JSON.stringify([
+        {
+          preferenceId: '1',
+          type: userData?.userType === 0 ? 'mentee' : 'mentor',
+        },
+        {preferenceId: '2', type: userData?.industry},
+        {preferenceId: '4', type: userData?.occupation},
+        {preferenceId: '5', type: userData?.city + userData?.country},
+      ]),
+      iso2: countryId,
+    };
+    try {
+      dispatch(edit_user_location(api_credential)).then(res => {
+        if (edit_user_location.fulfilled.match(res)) {
+          matchingProfileRefreshData({
+            limit: 1000,
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+    }
   };
 
   return (
@@ -467,6 +541,138 @@ const DashboardScreen = ({navigation, route}) => {
           );
         }}
       />
+      <Modal isVisible={showModal} onBackdropPress={() => setShowModal(false)}>
+        <View
+          style={{
+            width: '95%',
+            paddingVertical: scaledValue(20),
+            backgroundColor: colors.offWhite,
+            alignSelf: 'center',
+            borderRadius: scaledValue(8),
+            paddingHorizontal: scaledValue(20),
+          }}>
+          <GText
+            text={'Select Location'}
+            style={{
+              // textAlign: 'center',
+              lineHeight: scaledHeightValue(19.08),
+              fontSize: scaledValue(16),
+            }}
+          />
+          <TouchableOpacity
+            onPress={() => {
+              refRBSheetCountry?.current?.open();
+            }}
+            style={{
+              borderWidth: field?.country ? scaledValue(1) : scaledValue(0.5),
+              borderColor: '#312943',
+              height: scaledValue(48),
+              borderRadius: scaledValue(12),
+              justifyContent: 'space-between',
+              paddingHorizontal: scaledValue(15),
+              marginBottom: scaledValue(16),
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginTop: scaledValue(12),
+            }}>
+            <GText
+              beVietnamRegular
+              componentProps={{numberOfLines: 1, ellipsizeMode: 'tail'}}
+              text={field?.country || 'Select Country'}
+              style={styles.organizationText}
+            />
+            <Image source={Images.downArrow} style={styles.rightIcon} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              refRBSheetCity?.current?.open();
+            }}
+            style={{
+              borderWidth: field?.city ? scaledValue(1) : scaledValue(0.5),
+              borderColor: '#312943',
+              height: scaledValue(48),
+              borderRadius: scaledValue(12),
+              justifyContent: 'space-between',
+              paddingHorizontal: scaledValue(15),
+              marginBottom: scaledValue(16),
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <GText
+              beVietnamRegular
+              componentProps={{numberOfLines: 1, ellipsizeMode: 'tail'}}
+              text={field?.city || 'Select City'}
+              style={styles.organizationText}
+            />
+            <Image source={Images.downArrow} style={styles.rightIcon} />
+          </TouchableOpacity>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignSelf: 'center',
+              gap: scaledValue(20),
+              paddingTop: scaledValue(20),
+            }}>
+            <GradientButton
+              gradientColor={['#DA7575', '#A45EB0']}
+              title={'Confirm'}
+              gradientstyle={{
+                height: scaledValue(35),
+                paddingHorizontal: scaledValue(25),
+              }}
+              textstyle={{
+                fontSize: scaledValue(14),
+                letterSpacing: scaledValue(14 * -0.02),
+              }}
+              onPress={() => {
+                setShowModal(false);
+                setTimeout(() => {
+                  edit_user_profile_hit();
+                }, 300);
+              }}
+            />
+            <GradientBorderButton
+              activeOpacity={0.8}
+              title={'Cancel'}
+              onPress={() => {
+                setShowModal(false);
+              }}
+              inner={{
+                backgroundColor: '#FFF4EC',
+                paddingHorizontal: scaledValue(25),
+              }}
+              buttonTextStyle={{
+                lineHeight: scaledHeightValue(19),
+              }}
+              buttonStyle={{
+                height: scaledValue(35),
+              }}
+            />
+          </View>
+        </View>
+        <GOptions
+          refRBSheet={refRBSheetCountry}
+          title="Select Country"
+          options={countriescities}
+          search={true}
+          onChoose={val => {
+            getCitiesData(val);
+            setField({...field, country: val?.name, city: ''});
+            refRBSheetCountry?.current?.close();
+          }}
+        />
+        <SubLocations
+          refRBSheet={refRBSheetCity}
+          title={'Select City'}
+          options={subCity?.cities}
+          search={true}
+          onChoose={val => {
+            setField({...field, city: val[0]});
+            refRBSheetCity?.current?.close();
+          }}
+        />
+      </Modal>
+
       <OptionMenuSheet
         refRBSheet={refRBSheet}
         options={reportAsList}

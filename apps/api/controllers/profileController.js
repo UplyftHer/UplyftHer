@@ -1380,6 +1380,15 @@ const profileController = {
                     ignoreCognitoUserId.push(ignoreid);
                 }
             });
+            const UnconnectedUsersList = await UnConnectedUserModel.find({
+                cognitoUserId: cognitoUserId,
+            })
+            UnconnectedUsersList.forEach(unconnect => {
+                let ignoreid = unconnect.cognitoUserIdSave;
+                if (!ignoreCognitoUserId.includes(ignoreid)) {
+                    ignoreCognitoUserId.push(ignoreid);
+                }
+            });
 
             console.log("ignoreCognitoUserId",ignoreCognitoUserId);
 
@@ -1574,7 +1583,7 @@ const profileController = {
 
             return res.status(200).json({
                 status: 1,
-                message: "User Unconnected successfully.",
+                message: "This profile has been removed from your recommendations. You won’t see this profile again.",
             });
 
         } catch (error) {
@@ -2898,6 +2907,16 @@ const profileController = {
             );
             InactiveUsersList.forEach(block => {
                 let ignoreid = block.cognitoUserId;
+                if (!ignoreCognitoUserId.includes(ignoreid)) {
+                    ignoreCognitoUserId.push(ignoreid);
+                }
+            });
+            
+            const UnconnectedUsersList = await UnConnectedUserModel.find({
+                cognitoUserId: cognitoUserIdMy,
+            })
+            UnconnectedUsersList.forEach(unconnect => {
+                let ignoreid = unconnect.cognitoUserIdSave;
                 if (!ignoreCognitoUserId.includes(ignoreid)) {
                     ignoreCognitoUserId.push(ignoreid);
                 }

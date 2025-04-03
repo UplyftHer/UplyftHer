@@ -1,16 +1,10 @@
 import React, {useState} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  useColorScheme,
-  View,
-} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import WebView from 'react-native-webview';
-import {LINKEDIN_CALLBACK_URL, LINKEDIN_CLIENT_ID} from '../../../constants';
+import {
+  LINKEDIN_CALLBACK_URL,
+  LINKEDIN_LOGIN_PAGE_URL,
+} from '../../../constants';
 
 const LinkedinLogin = ({navigation, route}) => {
   const [linkedinWeb, setLinkedinWeb] = useState(false);
@@ -18,7 +12,7 @@ const LinkedinLogin = ({navigation, route}) => {
   const [found, setFound] = useState(false);
   const listenURL = LINKEDIN_CALLBACK_URL;
 
-  const linkedinLoginPage = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${LINKEDIN_CLIENT_ID}&redirect_uri=https%3A%2F%2Fdevapi.uplyfther.com%2Fapi%2Fauth%2Flinkedin%2Fcallback&scope=profile%2Cemail%2Copenid`;
+  const linkedinLoginPage = LINKEDIN_LOGIN_PAGE_URL;
 
   const handleChange = ({nativeEvent: stage}) => {
     console.log(stage);

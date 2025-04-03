@@ -1,5 +1,9 @@
 import {StyleSheet} from 'react-native';
-import {getFontSize, scaledValue} from '../../../utils/design.utils';
+import {
+  getFontSize,
+  scaledHeightValue,
+  scaledValue,
+} from '../../../utils/design.utils';
 import {colors} from '../../../../assets/colors';
 import fonts from '../../../utils/fonts';
 
@@ -214,4 +218,10 @@ export const styles = StyleSheet.create({
     color: colors.charcoal,
   },
   savedProfileView: {marginBottom: scaledValue(68)},
+  rightIcon: {
+    resizeMode: 'contain',
+    height: scaledHeightValue(20),
+    width: scaledValue(20),
+    tintColor: colors.themeColor,
+  },
 });

@@ -1,6 +1,6 @@
 import {
+  FlatList,
   Image,
-  KeyboardAvoidingView,
   Platform,
   ScrollView,
   Text,
@@ -25,11 +25,14 @@ import SubLocations from '../../../../components/SubLocations';
 import GOptions from '../../../../components/GOptions';
 import countriescities from '../../../../../assets/countriescities.json';
 import {get_cities_api} from '../../../../redux/slices/authSlice';
+import useDataFactory from '../../../../components/UseDataFactory/useDataFactory';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const BasicInfo = ({navigation, route}) => {
   const {responseData} = route?.params;
   const fullName = responseData?.linkedinProfileData?.name;
   const insets = useSafeAreaInsets();
+  const [searchText, setSearchText] = useState('');
   const refRBSheet = useRef();
   const industryList = useAppSelector(state => state.auth.industryList);
   const [subCity, setSubCity] = useState([]);
@@ -61,8 +64,6 @@ const BasicInfo = ({navigation, route}) => {
   });
 
   const handleTextChange = input => {
-    // Allow only alphabets (A-Z, a-z)
-    // const filteredText = input.replace(/[^a-zA-Z]/g, '');
     const filteredText = input
       .replace(/[^a-zA-Z ]/g, '')
       .replace(/\s+/g, ' ')
@@ -74,7 +75,6 @@ const BasicInfo = ({navigation, route}) => {
   const sendParam = {
     fullName: field?.full_name,
     age: field?.age,
-    // location: field?.location,
     country: field?.country,
     city: field?.city,
     userType: field?.userType?.id,
@@ -93,7 +93,6 @@ const BasicInfo = ({navigation, route}) => {
     if (!field?.city?.trim()) newErrors.city = '*';
     if (!field?.industry?.title?.trim()) newErrors.industry = '*';
     if (!field?.userType?.title?.trim()) newErrors.user_Type = '*';
-    // if (!address.trim()) newErrors.address = 'Address is required';
 
     setErrors(newErrors);
 
@@ -120,11 +119,36 @@ const BasicInfo = ({navigation, route}) => {
     });
   };
 
+  const {
+    loading: loading,
+    data,
+    setData,
+    refreshData,
+    loadMore,
+    Placeholder,
+    Loader,
+  } = useDataFactory(
+    'searchCompany',
+    true,
+    {
+      search: searchText || '',
+    },
+    'POST',
+  );
+
+  const handleSearch = text => {
+    setSearchText(text);
+    setField({...field, ['company name']: text});
+    refreshData({
+      search: text,
+    });
+  };
+
   return (
-    <KeyboardAvoidingView
+    <KeyboardAwareScrollView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : ''}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
+      keyboardShouldPersistTaps="handled"
+      extraHeight={Platform.OS == 'ios' ? scaledValue(200) : ''}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{marginTop: insets.top + scaledValue(10)}}>
@@ -157,19 +181,22 @@ const BasicInfo = ({navigation, route}) => {
           beVietnamRegular
           style={styles.contentText}
         />
+        <GText
+          text={`( * Fields are required )`}
+          style={{
+            color: 'red',
+            fontSize: scaledValue(14),
+            paddingLeft: scaledValue(12),
+            marginBottom: scaledValue(31),
+            textAlign: 'center',
+            marginTop: scaledValue(5),
+          }}
+        />
 
         <View style={{gap: scaledValue(0)}}>
-          <GText
-            text={'* Required'}
-            style={{
-              color: 'red',
-              fontSize: scaledValue(14),
-              paddingLeft: scaledValue(12),
-            }}
-          />
           <Input
             value={field?.full_name}
-            placeholder={'Full name'}
+            placeholder={'Full name*'}
             onChangeText={handleTextChange}
             placeholderTextColor={colors.inputPlaceholder}
             style={[styles.input]}
@@ -181,22 +208,10 @@ const BasicInfo = ({navigation, route}) => {
             placeholder={'Age'}
             keyboardType={'number-pad'}
             placeholderTextColor={colors.inputPlaceholder}
-            style={[
-              styles.input,
-              {
-                marginBottom: scaledHeightValue(8),
-              },
-            ]}
+            style={[styles.input]}
             onChangeText={val => setField({...field, age: val})}
           />
-          <GText
-            text={'*'}
-            style={{
-              color: 'red',
-              fontSize: scaledValue(14),
-              paddingLeft: scaledValue(12),
-            }}
-          />
+
           <TouchableOpacity
             onPress={() => {
               refRBSheetCountry?.current?.open();
@@ -208,26 +223,19 @@ const BasicInfo = ({navigation, route}) => {
               borderRadius: scaledValue(12),
               justifyContent: 'space-between',
               paddingHorizontal: scaledValue(15),
-              marginBottom: errors?.country ? scaledValue(0) : scaledValue(16),
+              marginBottom: scaledValue(16),
               flexDirection: 'row',
               alignItems: 'center',
             }}>
             <GText
               beVietnamRegular
               componentProps={{numberOfLines: 1, ellipsizeMode: 'tail'}}
-              text={field?.country || 'Select Country'}
+              text={field?.country || 'Select Country*'}
               style={styles.organizationText}
             />
             <Image source={Images.downArrow} style={styles.rightIcon} />
           </TouchableOpacity>
-          <GText
-            text={'*'}
-            style={{
-              color: 'red',
-              fontSize: scaledValue(14),
-              paddingLeft: scaledValue(12),
-            }}
-          />
+
           <TouchableOpacity
             onPress={() => {
               refRBSheetCity?.current?.open();
@@ -239,26 +247,19 @@ const BasicInfo = ({navigation, route}) => {
               borderRadius: scaledValue(12),
               justifyContent: 'space-between',
               paddingHorizontal: scaledValue(15),
-              marginBottom: errors?.city ? scaledValue(0) : scaledValue(16),
+              marginBottom: scaledValue(16),
               flexDirection: 'row',
               alignItems: 'center',
             }}>
             <GText
               beVietnamRegular
               componentProps={{numberOfLines: 1, ellipsizeMode: 'tail'}}
-              text={field?.city || 'Select City'}
+              text={field?.city || 'Select City*'}
               style={styles.organizationText}
             />
             <Image source={Images.downArrow} style={styles.rightIcon} />
           </TouchableOpacity>
-          <GText
-            text={'*'}
-            style={{
-              color: 'red',
-              fontSize: scaledValue(14),
-              paddingLeft: scaledValue(12),
-            }}
-          />
+
           <TouchableOpacity
             onPress={() => {
               refRBSheet?.current?.open();
@@ -275,13 +276,11 @@ const BasicInfo = ({navigation, route}) => {
               alignItems: 'center',
               justifyContent: 'space-between',
               paddingHorizontal: scaledValue(16),
-              marginBottom: errors?.user_Type
-                ? scaledValue(0)
-                : scaledValue(16),
+              marginBottom: scaledValue(16),
             }}>
             <GText
               beVietnamRegular
-              text={field?.userType?.title || 'User Type'}
+              text={field?.userType?.title || 'User Type*'}
               style={{
                 color: '#5A5A5A',
                 fontSize: scaledValue(16),
@@ -302,23 +301,65 @@ const BasicInfo = ({navigation, route}) => {
           <Input
             value={field?.['company name']}
             placeholder={'Company Name'}
-            onChangeText={val => setField({...field, 'company name': val})}
+            onChangeText={handleSearch}
+            rightIcon={Images.Cross}
+            onPressRightIcon={() => {
+              setData([]);
+              setSearchText('');
+              setField({...field, ['company name']: ''});
+            }}
             placeholderTextColor={colors.inputPlaceholder}
             style={[
               styles.input,
               {
-                marginBottom: scaledHeightValue(8),
+                // marginBottom: scaledHeightValue(8),
               },
             ]}
           />
-          <GText
-            text={'*'}
-            style={{
-              color: 'red',
-              fontSize: scaledValue(14),
-              paddingLeft: scaledValue(12),
-            }}
-          />
+          {data?.length > 0 && (
+            <FlatList
+              data={data?.slice(0, 5)}
+              style={{marginBottom: scaledValue(8)}}
+              keyboardShouldPersistTaps="handled"
+              renderItem={({item, index}) => {
+                return (
+                  <View
+                    key={item?._id}
+                    style={{
+                      backgroundColor: '#fff',
+                      gap: scaledValue(10),
+                    }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setField({
+                          ...field,
+                          ['company name']: item?.organizationName,
+                        });
+                        setData([]);
+                      }}
+                      style={{
+                        paddingLeft: scaledValue(15),
+                        paddingVertical: scaledValue(12),
+                        justifyContent: 'center',
+                        top: scaledValue(5),
+                      }}>
+                      <GText text={item?.organizationName} />
+                    </TouchableOpacity>
+                    {data?.length !== index + 1 && (
+                      <View
+                        style={{
+                          borderWidth: scaledValue(0.5),
+                          borderColor: '#ccc',
+                          marginHorizontal: 10,
+                        }}
+                      />
+                    )}
+                  </View>
+                );
+              }}
+            />
+          )}
+
           <TouchableOpacity
             onPress={() => {
               industryRefRBSheet?.current?.open();
@@ -338,7 +379,7 @@ const BasicInfo = ({navigation, route}) => {
             }}>
             <GText
               beVietnamRegular
-              text={field?.industry?.title || 'Industry'}
+              text={field?.industry?.title || 'Industry*'}
               style={styles.organizationText}
             />
             <Image source={Images.downArrow} style={styles.rightIcon} />
@@ -405,7 +446,7 @@ const BasicInfo = ({navigation, route}) => {
           if (val[0]?.trim()) setErrors(prev => ({...prev, city: ''}));
         }}
       />
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollView>
   );
 };
 

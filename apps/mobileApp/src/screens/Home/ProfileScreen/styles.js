@@ -7,6 +7,7 @@ import {
 import {colors} from '../../../../assets/colors';
 import fonts from '../../../utils/fonts';
 const deviceW = Dimensions.get('window').width;
+const {width, height} = Dimensions.get('window');
 
 export const styles = StyleSheet.create({
   container: {
@@ -26,7 +27,7 @@ export const styles = StyleSheet.create({
   },
   gradient: {
     position: 'absolute',
-    height: '50%',
+    height: '55%',
     width: '100%',
     bottom: 0,
     alignItems: 'center',
@@ -105,11 +106,11 @@ export const styles = StyleSheet.create({
     borderRadius: scaledValue(40),
     backgroundColor: colors.offWhite,
     alignSelf: 'center',
-    marginBottom: insets.bottom + scaledHeightValue(4),
+    // marginBottom: insets.bottom + scaledHeightValue(4),
     alignItems: 'center',
     justifyContent: 'center',
-    // position: 'absolute',
-    // bottom: 0,
+    position: 'absolute',
+    bottom: 0,
   }),
   rectView: {
     height: scaledHeightValue(64),
@@ -125,6 +126,7 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.softRed,
     alignItems: 'center',
     justifyContent: 'center',
+    // opacity: 0.3,
   },
   acceptedView: {
     height: scaledValue(60),
@@ -186,21 +188,22 @@ export const styles = StyleSheet.create({
   },
 
   careerCardView: {
-    marginTop: scaledHeightValue(4),
+    marginTop: scaledHeightValue(18),
     marginHorizontal: scaledValue(10),
     marginBottom: scaledHeightValue(18),
   },
   careerListView: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    columnGap: scaledValue(4),
+    columnGap: scaledValue(6),
     justifyContent: 'center',
+    rowGap: scaledValue(8),
   },
   careerCardTouchable: {
     height: scaledHeightValue(35),
     borderRadius: scaledValue(24),
     justifyContent: 'center',
-    marginTop: scaledValue(8),
+    // marginTop: scaledValue(8),
     backgroundColor: colors.offWhite,
   },
   leftArrowView: insets => ({
@@ -226,4 +229,66 @@ export const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  container: {flex: 1, padding: 20, backgroundColor: '#fff'},
+  itemContainer: {
+    padding: 15,
+    backgroundColor: '#ddd',
+    marginVertical: 5,
+    borderRadius: 5,
+  },
+  itemText: {fontSize: 16},
+
+  tutorialContainer: {
+    width,
+    height,
+    // backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#3E3E3EB2',
+  },
+  tutorialPage: {
+    width,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  tutorialTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 10,
+  },
+  tutorialDescription: {
+    fontSize: 16,
+    color: 'white',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+
+  dot: {
+    backgroundColor: colors.offWhite,
+    width: scaledValue(10),
+    height: scaledValue(10),
+    borderRadius: scaledValue(10),
+    marginHorizontal: scaledValue(7),
+    opacity: 0.5,
+  },
+  activeDot: {
+    backgroundColor: colors.offWhite,
+    width: scaledValue(22.86),
+    height: scaledValue(10),
+    borderRadius: scaledValue(8),
+  },
+
+  nextButton: {
+    position: 'absolute',
+    bottom: 50,
+    backgroundColor: 'blue',
+    padding: 12,
+    borderRadius: 5,
+  },
+  nextButtonText: {color: 'white', fontSize: 16, fontWeight: 'bold'},
+
+  skipButton: {position: 'absolute', top: 40, right: 20},
+  skipButtonText: {color: 'white', fontSize: 16},
 });

@@ -1,12 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {
-  Text,
-  ScrollView,
-  View,
-  TouchableOpacity,
-  Image,
-  TextInput,
-} from 'react-native';
+import {ScrollView, View, TouchableOpacity, TextInput} from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import GText from '../GText';
 

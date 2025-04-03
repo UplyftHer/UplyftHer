@@ -95,7 +95,7 @@ export default async function API(props) {
     // Alert.alert(error?.code, error?.message);
     console.log('errors', error?.code);
     console.log('errors0012', error?.message);
-    if (error?.code == 'ERR_NETWORK' && !global.networkError) {
+    if (error?.code === 'ERR_NETWORK' && !global.networkError) {
       global.networkError = true;
       Alert.alert(
         'Network Error',

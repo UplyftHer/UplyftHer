@@ -7,11 +7,10 @@ const deviceW = Dimensions.get('window').width;
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     backgroundColor: colors.offWhite,
+    paddingHorizontal: scaledValue(20),
   },
   headerText1: {
-    // marginTop: scaledHeightValue(7),
     color: colors.black,
     fontFamily: fonts.SUSE_SEMIBOLD,
     fontSize: scaledValue(16),
@@ -38,7 +37,6 @@ export const styles = StyleSheet.create({
     letterSpacing: scaledValue(14 * -0.02),
     fontSize: scaledValue(14),
     color: colors.Gray,
-    marginBottom: scaledHeightValue(31),
   },
   input: {
     width: deviceW - 40,
@@ -46,14 +44,11 @@ export const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     marginBottom: scaledHeightValue(16),
     color: '#5A5A5A',
-    // fontFamily: fonts.SATOSHI_MEDIUM,
     fontSize: scaledValue(16),
   },
   gradientStyle: {
     height: scaledHeightValue(48),
     width: deviceW - 40,
-    // marginTop: scaledValue(70),
-    // marginBottom: scaledHeightValue(40),
     alignSelf: 'center',
   },
   textStyle: {

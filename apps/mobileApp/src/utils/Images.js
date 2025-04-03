@@ -103,3 +103,7 @@ export const DeleteAccount = require('../../assets/images/delete_account.png');
 export const Back = require('../../assets/images/back.png');
 export const Forward = require('../../assets/images/forward.png');
 export const fShimmer = require('../../assets/images/femaleShimmer.png');
+export const RightSwipe = require('../../assets/images/right-swipe.png');
+export const LeftSwipe = require('../../assets/images/leftSwipe.png');
+export const animatedArrowDown = require('../../assets/images/animated-arrow-down.png');
+export const lightningFill = require('../../assets/images/lightning-fill.png');

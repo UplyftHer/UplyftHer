@@ -18,7 +18,7 @@ import TabBar from './src/navigations/TabBar';
 import Spinner from 'react-native-loading-spinner-overlay';
 import SplashScreen from 'react-native-splash-screen';
 import FlashMessage from 'react-native-flash-message';
-import {statusBarHeight} from './src/utils/design.utils';
+import {scaledValue, statusBarHeight} from './src/utils/design.utils';
 import ForegroundHandler from './src/helpers/foregroundHandler';
 import {MatchingProfileProvider} from './src/hooks/useMatchingProfiles';
 import {useAppDispatch} from './src/redux/store/storeUtils';

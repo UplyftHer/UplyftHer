@@ -6,32 +6,45 @@ import {
   FlatList,
   Dimensions,
   Animated,
-  PanResponder,
+  StatusBar,
+  Modal,
 } from 'react-native';
 import {styles} from './styles';
 import {Images} from '../../../utils';
 import LinearGradient from 'react-native-linear-gradient';
-import GButton from '../../../components/GButton';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {Text} from 'react-native';
 import GText from '../../../components/GText';
-import BottomSheet from './BottomSheet';
 import {
-  saved_profile,
   send_connect_request,
+  send_unconnect_request,
   setSavedProfile,
 } from '../../../redux/slices/profileSlice';
 import {useAppDispatch, useAppSelector} from '../../../redux/store/storeUtils';
-import GImage from '../../../components/GImage';
 import useMatchingProfiles from '../../../hooks/useMatchingProfiles';
 import UserContent from './UserContent';
 import {scaledValue} from '../../../utils/design.utils';
+import GestureRecognizer from 'react-native-swipe-gestures-plus';
+import Swiper from 'react-native-swiper';
+import {BlurView} from '@react-native-community/blur';
+import ThirdTutorial from '../TutorialScreens/thirdTutorial';
+import GTextButton from '../../../components/GTextButton';
+import fonts from '../../../utils/fonts';
+import {colors} from '../../../../assets/colors';
+import SecondTutorial from '../TutorialScreens/secondTutorial';
+import FirstTutorial from '../TutorialScreens/firstTutorial';
+import ForthTutorial from '../TutorialScreens/fourthTutorial';
+import FifthTutorial from '../TutorialScreens/fifthTutorial';
+import CompleteTutorial from '../TutorialScreens/completeTutorial';
+import {setShowTutorial} from '../../../redux/slices/authSlice';
 
 const ProfileScreen = ({navigation, route}) => {
   const refRBSheet = useRef();
   const {searchUserData, screen, itemIndex, setUserListData, userListData} =
     route?.params;
   const [userList, setUserList] = useState([searchUserData]);
+
+  const showTutorial = useAppSelector(state => state.auth.showTutorial);
+
   const insets = useSafeAreaInsets();
   const flatListRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(itemIndex || 0);
@@ -56,12 +69,45 @@ const ProfileScreen = ({navigation, route}) => {
     dispatch(send_connect_request(input)).then(res => {
       if (send_connect_request.fulfilled.match(res)) {
         if (!screen) {
-          animateCard('next', false);
           setMatchingProfileData(filteredData);
+          animateCard('next', false);
+        } else {
+          setMatchingProfileData(filteredData);
+        }
+      }
+    });
+  };
+
+  const send_unconnect_request_hit = id => {
+    const input = {
+      cognitoUserId: id,
+    };
+    const filteredData = matchingProfileData.filter(
+      item => item?.cognitoUserId !== id,
+    );
+    dispatch(send_unconnect_request(input)).then(res => {
+      if (send_unconnect_request.fulfilled.match(res)) {
+        if (!screen) {
+          setMatchingProfileData(filteredData);
+          animateCard('next', false);
         } else {
           // animateCard('next');
           setMatchingProfileData(filteredData);
         }
+      }
+
+      if (screen === 'SavedProfile' || screen === 'SearchUser') {
+        dispatch(
+          setSavedProfile(
+            savedProfileData?.filter(
+              item => item?.cognitoUserIdSave?.cognitoUserId !== id,
+            ),
+          ),
+        );
+        setUserListData(
+          userListData?.filter(item => item?.cognitoUserId !== id),
+        ),
+          navigation?.goBack();
       }
     });
   };
@@ -82,17 +128,17 @@ const ProfileScreen = ({navigation, route}) => {
           direction === 'next'
             ? -Dimensions.get('window').width
             : Dimensions.get('window').width,
-        duration: 300, // Increased speed
+        duration: 200, // Increased speed
         useNativeDriver: true,
       }),
       Animated.timing(opacityAnim, {
         toValue: 0,
-        duration: 300,
+        duration: 200,
         useNativeDriver: true,
       }),
       Animated.timing(scaleAnim, {
         toValue: 0.8,
-        duration: 300,
+        duration: 200,
         useNativeDriver: true,
       }),
     ]).start(() => {
@@ -160,17 +206,17 @@ const ProfileScreen = ({navigation, route}) => {
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 0,
-          duration: 300, // Match initial duration
+          duration: 200, // Match initial duration
           useNativeDriver: true,
         }),
         Animated.timing(opacityAnim, {
           toValue: 1,
-          duration: 300,
+          duration: 200,
           useNativeDriver: true,
         }),
         Animated.timing(scaleAnim, {
           toValue: 1,
-          duration: 300,
+          duration: 200,
           useNativeDriver: true,
         }),
       ]).start(() => {
@@ -198,22 +244,17 @@ const ProfileScreen = ({navigation, route}) => {
 
   const pan = useRef(new Animated.ValueXY()).current;
 
-  const panResponder = useRef(
-    PanResponder.create({
-      // Decide whether this gesture should be handled
-      onMoveShouldSetPanResponder: (_, gestureState) =>
-        Math.abs(gestureState.dy) > Math.abs(gestureState.dx),
-      // Handle gesture release
-      onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dy < -20) {
-          // Detect a slight swipe up
-          refRBSheet.current.open();
-        }
-      },
-    }),
-  ).current;
+  const config = {
+    velocityThreshold: 0.3,
+    directionalOffsetThreshold: 80,
+    swipeEnabled: true,
+    longpressDelay: 700,
+  };
+  const {width, height} = Dimensions.get('window');
 
-  // console.log('matchingProfileData?.length0', matchingProfileData?.length);
+  const [tutorialVisible, setTutorialVisible] = useState(showTutorial);
+  const [currentModalIndex, setCurrentMOdalIndex] = useState(0);
+  const swiperRef = useRef(null);
 
   return (
     <LinearGradient
@@ -221,6 +262,11 @@ const ProfileScreen = ({navigation, route}) => {
       start={{x: 0.5, y: 1}}
       end={{x: 0.5, y: 0}}
       style={{flex: 1}}>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="light-content"
+      />
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={styles.leftArrowView(insets)}>
@@ -229,165 +275,187 @@ const ProfileScreen = ({navigation, route}) => {
           style={styles.leftArrowStyle(insets)}
         />
       </TouchableOpacity>
-      {screen == 'InBox' || screen === 'PreviousInteracted' ? null : (
+
+      <GestureRecognizer
+        onSwipeLeft={state => {
+          if (!screen) {
+            if (!tutorialVisible) {
+              animateCard('next', true);
+            } else if (currentModalIndex === 0) {
+              // alert('hey');
+              swiperRef.current.scrollBy(1);
+            }
+          }
+        }}
+        onSwipeRight={state => {
+          if (!screen) {
+            // if (currentIndex != 0) {
+            if (!tutorialVisible) {
+              if (currentIndex != 0) {
+                animateCard('previous', false);
+              }
+            } else if (currentModalIndex === 1) {
+              // if (currentIndex != 0) {
+              swiperRef.current.scrollBy(1);
+              // }
+            }
+            // }
+          }
+        }}
+        config={config}
+        style={{
+          flex: 1,
+        }}>
         <View
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            width: '100%',
-            // marginTop: Dimensions.get('window').height / 2.6,
-            position: 'absolute',
-            top: Dimensions.get('window').height / 2.6,
-            zIndex: 10,
-            elevation: 100,
+            marginTop:
+              matchingProfileData?.length < 1 &&
+              !screen &&
+              Dimensions.get('window').height / 2,
           }}>
-          <TouchableOpacity
-            disabled={currentIndex === 0 ? true : false}
-            onPress={() => animateCard('previous', false)}
-            style={{
-              borderRadius: 10, // Ensures the shadow follows the shape
-              overflow: 'hidden', // Prevents shadow from getting clipped
-              shadowColor: '#000',
-              shadowOffset: {width: 10, height: 5},
-              shadowOpacity: 0.3,
-              shadowRadius: 6,
-              elevation: 20, // Android shadow
-              opacity: currentIndex !== 0 ? 1 : 0.5,
-            }}>
-            <Image
-              source={Images.Back}
-              tintColor={'#fff'}
-              style={{
-                width: scaledValue(60),
-                height: scaledValue(60),
-              }}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => {
-              animateCard('next', true);
-            }}
-            style={{
-              borderRadius: 10, // Ensures the shadow follows the shape
-              overflow: 'hidden', // Prevents shadow from getting clipped
-              shadowColor: '#000',
-              shadowOffset: {width: 10, height: 4},
-              shadowOpacity: 0.3,
-              shadowRadius: 6,
-              elevation: 20, // Android shadow
-            }}>
-            <Image
-              source={Images.Forward}
-              tintColor={'#fff'}
-              style={{
-                width: scaledValue(60),
-                height: scaledValue(60),
-              }}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
-      {/* {matchingProfileData?.length >= 0 && ( */}
-
-      <View
-        {...panResponder.panHandlers}
-        style={{
-          marginTop:
-            matchingProfileData?.length < 1 &&
-            !screen &&
-            Dimensions.get('window').height / 2,
-          // height: matchingProfileData?.length > 0 && !screen && '100%',
-        }}>
-        <FlatList
-          data={screen ? userList : [matchingProfileData[currentIndex]]}
-          // contentContainerStyle={{height: '100%'}}
-          // contentContainerStyle={{
-          //   marginTop:
-          //     matchingProfileData?.length < 1 &&
-          //     !screen &&
-          //     Dimensions.get('window').height / 2,
-          //   height: matchingProfileData?.length > 0 && !screen && '100%',
-          // }}
-          ref={flatListRef}
-          // horizontal={true}
-          horizontal={matchingProfileData?.length > 0 || screen ? true : false}
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          scrollEnabled={false}
-          ListEmptyComponent={() => {
-            return (
-              <View
-                style={{
-                  flex: 1,
-                  alignSelf: 'center',
-                  justifyContent: 'center',
-                }}>
-                <GText
-                  text={'No additional matching\nprofiles available.'}
+          <FlatList
+            data={screen ? userList : [matchingProfileData[currentIndex]]}
+            ref={flatListRef}
+            horizontal={
+              matchingProfileData?.length > 0 || screen ? true : false
+            }
+            pagingEnabled
+            keyExtractor={item => item?._id}
+            showsHorizontalScrollIndicator={false}
+            scrollEnabled={false}
+            ListEmptyComponent={() => {
+              return (
+                <View
                   style={{
-                    color: '#fff',
-                    textAlign: 'center',
-                    fontSize: scaledValue(25),
-                  }}
-                />
-              </View>
-            );
-          }}
-          // onEndReached={matchingProfileLoadMore}
-          // onEndReached={() => alert('heuy')}
-          ListFooterComponent={matchingProfileLoader}
-          // renderItem={({item}) => {}}}
-          renderItem={({item}) => {
-            return (
-              <>
-                {matchingProfileData?.length < 1 && !screen ? (
-                  <View
+                    flex: 1,
+                    alignSelf: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <GText
+                    text={'No additional matching\nprofiles available.'}
                     style={{
-                      flex: 1,
-                      alignSelf: 'center',
-                      justifyContent: 'center',
-                    }}>
-                    <GText
-                      text={'No additional matching\nprofiles available.'}
-                      style={{
-                        color: '#fff',
-                        textAlign: 'center',
-                        fontSize: scaledValue(25),
-                      }}
-                    />
-                  </View>
-                ) : (
-                  <UserContent
-                    item={item}
-                    // panResponder={panResponder}
-                    pan={pan}
-                    screen={screen}
-                    animateCard={animateCard}
-                    send_connect_request_hit={send_connect_request_hit}
-                    opacityAni={opacityAnim}
-                    scaleAnim={scaleAnim}
-                    slideAnim={slideAnim}
-                    refRBSheet={refRBSheet}
-                    navigation={navigation}
-                    setReduceImgSize={setReduceImgSize}
-                    dispatch={dispatch}
-                    savedProfileData={savedProfileData}
-                    setMatchingProfileData={setMatchingProfileData}
-                    matchingProfileData={matchingProfileData}
-                    setData={setUserList}
-                    data={userList}
-                    setUserList={setUserListData}
-                    userList={userListData}
+                      color: '#fff',
+                      textAlign: 'center',
+                      fontSize: scaledValue(25),
+                    }}
                   />
-                )}
-              </>
-            );
-          }}
-        />
-      </View>
-      {/* )} */}
+                </View>
+              );
+            }}
+            ListFooterComponent={matchingProfileLoader}
+            renderItem={({item}) => {
+              return (
+                <>
+                  {matchingProfileData?.length < 1 && !screen ? (
+                    <View
+                      style={{
+                        flex: 1,
+                        alignSelf: 'center',
+                        justifyContent: 'center',
+                      }}>
+                      <GText
+                        text={'No additional matching\nprofiles available.'}
+                        style={{
+                          color: '#fff',
+                          textAlign: 'center',
+                          fontSize: scaledValue(25),
+                        }}
+                      />
+                    </View>
+                  ) : (
+                    <>
+                      {tutorialVisible && (
+                        <Modal
+                          visible={tutorialVisible}
+                          transparent
+                          animationType="fade"
+                          style={{margin: 0, padding: 0}}>
+                          <BlurView
+                            style={{
+                              width,
+                              height,
+                            }}
+                            blurType="light"
+                            blurAmount={2.5}
+                            reducedTransparencyFallbackColor="white">
+                            <View style={styles.tutorialContainer}>
+                              {currentModalIndex != 5 && (
+                                <View
+                                  style={{
+                                    // backgroundColor: 'red',
+                                    top: insets.top + scaledValue(13),
+                                    position: 'absolute',
+                                    right: scaledValue(32),
+                                    zIndex: 100,
+                                  }}>
+                                  <GTextButton
+                                    onPress={() => {
+                                      setTutorialVisible(false);
+                                      dispatch(setShowTutorial(false));
+                                    }}
+                                    title={'Skip Tutorial'}
+                                    titleStyle={{
+                                      color: colors.offWhite,
+                                      fontSize: scaledValue(16),
+                                      fontFamily: fonts.SUSE_MEDIUM,
+                                    }}
+                                  />
+                                </View>
+                              )}
+                              <Swiper
+                                height={Dimensions.get('window').height}
+                                ref={swiperRef}
+                                loop={false}
+                                scrollEnabled={false}
+                                showsPagination={true}
+                                dotStyle={styles.dot}
+                                activeDotStyle={styles.activeDot}
+                                onIndexChanged={index =>
+                                  setCurrentMOdalIndex(index)
+                                }>
+                                <FirstTutorial />
+                                <SecondTutorial />
+                                <ThirdTutorial swiperRef={swiperRef} />
+                                <ForthTutorial swiperRef={swiperRef} />
+                                <FifthTutorial swiperRef={swiperRef} />
+                                <CompleteTutorial
+                                  setTutorialVisible={setTutorialVisible}
+                                />
+                              </Swiper>
+                            </View>
+                          </BlurView>
+                        </Modal>
+                      )}
+                      <UserContent
+                        item={item}
+                        pan={pan}
+                        screen={screen}
+                        animateCard={animateCard}
+                        send_connect_request_hit={send_connect_request_hit}
+                        send_unconnect_request_hit={send_unconnect_request_hit}
+                        opacityAni={opacityAnim}
+                        scaleAnim={scaleAnim}
+                        slideAnim={slideAnim}
+                        refRBSheet={refRBSheet}
+                        navigation={navigation}
+                        setReduceImgSize={setReduceImgSize}
+                        dispatch={dispatch}
+                        savedProfileData={savedProfileData}
+                        setMatchingProfileData={setMatchingProfileData}
+                        matchingProfileData={matchingProfileData}
+                        setData={setUserList}
+                        data={userList}
+                        setUserList={setUserListData}
+                        userList={userListData}
+                      />
+                    </>
+                  )}
+                </>
+              );
+            }}
+          />
+        </View>
+      </GestureRecognizer>
     </LinearGradient>
   );
 };
