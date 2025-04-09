@@ -57,7 +57,8 @@ const TestimonialsController = {
             
             for (let i = 0; i < testimonials.length; i++) {
                 if (testimonials[i].image) {
-                    testimonials[i].image = await getSignedUrl(testimonials[i].image);
+                    //testimonials[i].image = await getSignedUrl(testimonials[i].image);
+                    testimonials[i].image = `${process.env.BASE_URL_IMAGE}/${testimonials[i].image}`;
                 }
             }
 
