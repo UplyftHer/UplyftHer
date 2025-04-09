@@ -1,5 +1,5 @@
 'use client';
-import React from 'react'
+import React, { useEffect, useState } from 'react';
 import "./LandingPage.css"
 import { Container} from 'react-bootstrap';
 import Link from 'next/link';
@@ -15,10 +15,36 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Header from '../Components/Headers/page';
 import ProfesSlider from '../Components/ProfesSlider/ProfesSlider';
+import axios from 'axios';
 
 
 
 function Landingpage() {
+  const [socials, setSocials] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  
+    const fetchSocials = async () => {
+      try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}api/admin/social-links`);
+         console.log('theredata', response)
+        if (response.data && response.data.socialLinks.length > 0) {
+          console.log('theredata', response)
+          setSocials(response.data.socialLinks);
+        }
+      } catch (error) {
+        console.error('API Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchSocials();
+  }, []);
+  
   return (
     <>
     <Header/>
@@ -257,9 +283,18 @@ function Landingpage() {
           <div className="FollowusDiv" data-aos="fade-up"data-aos-anchor-placement="top-bottom">
             <span>Follow us</span>
             <div className="social">
-              <Link target='_blank' href="https://www.instagram.com/accounts/login/?hl=en"><FaInstagram /></Link>
+            <div className="social">
+         {socials.map((item) => (
+        <Link key={item._id}target="_blank"href={item.url} rel="noopener noreferrer">
+         <img src={item.image} alt={item.name} style={{ width: 30, height: 30, marginRight: 10 }}
+         />
+       </Link>
+          ))}
+               </div>
+
+              {/* <Link target='_blank' href="https://www.instagram.com/accounts/login/?hl=en"><FaInstagram /></Link>
               <Link target='_blank' href="https://web.whatsapp.com/"> <FaWhatsapp /></Link>
-              <Link target='_blank' href="https://web.telegram.org/"><FaTelegramPlane /></Link>
+              <Link target='_blank' href="https://web.telegram.org/"><FaTelegramPlane /></Link> */}
             </div>
           </div>
         </div>
