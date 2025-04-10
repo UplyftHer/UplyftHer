@@ -1617,6 +1617,9 @@
     .UpliftedWomenSec {
         padding: 35px 0px;
     }
+    .TestimonialText{
+        max-width: 340px;
+    }
     .TestimonialText h2 {
         font-size: 22px;
         line-height: 25.12px;
@@ -1672,7 +1675,7 @@
 @media only screen and (max-width: 410px){
 
     .NetworkCard {
-        max-width: 375px;
+        max-width: 300px;
     }
     .NetworkTexed h4 {
         font-size: 16px;
