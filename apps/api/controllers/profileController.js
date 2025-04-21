@@ -2869,7 +2869,7 @@ const profileController = {
 
 
         //console.log("cognitoUserIdMy",cognitoUserIdMy);
-        const { search, filter, offset } = req.body;
+        const { search, filter, offset } = req.body.data;
 
         //console.log("cognitoUserId",cognitoUserId);
         try {
@@ -2945,7 +2945,7 @@ const profileController = {
                 };
             }
 
-            //console.log("finddata",finddata);
+            console.log("finddata",finddata);
 
             const users = await UsersModel.find(finddata).lean();
 
