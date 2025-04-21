@@ -2930,9 +2930,9 @@ const profileController = {
 
             if (search) {
                 finddata.$or = [
-                    { fullName: { $regex: search, $options: "i" } },
+                    //{ fullName: { $regex: search, $options: "i" } },
                     //{ location: { $regex: search, $options: "i" } },
-                    //{ "interests.name": { $regex: search, $options: "i" } }
+                    { "interests.name": { $regex: search, $options: "i" } }
                 ];
             }
 
