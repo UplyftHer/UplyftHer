@@ -16,13 +16,17 @@ import "slick-carousel/slick/slick-theme.css";
 import Header from '../Components/Headers/page';
 import ProfesSlider from '../Components/ProfesSlider/ProfesSlider';
 import axios from 'axios';
+import Cookies from '../Components/Cookies/Cookies';
+
 
 
 
 function Landingpage() {
+
   const [socials, setSocials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+
   
   useEffect(() => {
     setMounted(true);
@@ -47,6 +51,13 @@ function Landingpage() {
   
   return (
     <>
+
+    
+
+    <Cookies/>
+
+
+
     <Header/>
     
     <section className='HeroSection'>
