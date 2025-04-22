@@ -1,0 +1,240 @@
+.CookieSec{
+    position: fixed;
+    left: 20px;
+    bottom: 10%;
+    background: #ffffff;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    z-index: 9999;
+    max-width: 420px;
+}
+.CookieInner , .WantChosee{
+    padding: 20px 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.CookieInner p{
+    font-size: 12px;
+    font-weight: 400;
+    color: #262626;
+    margin: 0;
+}
+
+.TopCokieInner{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.TopCokieInner .text{
+    display: flex;
+    flex-direction: column;
+}
+.TopCokieInner .text small{
+    font-size: 15px;
+    font-weight: 400;
+    color: #262626;
+}
+.TopCokieInner .text span{
+    font-size: 21px;
+    font-weight: 600;
+    color: #262626;
+    line-height: 22px;
+}
+.WhyCookie{
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid rgba(0, 0, 0, 0.04);
+    background: #ffffff;
+}
+.WhyCookie h5{
+    font-size: 14px;
+    font-weight: 600;
+    color: #262626;
+    line-height: 22px;
+    margin: 0;
+}
+.WhyCookie ul{
+    margin: 0;
+}
+.WhyCookie ul li{
+    font-size: 12px;
+    font-weight: 400;
+    color: #262626;
+    line-height: 18px;
+}
+.WhyCookie ul li a{
+    color: #262626;
+}
+.WhyCookie ul li:hover {
+    text-decoration: underline;
+}
+
+.UplCertify span{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 18px;
+    letter-spacing: 0.02em;
+    color: #262626;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 8px 12px;
+    border-radius: 8px 8px 0px 0px;
+}
+.UplCertify span:hover{
+    background: #966B9D;
+    color: #FFF4EC;
+}
+.CookieBotm{
+    display: grid;
+    align-items: center;
+    grid-template-columns: 1fr  1fr;
+    border-top: 1px solid #EBECE9;
+}
+.CookieBotm button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 19.2px;
+    letter-spacing: 0.02em;
+    color: #262626;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+}
+.CookieBotm button:hover{
+    background: #966B9D !important;
+    color: #FFF4EC;
+}
+.CookieBotm button:first-child{
+    border-radius: 0px 0px 0px 8px;
+    border-right: 1px solid #EBECE9 ;
+}
+.CookieBotm button:last-child{
+    border-radius: 0px 0px 8px 0px;
+    /* border-left: 1px solid #EBECE9 ; */
+}
+
+
+/* WantChosee */
+
+
+.sitelock{
+    text-align: center;
+}
+.WantTexed h3{
+    font-size: 23px;
+    font-weight: 600;
+    color: #262626;
+    line-height: 22px;
+}
+.WantTexed p{
+    font-size: 14px;
+    font-weight: 400;
+    color: #262626;
+    margin: 0;
+}
+
+
+.TopToggle{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.Cookie-toggle-wrapper {
+    position: relative;
+    width: 50px;
+    height: 30px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.Cookie-toggle-wrapper .form-check-input {
+    opacity: 0;
+    width: 50px;
+    height: 24px;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+
+.Cookie-custom-toggle {
+    width: 50px;
+    height: 24px;
+    background: rgb(173, 173, 173);
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    transition: background-color 0.3s;
+}
+
+.Cookie-custom-toggle.on {
+    background: #966B9D;
+}
+
+.Cookie-custom-toggle .icon {
+    background: rgb(255, 255, 255);
+    box-shadow: rgba(0, 0, 0, 0.336) 0px 3px 12px;
+    transition: background-color 0.25s, transform 0.25s, box-shadow 0.15s;
+    /* border: 1px solid #966B9D; */
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.Checksvg{
+    color: #966B9D;
+}
+
+.Cookie-custom-toggle.on .icon {
+    transform: translateX(25px);
+}
+
+.CookieToggleDiv{
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid rgba(0, 0, 0, 0.04);
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.GlCokieCard{
+    display: grid;
+    align-items: center;
+    grid-template-columns: auto 1fr; 
+    grid-gap: 25px;
+}
+.CokieCardItems{
+    display: flex;
+    gap: 10px;
+}
+.CokieCardItems .ckcardtext span{
+    font-size: 16px;
+    font-weight: 600;
+    color: #262626;
+    line-height: 18px;
+}
+.CokieCardItems .ckcardtext p{
+    font-size: 12px;
+    font-weight: 400;
+    color: #262626;
+    margin: 0;
+}
+  
+/* WantChosee */
