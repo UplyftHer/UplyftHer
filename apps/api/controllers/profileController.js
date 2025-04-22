@@ -2929,18 +2929,28 @@ const profileController = {
 
 
             if (search) {
-                finddata.$or = [
-                    //{ fullName: { $regex: search, $options: "i" } },
-                    //{ location: { $regex: search, $options: "i" } },
-                    { "interests.name": { $regex: search, $options: "i" } }
+                finddata.$and = [
+                    {
+                        $or: [
+                          // Uncomment these if you want to include them
+                          // { fullName: { $regex: search, $options: "i" } },
+                          // { location: { $regex: search, $options: "i" } },
+                          { "interests.name": { $regex: search, $options: "i" } },
+                        ],
+                    },
                 ];
+                // finddata.$or = [
+                //     //{ fullName: { $regex: search, $options: "i" } },
+                //     //{ location: { $regex: search, $options: "i" } },
+                //     { "interests.name": { $regex: search, $options: "i" } }
+                // ];
             }
 
 
             if (filter && Array.isArray(filter) && filter.length > 0) {
                 finddata.interests = {
                     $elemMatch: {
-                        interestId: { $in: filter },
+                        name: { $in: filter },
                     },
                 };
             }
