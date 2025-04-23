@@ -2869,7 +2869,7 @@ const profileController = {
 
 
         //console.log("cognitoUserIdMy",cognitoUserIdMy);
-        const { search, filter, offset } = req.body.data;
+        const { search, filter, offset } = req.body;
 
         //console.log("cognitoUserId",cognitoUserId);
         try {
