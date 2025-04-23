@@ -674,7 +674,7 @@ const profileController = {
         } catch (error) {
             //res.status(500).json({ message: 'Error saving profile', error });
             let errormessage = error.message;
-            if(error.message == "Access Token has expired")
+            if(error.message == "Access Token has expired" || error.message == "Missing required key 'AccessToken' in params")
             {
                 //return res.json({ status: 0, message: errormessage });
                 res.status(401).json({ status: 0, message: errormessage });
