@@ -84,17 +84,11 @@ importers:
         specifier: ^1.11.0
         version: 1.11.0(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
       '@react-native-firebase/app':
-        specifier: ^21.12.3
-        version: 21.12.3(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
-      '@react-native-firebase/auth':
-        specifier: ^21.12.3
-        version: 21.12.3(@react-native-firebase/app@21.12.3(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0))
-      '@react-native-firebase/crashlytics':
-        specifier: ^21.12.3
-        version: 21.12.3(@react-native-firebase/app@21.12.3(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0))
+        specifier: ^21.14.0
+        version: 21.14.0(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
       '@react-native-firebase/messaging':
-        specifier: ^21.12.3
-        version: 21.12.3(@react-native-firebase/app@21.12.3(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0))
+        specifier: ^21.14.0
+        version: 21.14.0(@react-native-firebase/app@21.14.0(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0))
       '@react-native/codegen':
         specifier: ^0.78.1
         version: 0.78.1(@babel/preset-env@7.26.9(@babel/core@7.26.10))
@@ -150,8 +144,8 @@ importers:
         specifier: ^7.4.0
         version: 7.4.0(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
       react-native-date-picker:
-        specifier: ^5.0.11
-        version: 5.0.11(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
+        specifier: ^5.0.12
+        version: 5.0.12(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
       react-native-deck-swiper:
         specifier: ^2.0.17
         version: 2.0.17(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
@@ -1775,8 +1769,8 @@ packages:
       react: '>=16.6.3'
       react-native: '>=0.58.4'
 
-  '@react-native-firebase/app@21.12.3':
-    resolution: {integrity: sha512-q+FoAJ9yZrXg4hJDXQQputeO/b0yos3iMMV7nnhz3ZizVE9MxfpPCWACveYhs9Suni+c/+b44wPR9P6vS/kM/g==}
+  '@react-native-firebase/app@21.14.0':
+    resolution: {integrity: sha512-vBNfn7PoQrZfANLJnJiWZSHVu7WG6hjM5w3MDfmG8DLdr8VsAVBUgsn8lGpqobSuno1vTgwDIhR8PYZjMGsuvg==}
     peerDependencies:
       expo: '>=47.0.0'
       react: '*'
@@ -1785,28 +1779,10 @@ packages:
       expo:
         optional: true
 
-  '@react-native-firebase/auth@21.12.3':
-    resolution: {integrity: sha512-GK0yZfOxNP3CwczsMIYzldBf9Qv26DCstOTGvwusC75XppSyWE/b6I2ZqB219wv9zyvVgO2DRnRcGk2FaQtCsw==}
+  '@react-native-firebase/messaging@21.14.0':
+    resolution: {integrity: sha512-EwJVFr2xtQFf6wQ3anXvnxCyFNRc6Hw7B6Ov4GYwgBEXNzw0MIPN2qDDA3lIN2a6nf6zESPuflYyG6Tel1ovSQ==}
     peerDependencies:
-      '@react-native-firebase/app': 21.12.3
-      expo: '>=47.0.0'
-    peerDependenciesMeta:
-      expo:
-        optional: true
-
-  '@react-native-firebase/crashlytics@21.12.3':
-    resolution: {integrity: sha512-kqzVsD26694s8SBe9kO18Gzgs4tP1b9Y4B7L0K9xGb/naVu6ubdJoVjWub4VLd/BLLWVOByHnQo/cugAO48wsQ==}
-    peerDependencies:
-      '@react-native-firebase/app': 21.12.3
-      expo: '>=47.0.0'
-    peerDependenciesMeta:
-      expo:
-        optional: true
-
-  '@react-native-firebase/messaging@21.12.3':
-    resolution: {integrity: sha512-ibrT9VPPPZggRN0a6qENsoU0kGTKNvGcXhjZ3YYB2B6TCDnTgI29vZOTT0KM5RgR7L8FBcT7Ie3NOT1OQWD7pw==}
-    peerDependencies:
-      '@react-native-firebase/app': 21.12.3
+      '@react-native-firebase/app': 21.14.0
       expo: '>=47.0.0'
     peerDependenciesMeta:
       expo:
@@ -2362,10 +2338,6 @@ packages:
     resolution: {integrity: sha512-XBWpUP0mHya6yGBwNefhyEa6V7HgYKCxEAY4qhTm/PcAQyBPNmjj97VZJOJkVdUsyuuii7xmq0pXWX/c2aToHQ==}
     cpu: [x64]
     os: [win32]
-
-  '@xmldom/xmldom@0.8.10':
-    resolution: {integrity: sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==}
-    engines: {node: '>=10.0.0'}
 
   abort-controller@3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
@@ -4838,10 +4810,6 @@ packages:
     resolution: {integrity: sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==}
     engines: {node: '>=8'}
 
-  plist@3.1.0:
-    resolution: {integrity: sha512-uysumyrvkUX0rX/dEVqt8gC3sTBzd4zoWfLeS29nb53imdaXVvLINYXTI2GNqzaMuvacNx4uJQ8+b3zXR0pkgQ==}
-    engines: {node: '>=10.4.0'}
-
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
     engines: {node: '>= 0.4'}
@@ -5023,8 +4991,8 @@ packages:
       react-native:
         optional: true
 
-  react-native-date-picker@5.0.11:
-    resolution: {integrity: sha512-D7NSGVEhpgAEipo/PSy5oDJsLWRWaJQ5FS9ujr1HI1pVUIGJ0B6LaHoz2zR2X0LQ/IWWTA7mijUdeq5xbSXrEQ==}
+  react-native-date-picker@5.0.12:
+    resolution: {integrity: sha512-R/mUnCKhcuxbhKPFwYdBQCxQt9HHLqpM4ruRUqlcBjiUZ3N2wdnwOMyc888Ps8qp8e7v29PrDHtUlG8LPuFn9w==}
     peerDependencies:
       react: '>= 17.0.1'
       react-native: '>= 0.64.3'
@@ -5516,10 +5484,6 @@ packages:
   source-map-support@0.5.21:
     resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}
 
-  source-map@0.5.6:
-    resolution: {integrity: sha512-MjZkVp0NHr5+TPihLcadqnlVoGIoWo4IBHptutGh9wI3ttUYvCG26HkSuDi+K6lsZ25syXJXcctwgyVCt//xqA==}
-    engines: {node: '>=0.10.0'}
-
   source-map@0.5.7:
     resolution: {integrity: sha512-LbrmJOMUSdEVxIKvdcJzQC+nQhe8FUZQTXQy6+I75skNgn3OoQ0DZA8YnFa7gp8tqtL3KPf1kmo0R5DoApeSGQ==}
     engines: {node: '>=0.10.0'}
@@ -5545,21 +5509,12 @@ packages:
   stable-hash@0.0.5:
     resolution: {integrity: sha512-+L3ccpzibovGXFK+Ap/f8LOS0ahMrHTf3xu7mMLSpEGU0EO9ucaysSylKo9eRDFNhWve/y275iPmIZ4z39a9iA==}
 
-  stack-generator@2.0.10:
-    resolution: {integrity: sha512-mwnua/hkqM6pF4k8SnmZ2zfETsRUpWXREfA/goT8SLCV4iOFa4bzOX2nDipWAZFPTjLvQB82f5yaodMVhK0yJQ==}
-
   stack-utils@2.0.6:
     resolution: {integrity: sha512-XlkWvfIm6RmsWtNJx+uqtKLS8eqFbxUg0ZzLXqY0caEy9l7hruX8IpiDnjsLavoBgqCCR71TqWO8MaXYheJ3RQ==}
     engines: {node: '>=10'}
 
   stackframe@1.3.4:
     resolution: {integrity: sha512-oeVtt7eWQS+Na6F//S4kJ2K2VbRlS9D43mAlMyVpVWovy9o+jfgH8O9agzANzaiLjclA0oYzUXEM4PurhSUChw==}
-
-  stacktrace-gps@3.1.2:
-    resolution: {integrity: sha512-GcUgbO4Jsqqg6RxfyTHFiPxdPqF+3LFmQhm7MgCuYQOYuWyqxo5pwRPz5d/u6/WYJdEnWfK4r+jGbyD8TSggXQ==}
-
-  stacktrace-js@2.0.2:
-    resolution: {integrity: sha512-Je5vBeY4S1r/RnLydLl0TBTi3F2qdfWmYsGvtfZgEI+SCprPppaIhQf5nGcal4gI4cGpCV/duLcAzT1np6sQqg==}
 
   stacktrace-parser@0.1.11:
     resolution: {integrity: sha512-WjlahMgHmCJpqzU8bIBy4qtsZdU9lRlcZE3Lvyej6t4tuOuv1vk57OW3MBrj6hXBFx/nNoC9MPMTcr5YA7NQbg==}
@@ -6096,10 +6051,6 @@ packages:
   xmlbuilder@11.0.1:
     resolution: {integrity: sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA==}
     engines: {node: '>=4.0'}
-
-  xmlbuilder@15.1.1:
-    resolution: {integrity: sha512-yMqGBqtXyeN1e3TGYvgNgDVZ3j84W4cwkOXQswghol6APgZWaff9lnbvN7MHYJOiXsvGPXtjTYJEiC9J2wv9Eg==}
-    engines: {node: '>=8.0'}
 
   xmlhttprequest-ssl@2.1.2:
     resolution: {integrity: sha512-TEU+nJVUUnA4CYJFLvK5X9AOeH4KvDvhIfm0vV1GaQRtchnG0hgK5p8hw/xjv8cunWYCsiPCSDzObPyhEwq3KQ==}
@@ -8062,7 +8013,7 @@ snapshots:
       react: 19.0.0
       react-native: 0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)
 
-  '@react-native-firebase/app@21.12.3(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)':
+  '@react-native-firebase/app@21.14.0(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)':
     dependencies:
       firebase: 11.3.1(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))
       react: 19.0.0
@@ -8070,19 +8021,9 @@ snapshots:
     transitivePeerDependencies:
       - '@react-native-async-storage/async-storage'
 
-  '@react-native-firebase/auth@21.12.3(@react-native-firebase/app@21.12.3(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0))':
+  '@react-native-firebase/messaging@21.14.0(@react-native-firebase/app@21.14.0(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0))':
     dependencies:
-      '@react-native-firebase/app': 21.12.3(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
-      plist: 3.1.0
-
-  '@react-native-firebase/crashlytics@21.12.3(@react-native-firebase/app@21.12.3(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0))':
-    dependencies:
-      '@react-native-firebase/app': 21.12.3(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
-      stacktrace-js: 2.0.2
-
-  '@react-native-firebase/messaging@21.12.3(@react-native-firebase/app@21.12.3(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0))':
-    dependencies:
-      '@react-native-firebase/app': 21.12.3(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
+      '@react-native-firebase/app': 21.14.0(@react-native-async-storage/async-storage@2.1.2(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)))(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0)
 
   '@react-native/assets-registry@0.78.1': {}
 
@@ -8814,8 +8755,6 @@ snapshots:
 
   '@unrs/resolver-binding-win32-x64-msvc@1.3.2':
     optional: true
-
-  '@xmldom/xmldom@0.8.10': {}
 
   abort-controller@3.0.0:
     dependencies:
@@ -11984,12 +11923,6 @@ snapshots:
     dependencies:
       find-up: 4.1.0
 
-  plist@3.1.0:
-    dependencies:
-      '@xmldom/xmldom': 0.8.10
-      base64-js: 1.5.1
-      xmlbuilder: 15.1.1
-
   possible-typed-array-names@1.1.0: {}
 
   postcss@8.4.31:
@@ -12187,7 +12120,7 @@ snapshots:
       react: 19.0.0
       react-native: 0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)
 
-  react-native-date-picker@5.0.11(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0):
+  react-native-date-picker@5.0.12(react-native@0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0))(react@19.0.0):
     dependencies:
       react: 19.0.0
       react-native: 0.78.1(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(@react-native-community/cli@15.0.1(typescript@5.0.4))(@types/react@19.0.12)(react@19.0.0)
@@ -12793,8 +12726,6 @@ snapshots:
       buffer-from: 1.1.2
       source-map: 0.6.1
 
-  source-map@0.5.6: {}
-
   source-map@0.5.7: {}
 
   source-map@0.6.1: {}
@@ -12811,26 +12742,11 @@ snapshots:
 
   stable-hash@0.0.5: {}
 
-  stack-generator@2.0.10:
-    dependencies:
-      stackframe: 1.3.4
-
   stack-utils@2.0.6:
     dependencies:
       escape-string-regexp: 2.0.0
 
   stackframe@1.3.4: {}
-
-  stacktrace-gps@3.1.2:
-    dependencies:
-      source-map: 0.5.6
-      stackframe: 1.3.4
-
-  stacktrace-js@2.0.2:
-    dependencies:
-      error-stack-parser: 2.1.4
-      stack-generator: 2.0.10
-      stacktrace-gps: 3.1.2
 
   stacktrace-parser@0.1.11:
     dependencies:
@@ -13365,8 +13281,6 @@ snapshots:
       xmlbuilder: 11.0.1
 
   xmlbuilder@11.0.1: {}
-
-  xmlbuilder@15.1.1: {}
 
   xmlhttprequest-ssl@2.1.2: {}
 
