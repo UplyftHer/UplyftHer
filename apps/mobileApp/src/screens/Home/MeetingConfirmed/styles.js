@@ -60,12 +60,12 @@ export const styles = StyleSheet.create({
     height: scaledHeightValue(68),
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: scaledValue(50),
+    borderRadius: scaledValue(34),
   },
   userImage: {
     width: scaledValue(60),
     height: scaledHeightValue(60),
-    borderRadius: scaledValue(50),
+    borderRadius: scaledValue(30),
     color: colors.charcoal,
   },
 

@@ -31,11 +31,11 @@ const MeetingConfirmed = ({navigation}) => {
     // <View style={styles.container}>
     <ImageBackground source={Images.InvitationBg} style={{height: '100%'}}>
       {/* <ScrollView showsVerticalScrollIndicator={false} style={{flexGrow: 1}}> */}
-      <StatusBar
+      {/* <StatusBar
         translucent
         backgroundColor="transparent"
         barStyle="dark-content"
-      />
+      /> */}
 
       {/* <Image source={Images.whiteLines} style={styles.whiteLines} /> */}
       <View style={styles.headerTitileView(insets)}>

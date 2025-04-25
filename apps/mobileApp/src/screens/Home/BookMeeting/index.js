@@ -371,7 +371,7 @@ const BookMeeting = ({navigation, route}) => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         style={styles.container}>
-        <StatusBar backgroundColor={colors.offWhite} barStyle="dark-content" />
+        {/* <StatusBar backgroundColor={colors.offWhite} barStyle="dark-content" /> */}
         <ProfileCard
           name={mentorData?.fullName}
           image={mentorData?.profilePic}

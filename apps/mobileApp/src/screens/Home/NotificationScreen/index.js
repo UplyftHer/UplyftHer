@@ -29,11 +29,18 @@ import GradientBorderButton from '../../../components/GradientBorderButton';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {accept_decline_request} from '../../../redux/slices/notificationSlice';
 import useDataFactory from '../../../components/UseDataFactory/useDataFactory';
+import {useEffect} from 'react';
+import {setNewNotification} from '../../../redux/slices/authSlice';
 
 const NotificationScreen = ({navigation}) => {
   const userData = useAppSelector(state => state.auth.user);
   const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(setNewNotification(false));
+  }, []);
+
   const {loading, data, setData, refreshData, loadMore, Placeholder, Loader} =
     useDataFactory('notificationsList', true, '', 'POST');
 
@@ -135,11 +142,11 @@ const NotificationScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar
+      {/* <StatusBar
         backgroundColor="#A45EB0"
         barStyle="dark-content"
         translucent
-      />
+      /> */}
       <LinearGradient
         colors={['#A45EB0', '#A45EB0', '#DA7575']}
         style={[

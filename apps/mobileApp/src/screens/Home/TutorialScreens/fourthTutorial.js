@@ -15,10 +15,10 @@ import {useAppSelector} from '../../../redux/store/storeUtils';
 
 const {width, height} = Dimensions.get('window');
 
-const ForthTutorial = ({swiperRef}) => {
+const ForthTutorial = ({goToNextManually}) => {
   const insets = useSafeAreaInsets();
   const userData = useAppSelector(state => state.auth.user);
-  const user = userData?.userType === 0 ? 'mentee' : 'mentor';
+  const user = userData?.userType === 0 ? 'mentor' : 'mentee';
   const tapText = `to skip this ${user}`;
 
   return (
@@ -30,7 +30,7 @@ const ForthTutorial = ({swiperRef}) => {
         <View style={styles.tapView(insets)}>
           <TouchableOpacity
             onPress={() => {
-              swiperRef.current.scrollBy(1);
+              goToNextManually();
             }}
             style={styles.tapTouchView}>
             <Image source={Images.rejectImage} style={styles.rejectImgStyle} />
@@ -45,15 +45,21 @@ export default ForthTutorial;
 
 const styles = StyleSheet.create({
   container: {
-    width,
-    justifyContent: 'center',
-    paddingHorizontal: scaledValue(20),
-    position: 'absolute',
-    bottom: 0,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'flex-end', // important for bottom align
+    alignItems: 'center',
+    // backgroundColor: 'rgba(0,0,0,0.6)', // semi-transparent if desired
+    position: 'absolute', // can overlay over anything
+    top: 0,
+    left: 0,
   },
   innerView: {
-    height: '100%',
+    // height: '100%',
     marginLeft: scaledValue(50),
+    // alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: scaledValue(40),
   },
   tapTextStyle: {
     color: colors.peachy,

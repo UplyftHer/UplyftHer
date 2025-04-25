@@ -223,11 +223,11 @@ const Inbox = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar
+      {/* <StatusBar
         translucent
         backgroundColor="transparent"
         barStyle="light-content"
-      />
+      /> */}
       <ImageBackground
         source={Images.gradientRect}
         resizeMode="cover"

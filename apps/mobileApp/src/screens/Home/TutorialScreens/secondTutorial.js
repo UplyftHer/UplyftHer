@@ -12,7 +12,7 @@ const SecondTutorial = () => {
   const translateX = useRef(new Animated.Value(-50)).current;
   const opacity = useRef(new Animated.Value(1)).current;
   const userData = useAppSelector(state => state.auth.user);
-  const user = userData?.userType === 0 ? 'mentee' : 'mentor';
+  const user = userData?.userType === 0 ? 'mentor' : 'mentee';
   const swipeRight = 'Swipe Right';
   const swipeLeftToView = `to go back to\nthe previous ${user}`;
 
@@ -68,11 +68,12 @@ export default SecondTutorial;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    width,
+    // flex: 1,
+    // width,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: scaledValue(20),
+    width: '100%',
   },
   innerView: {
     justifyContent: 'center',

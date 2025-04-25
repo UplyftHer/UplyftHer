@@ -228,7 +228,7 @@ const ChatScreen = ({navigation, route}) => {
 
   return (
     <>
-      <StatusBar backgroundColor="#A45EB0" barStyle="dark-content" />
+      {/* <StatusBar backgroundColor="#A45EB0" barStyle="dark-content" /> */}
       {editCheck ? (
         <LinearGradient
           colors={['#A45EB0', '#A45EB0', '#DA7575']}

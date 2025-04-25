@@ -6,8 +6,28 @@ import {Alert} from 'react-native';
 import {logout_user} from '../redux/slices/authSlice';
 import {showToast} from '../components/Toast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo'; // ✅ Import NetInfo
 
 export default async function API(props) {
+  // ✅ Check internet connection first
+  const netState = await NetInfo.fetch();
+
+  if (!netState.isConnected) {
+    if (!global.networkError) {
+      global.networkError = true;
+
+      Alert.alert(
+        'No Internet Connection',
+        'Please check your internet connection and try again.',
+        [{text: 'OK', onPress: () => (global.networkError = false)}],
+      );
+    }
+
+    return {
+      status: 0,
+      error: 'No internet connection',
+    };
+  }
   //SET URL
   let path = API_BASE_URL;
   let route = props.route;
@@ -35,7 +55,6 @@ export default async function API(props) {
   if (multiPartData) {
     Object.keys(body).forEach(key => {
       if (Array.isArray(body[key])) {
-        // Append each array element with the same key
         body[key].forEach(item => {
           formData.append(key, item);
         });
@@ -46,55 +65,56 @@ export default async function API(props) {
   }
 
   const authState = store.getState().auth;
-
   let accessToken = authState?.user?.accessToken;
 
-  //   let headers = {};
-  //SET HEADERS
   let headers = {
-    // 'Content-Type': 'multipart/form-data',
     Authorization: `Bearer ${accessToken}`,
-    // locale: locale || systemLocale || 'en',
   };
+
   if (props.headers) {
     headers = {...headers, ...props.headers};
     console.log('TempHeaders2=>>', headers);
   }
+
   console.log(url);
-  //SET REQUEST
+
   const request = {
     method: method,
     url: url,
     headers: headers,
   };
-  if (method != 'GET') {
-    // request.data = multiPartData ? formData : body;
-    console.log('formDataValue', JSON.stringify(formData));
 
+  if (method != 'GET') {
+    console.log('formDataValue', JSON.stringify(formData));
     request.data = multiPartData ? formData : body;
   }
 
   console.log('request', request);
 
-  //CALL API
   try {
     let response = await axios(request);
     console.log('response=>>>>', JSON.stringify(response));
     return response;
   } catch (error) {
     console.log('errors0012555', error);
-    // console.log('error.response.status', error.response.status);
     if (accessToken && error?.response?.status === 403) {
-      store.dispatch(
-        logout_user({
-          deviceToken: (await AsyncStorage.getItem('fcmToken')) || '1234',
-        }),
-      );
-      showToast(0, 'Your account is temporarily restricted.');
+      if (!global.temporaryDelete) {
+        global.temporaryDelete = true;
+
+        store.dispatch(
+          logout_user({
+            deviceToken: (await AsyncStorage.getItem('fcmToken')) || '1234',
+          }),
+        );
+        showToast(0, 'Your account is temporarily restricted.');
+      }
+
+      return {
+        status: 0,
+        error: 'Your account is temporarily restricted.',
+      };
     }
-    // Alert.alert(error?.code, error?.message);
-    console.log('errors', error?.code);
-    console.log('errors0012', error?.message);
+
     if (error?.code === 'ERR_NETWORK' && !global.networkError) {
       global.networkError = true;
       Alert.alert(
@@ -108,12 +128,14 @@ export default async function API(props) {
         ],
       );
     }
+
     if (!error.response) {
       return {
         status: 26,
         error: error,
       };
     }
+
     return error;
   }
 }

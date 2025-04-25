@@ -12,9 +12,9 @@ import {Images} from '../../../utils';
 import {colors} from '../../../../assets/colors';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-const {width} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
-const ThirdTutorial = ({swiperRef}) => {
+const ThirdTutorial = ({goToNextManually}) => {
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.container}>
@@ -25,7 +25,7 @@ const ThirdTutorial = ({swiperRef}) => {
         <View style={styles.tapView(insets)}>
           <TouchableOpacity
             onPress={() => {
-              swiperRef.current.scrollBy(1);
+              goToNextManually();
             }}
             style={styles.tapTouchView}>
             <Image source={Images.checkCircle} style={styles.circleImgStyle} />
@@ -40,16 +40,21 @@ export default ThirdTutorial;
 
 const styles = StyleSheet.create({
   container: {
-    width,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'flex-end', // important for bottom align
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: scaledValue(20),
-    position: 'absolute',
-    bottom: 0,
+    // backgroundColor: 'rgba(0,0,0,0.6)', // semi-transparent if desired
+    position: 'absolute', // can overlay over anything
+    top: 0,
+    left: 0,
   },
   innerView: {
-    height: '100%',
+    // height: '100%',
+    // alignItems: 'center',
     alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: scaledValue(20),
   },
   tapTextStyle: {
     color: colors.peachy,

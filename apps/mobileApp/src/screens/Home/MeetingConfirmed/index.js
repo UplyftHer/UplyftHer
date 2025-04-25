@@ -26,6 +26,7 @@ import {useAppSelector} from '../../../redux/store/storeUtils';
 import RNCalendarEvents from 'react-native-calendar-events';
 import moment from 'moment';
 import {showToast} from '../../../components/Toast';
+import {CommonActions} from '@react-navigation/native';
 
 const MeetingConfirmed = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
@@ -34,28 +35,6 @@ const MeetingConfirmed = ({navigation, route}) => {
   const [eventId, setEventId] = useState('');
   const [calendars, setCalendars] = useState([]);
   const [pickedCal, setPickedCal] = useState(null);
-
-  // async function loadCalendars() {
-  //   try {
-  //     const perms = await RNCalendarEvents.requestPermissions();
-  //     if (perms === 'authorized') {
-  //       const allCalendars = await RNCalendarEvents.findCalendars();
-  //       const primaryCal = allCalendars.find(
-  //         cal => cal.isPrimary && cal.allowsModifications,
-  //       );
-  //       if (primaryCal) {
-  //         primaryCal.title = 'Default Calendar'; // Ensuring the title exists
-  //       }
-  //       setCalendars(allCalendars);
-  //       setPickedCal(primaryCal);
-  //       createEvent();
-  //     } else {
-  //       console.log('Calendar permission denied.');
-  //     }
-  //   } catch (error) {
-  //     console.log('Error while fetching calendars:', error);
-  //   }
-  // }
 
   async function loadCalendars() {
     try {
@@ -147,33 +126,34 @@ const MeetingConfirmed = ({navigation, route}) => {
         eventDetails,
       );
       showToast(1, 'Meeting added to calender successfully!');
-      navigation?.goBack();
+      // navigation?.goBack();
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'TabBar', // Your tab navigator
+              state: {
+                index: 0,
+                routes: [
+                  {
+                    name: 'HomeStack', // Your first stack inside tabs
+                    state: {
+                      index: 0,
+                      routes: [{name: 'DashBoardScreen'}], // First screen in the stack
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+      );
       console.log('Event created with ID:', eventId);
     } catch (error) {
       console.log('Error while creating event:', error);
     }
   }
-
-  // Format it to ISO 8601
-
-  // const createEvent = async () => {
-  //   try {
-  //     const savedEventId = await RNCalendarEvents.saveEvent(
-  //       newMeetingData?.meetingTitle,
-  //       {
-  //         calendarId: Platform.OS === 'android' ? pickedCal?.id : undefined,
-  //         startDate: formattedDate,
-  //         endDate: formattedDate,
-  //         // location: eventLocation,
-  //       },
-  //     );
-
-  //     setEventId(savedEventId);
-  //     alert('Event saved successfully.');
-  //   } catch (error) {
-  //     console.log('Error while saving event:', error);
-  //   }
-  // };
 
   const formatDate = dateString => {
     const date = new Date(dateString);
@@ -187,11 +167,11 @@ const MeetingConfirmed = ({navigation, route}) => {
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} style={{flexGrow: 1}}>
-        <StatusBar
+        {/* <StatusBar
           translucent
           backgroundColor="transparent"
           barStyle="dark-content"
-        />
+        /> */}
 
         <Image source={Images.whiteLines} style={styles.whiteLines} />
         <View style={styles.headerTitileView(insets)}>

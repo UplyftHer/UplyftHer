@@ -50,12 +50,15 @@ import {
   edit_user_location,
   edit_user_profile,
   get_cities_api,
+  setShowTutorial,
 } from '../../../redux/slices/authSlice';
 
 const DashboardScreen = ({navigation, route}) => {
   const savedProfileData = useSelector(state => state.profile.savedProfile);
   const [showModal, setShowModal] = useState(false);
   const userData = useAppSelector(state => state.auth.user);
+  const newNotification = useAppSelector(state => state.auth.isNewNotification);
+
   const [subCity, setSubCity] = useState([]);
   const [countryId, setCountryId] = useState();
   const refRBSheetCountry = useRef();
@@ -82,9 +85,10 @@ const DashboardScreen = ({navigation, route}) => {
 
   useEffect(() => {
     configureHeader();
-  }, [userData]);
+  }, [userData, newNotification]);
 
   useEffect(() => {
+    // dispatch(setShowTutorial(true));
     getSaved_profile_hit();
 
     if (matchingProfileData?.length < 1) {
@@ -134,7 +138,7 @@ const DashboardScreen = ({navigation, route}) => {
           />
 
           <HeaderButton
-            icon={Images.bellIcon}
+            icon={newNotification ? Images.bellIcon : Images.noBellIcon}
             onPress={() => {
               navigation.navigate('StackScreens', {
                 screen: 'NotificationScreen',
@@ -233,9 +237,16 @@ const DashboardScreen = ({navigation, route}) => {
             <View style={{flexDirection: 'row'}}>
               <GText
                 beVietnamSemiBold
-                text={`${item?.cognitoUserIdSave?.fullName?.split(' ')[0]}, ${
+                text={`${item?.cognitoUserIdSave?.fullName?.split(' ')[0]}`}
+                style={styles.userName}
+              />
+              <GText
+                beVietnamSemiBold
+                text={
                   item?.cognitoUserIdSave?.age
-                }`}
+                    ? `, ${item?.cognitoUserIdSave?.age}`
+                    : ''
+                }
                 style={styles.userName}
               />
             </View>
@@ -428,9 +439,8 @@ const DashboardScreen = ({navigation, route}) => {
                           <UserCard
                             userDetailStyle={styles.userCardDetailStyle}
                             itemData={item}
-                            userName={`${item?.fullName.split(' ')[0]}, ${
-                              item?.age
-                            }`}
+                            userAge={item?.age}
+                            userName={`${item?.fullName.split(' ')[0]}`}
                             label={`${item.matchPercentage}% Match`}
                             index={index}
                             onPress={() =>
@@ -479,9 +489,10 @@ const DashboardScreen = ({navigation, route}) => {
                       renderItem={({item, index}) => {
                         return (
                           <UserCard
+                            userAge={item?.userdetail?.age}
                             userName={`${
                               item?.userdetail?.fullName.split(' ')[0]
-                            }, ${item?.userdetail?.age}`}
+                            }`}
                             onPress={() =>
                               navigation?.navigate('StackScreens', {
                                 screen: 'ProfileScreen',

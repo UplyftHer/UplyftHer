@@ -25,7 +25,10 @@ import {useAppDispatch} from './src/redux/store/storeUtils';
 import {
   get_industry_api,
   get_interests_api,
+  setNewNotification,
+  setShowTutorial,
 } from './src/redux/slices/authSlice';
+import {EventRegister} from 'react-native-event-listeners';
 
 export const navigationContainerRef = createNavigationContainerRef();
 
@@ -39,10 +42,10 @@ const App = () => {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <SafeAreaProvider>
-          <StatusBar
+          {/* <StatusBar
             backgroundColor={colors.offWhite}
             barStyle="dark-content"
-          />
+          /> */}
           <AppNavigation />
         </SafeAreaProvider>
       </PersistGate>
@@ -58,6 +61,9 @@ const AppNavigation = () => {
   const RootStack = createNativeStackNavigator();
   const dispatch = useAppDispatch();
   useEffect(() => {
+    EventRegister.addEventListener('notificationReceived', data => {
+      dispatch(setNewNotification(true));
+    });
     dispatch(get_industry_api());
     dispatch(get_interests_api());
   }, []);

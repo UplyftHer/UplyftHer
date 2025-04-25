@@ -29,6 +29,7 @@ import Input from '../../../components/Input';
 import {colors} from '../../../../assets/colors';
 import {closeEye, openEye} from '../../../utils/Images';
 import {showToast} from '../../../components/Toast';
+import fonts from '../../../utils/fonts';
 
 const CELL_COUNT = 6;
 
@@ -38,6 +39,7 @@ const ConfirmSignUp = ({navigation, route}) => {
 
   const dispatch = useAppDispatch();
   const [value, setValue] = useState('');
+  const [timerCount, setTimer] = useState(30);
   const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
     value,
@@ -78,6 +80,35 @@ const ConfirmSignUp = ({navigation, route}) => {
     dispatch(resend_confirmation_code(input));
   };
 
+  const maskEmail = email => {
+    const [local, domain] = email.split('@');
+
+    // Mask local part: keep first 3 characters, add *
+    const maskedLocal =
+      local.length > 3 ? local.slice(0, 3) + '*' : local + '*';
+
+    // Mask domain part: just show `.com` (or last part)
+    const domainParts = domain.split('.');
+    const tld = domainParts.pop(); // get the last part like 'com'
+    const maskedDomain = '*'.repeat(7) + '.' + tld;
+
+    return `${maskedLocal}@${maskedDomain}`;
+  };
+
+  useEffect(() => {
+    if (timerCount > 0) {
+      let interval = setInterval(() => {
+        setTimer(lastTimerCount => {
+          lastTimerCount <= 1 && clearInterval(interval);
+          return lastTimerCount - 1;
+        });
+      }, 1000); //each count lasts for a second
+
+      //cleanup the interval on complete
+      return () => clearInterval(interval);
+    }
+  }, [timerCount]);
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -88,7 +119,9 @@ const ConfirmSignUp = ({navigation, route}) => {
         />
         {/* <GText text="Create a New Password" medium style={styles.emailText} /> */}
         <GText
-          text={`We’ve sent a One-Time Password (OTP) \nto your email ${responseData?.data?.email}. \nEnter it below to verify your account.`}
+          text={`We’ve sent a One-Time Password (OTP) \nto your email ${maskEmail(
+            responseData?.data?.email,
+          )}. \nEnter it below to verify your account.`}
           beVietnamRegular
           style={styles.content}
         />
@@ -113,7 +146,37 @@ const ConfirmSignUp = ({navigation, route}) => {
           )}
         />
 
-        <TouchableOpacity
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: scaledValue(32),
+            justifyContent: 'center',
+          }}>
+          <Text style={styles.bottomText1}>Didn’t received OTP?</Text>
+          <TouchableOpacity
+            disabled={timerCount > 0}
+            style={{
+              alignSelf: 'center',
+            }}
+            onPress={resend_code_hit}>
+            <Text
+              style={{
+                color: colors.themeColor,
+                fontSize: scaledValue(16),
+                lineHeight: scaledValue(16),
+                marginTop: scaledValue(5),
+                fontFamily: fonts.BE_VIETNAM_SEMIBOLD,
+                letterSpacing: scaledValue(19 * -0.04),
+              }}>
+              {timerCount > 0
+                ? ` Resend OTP in ${timerCount} sec`
+                : ' Send again'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* <TouchableOpacity
           style={{
             marginTop: scaledValue(32),
             alignSelf: 'center',
@@ -123,7 +186,7 @@ const ConfirmSignUp = ({navigation, route}) => {
             Didn’t receive OTP?
             <Text style={styles.bottomText2}> {' Send again'}.</Text>
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <View style={styles.gradientView}>
           <GradientButton
             style={{opacity: value.length >= 6 ? 1 : 0.5}}

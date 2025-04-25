@@ -4,6 +4,7 @@ import PushNotification from 'react-native-push-notification';
 import {Platform} from 'react-native';
 import notifee, {EventType} from '@notifee/react-native';
 import {navigationContainerRef} from '../../App';
+import {EventRegister} from 'react-native-event-listeners';
 
 const ForegroundHandler = () => {
   PushNotification.configure({
@@ -65,6 +66,7 @@ const ForegroundHandler = () => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       console.log('handle in foreground123456', remoteMessage);
       const {notification, messageId, data} = remoteMessage;
+      EventRegister.emit('notificationReceived', data);
       if (Platform.OS === 'ios') {
         const channelId = await notifee.createChannel({
           id: messageId,

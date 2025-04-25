@@ -8,6 +8,9 @@ import {
   Animated,
   StatusBar,
   Modal,
+  ScrollView,
+  PanResponder,
+  Text,
 } from 'react-native';
 import {styles} from './styles';
 import {Images} from '../../../utils';
@@ -247,8 +250,8 @@ const ProfileScreen = ({navigation, route}) => {
   const config = {
     velocityThreshold: 0.3,
     directionalOffsetThreshold: 80,
-    swipeEnabled: true,
-    longpressDelay: 700,
+    // swipeEnabled: true,
+    // longpressDelay: 700,
   };
   const {width, height} = Dimensions.get('window');
 
@@ -256,206 +259,459 @@ const ProfileScreen = ({navigation, route}) => {
   const [currentModalIndex, setCurrentMOdalIndex] = useState(0);
   const swiperRef = useRef(null);
 
+  const scrollRef = useRef(null);
+  const [currentIndexs, setIndex] = useState(0);
+
+  const [indexes, setIndexes] = useState(0);
+
+  const screens = [
+    <FirstTutorial />,
+    <SecondTutorial />,
+    <ThirdTutorial goToNext={() => setIndexes(3)} />,
+    <ForthTutorial goToNext={() => setIndexes(4)} />,
+    <FifthTutorial goToNext={() => setIndexes(5)} />,
+    <CompleteTutorial />,
+  ];
+
+  const onSwipeLeft = () => {
+    if (indexes < screens.length - 1) setIndexes(indexes + 1);
+    // if (currentIndexs < 5) {
+    //   const next = currentIndexs + 1;
+    //   scrollRef.current?.scrollTo({x: width * next, animated: true});
+    //   setIndex(next);
+    // }
+    // if (!screen) {
+    //   if (!tutorialVisible) {
+    //     animateCard('next', true);
+    //   } else if (currentModalIndex < tutorialSteps.length - 1) {
+    //     const nextIndex = currentModalIndex + 1;
+    //     swiperRef.current.scrollToIndex({index: nextIndex, animated: true});
+    //     setCurrentMOdalIndex(nextIndex);
+    //   }
+    // }
+  };
+
+  const onSwipeRight = () => {
+    if (indexes > 0) setIndexes(indexes + 1);
+    // alert(currentIndexs);
+    // if (currentIndexs > 0) {
+    //   const prev = currentIndexs + 1;
+    //   scrollRef.current?.scrollTo({x: width * prev, animated: true});
+    //   setIndex(prev);
+    // }
+    // if (!screen) {
+    //   if (!tutorialVisible) {
+    //     if (currentModalIndex !== 0) {
+    //       animateCard('previous', false);
+    //     }
+    //   } else if (currentModalIndex > 0) {
+    //     const prevIndex = currentModalIndex + 1;
+    //     swiperRef.current.scrollToIndex({index: prevIndex, animated: true});
+    //     setCurrentMOdalIndex(prevIndex);
+    //   }
+    // }
+  };
+  const TOTAL_SCREENS = 6;
+
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const [getCurrentIndex, setGetCurrentIndex] = useState(0);
+  console.log('getCurrentIndexgetCurrentIndex', getCurrentIndex);
+
+  const currentIndexes = useRef(0);
+  const goToNextManually = () => {
+    if (currentIndexes.current < TOTAL_SCREENS - 1) {
+      currentIndexes.current += 1;
+      setGetCurrentIndex(currentIndexes.current);
+      Animated.spring(scrollX, {
+        toValue: currentIndexes.current * width,
+        useNativeDriver: false,
+      }).start();
+    }
+  };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        // Allow swipe gesture only on screen 0, 1, 2
+        return Math.abs(gestureState.dx) > 10 && currentIndexes.current <= 2;
+      },
+
+      onPanResponderMove: () => {
+        // No-op: avoid jitter
+      },
+
+      onPanResponderRelease: (_, gestureState) => {
+        const moveThreshold = 0.25 * width;
+        const dx = gestureState.dx;
+
+        if (currentIndexes.current > 1) return;
+
+        // ✅ Screen 0: block right swipe (dx > 0)
+        if (currentIndexes.current === 0 && dx > 0) return;
+
+        // ✅ Screen 1: block left swipe (dx < 0)
+        if (currentIndexes.current === 1 && dx < 0) return;
+
+        // ✅ Allow forward navigation on valid gesture
+        if (
+          Math.abs(dx) > moveThreshold &&
+          currentIndexes.current < TOTAL_SCREENS - 1
+        ) {
+          currentIndexes.current += 1;
+          setGetCurrentIndex(currentIndexes.current);
+        }
+
+        Animated.spring(scrollX, {
+          toValue: currentIndexes.current * width,
+          useNativeDriver: false,
+        }).start();
+      },
+    }),
+  ).current;
+
   return (
     <LinearGradient
       colors={['#DA7575', '#A45EB0']}
       start={{x: 0.5, y: 1}}
       end={{x: 0.5, y: 0}}
       style={{flex: 1}}>
-      <StatusBar
+      {/* <StatusBar
         translucent
         backgroundColor="transparent"
         barStyle="light-content"
-      />
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={styles.leftArrowView(insets)}>
-        <Image
-          source={Images.leftArrow}
-          style={styles.leftArrowStyle(insets)}
-        />
-      </TouchableOpacity>
+      /> */}
+      {!tutorialVisible && (
+        <TouchableOpacity
+          disabled={tutorialVisible}
+          onPress={() => navigation.goBack()}
+          style={[
+            styles.leftArrowView(insets),
+            {opacity: tutorialVisible ? 0.5 : 1},
+          ]}>
+          <Image
+            source={Images.leftArrow}
+            style={styles.leftArrowStyle(insets)}
+          />
+        </TouchableOpacity>
+      )}
 
-      <GestureRecognizer
-        onSwipeLeft={state => {
-          if (!screen) {
-            if (!tutorialVisible) {
-              animateCard('next', true);
-            } else if (currentModalIndex === 0) {
-              // alert('hey');
-              swiperRef.current.scrollBy(1);
-            }
-          }
-        }}
-        onSwipeRight={state => {
-          if (!screen) {
-            // if (currentIndex != 0) {
-            if (!tutorialVisible) {
-              if (currentIndex != 0) {
-                animateCard('previous', false);
-              }
-            } else if (currentModalIndex === 1) {
-              // if (currentIndex != 0) {
-              swiperRef.current.scrollBy(1);
-              // }
-            }
-            // }
-          }
-        }}
-        config={config}
+      <View
         style={{
           flex: 1,
+          backgroundColor: 'transparent',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}>
+        <GestureRecognizer
+          onSwipeLeft={state => {
+            if (!screen) {
+              if (!tutorialVisible) {
+                animateCard('next', true);
+              }
+            }
+          }}
+          onSwipeRight={state => {
+            if (!screen) {
+              if (!tutorialVisible) {
+                if (currentIndex != 0) {
+                  animateCard('previous', false);
+                }
+              }
+              // }
+            }
+          }}
+          config={config}
+          style={{
+            flex: 1,
+          }}>
+          <View
+            style={{
+              marginTop:
+                matchingProfileData?.length < 1 &&
+                !screen &&
+                Dimensions.get('window').height / 2,
+            }}>
+            <FlatList
+              data={screen ? userList : [matchingProfileData[currentIndex]]}
+              ref={flatListRef}
+              horizontal={
+                matchingProfileData?.length > 0 || screen ? true : false
+              }
+              pagingEnabled
+              keyExtractor={item => item?._id}
+              showsHorizontalScrollIndicator={false}
+              scrollEnabled={false}
+              ListEmptyComponent={() => {
+                return (
+                  <View
+                    style={{
+                      flex: 1,
+                      alignSelf: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <GText
+                      text={'No additional matching\nprofiles available.'}
+                      style={{
+                        color: '#fff',
+                        textAlign: 'center',
+                        fontSize: scaledValue(25),
+                      }}
+                    />
+                  </View>
+                );
+              }}
+              ListFooterComponent={matchingProfileLoader}
+              renderItem={({item}) => {
+                return (
+                  <>
+                    {matchingProfileData?.length < 1 && !screen ? (
+                      <View
+                        style={{
+                          flex: 1,
+                          alignSelf: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        <GText
+                          text={'No additional matching\nprofiles available.'}
+                          style={{
+                            color: '#fff',
+                            textAlign: 'center',
+                            fontSize: scaledValue(25),
+                          }}
+                        />
+                      </View>
+                    ) : (
+                      <>
+                        <UserContent
+                          item={item}
+                          pan={pan}
+                          screen={screen}
+                          animateCard={animateCard}
+                          send_connect_request_hit={send_connect_request_hit}
+                          send_unconnect_request_hit={
+                            send_unconnect_request_hit
+                          }
+                          opacityAni={opacityAnim}
+                          scaleAnim={scaleAnim}
+                          slideAnim={slideAnim}
+                          refRBSheet={refRBSheet}
+                          navigation={navigation}
+                          setReduceImgSize={setReduceImgSize}
+                          dispatch={dispatch}
+                          savedProfileData={savedProfileData}
+                          setMatchingProfileData={setMatchingProfileData}
+                          matchingProfileData={matchingProfileData}
+                          setData={setUserList}
+                          data={userList}
+                          setUserList={setUserListData}
+                          userList={userListData}
+                        />
+                      </>
+                    )}
+                  </>
+                );
+              }}
+            />
+          </View>
+        </GestureRecognizer>
+      </View>
+
+      {tutorialVisible && !screen && (
         <View
           style={{
-            marginTop:
-              matchingProfileData?.length < 1 &&
-              !screen &&
-              Dimensions.get('window').height / 2,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width,
+            height,
+            backgroundColor: 'rgba(0,0,0,0.4)',
           }}>
-          <FlatList
-            data={screen ? userList : [matchingProfileData[currentIndex]]}
-            ref={flatListRef}
-            horizontal={
-              matchingProfileData?.length > 0 || screen ? true : false
-            }
-            pagingEnabled
-            keyExtractor={item => item?._id}
-            showsHorizontalScrollIndicator={false}
-            scrollEnabled={false}
-            ListEmptyComponent={() => {
-              return (
+          <BlurView
+            style={{
+              width,
+              height,
+            }}
+            blurType="light"
+            blurAmount={2.5}
+            reducedTransparencyFallbackColor="white">
+            <View style={styles.tutorialContainer}>
+              {getCurrentIndex !== TOTAL_SCREENS - 1 && (
                 <View
                   style={{
-                    flex: 1,
-                    alignSelf: 'center',
-                    justifyContent: 'center',
+                    // backgroundColor: 'red',
+                    top: insets.top + scaledValue(13),
+                    position: 'absolute',
+                    right: scaledValue(32),
+                    zIndex: 100,
                   }}>
-                  <GText
-                    text={'No additional matching\nprofiles available.'}
-                    style={{
-                      color: '#fff',
-                      textAlign: 'center',
-                      fontSize: scaledValue(25),
+                  <GTextButton
+                    onPress={() => {
+                      setTutorialVisible(false);
+                      dispatch(setShowTutorial(false));
+                    }}
+                    title={'Skip Tutorial'}
+                    titleStyle={{
+                      color: colors.offWhite,
+                      fontSize: scaledValue(16),
+                      fontFamily: fonts.SUSE_MEDIUM,
                     }}
                   />
                 </View>
-              );
-            }}
-            ListFooterComponent={matchingProfileLoader}
-            renderItem={({item}) => {
+              )}
+              <Animated.View
+                style={[
+                  {
+                    flexDirection: 'row',
+                    width: '100%',
+                    height: '100%',
+                  },
+                  {
+                    transform: [
+                      {
+                        translateX: scrollX.interpolate({
+                          inputRange: [0, width * TOTAL_SCREENS],
+                          outputRange: [0, -width * TOTAL_SCREENS],
+                          extrapolate: 'clamp',
+                        }),
+                      },
+                    ],
+                  },
+                  // {transform: [{translateX: Animated.multiply(scrollX, -1)}]},
+                ]}
+                {...panResponder.panHandlers}>
+                <FirstTutorial />
+                <SecondTutorial />
+                <View style={{width: '100%', position: 'relative', top: 0}}>
+                  <ThirdTutorial goToNextManually={goToNextManually} />
+                </View>
+                <View style={{width: '100%', position: 'relative', top: 0}}>
+                  <ForthTutorial goToNextManually={goToNextManually} />
+                </View>
+                <View style={{width: '100%', position: 'relative', top: 0}}>
+                  <FifthTutorial goToNextManually={goToNextManually} />
+                </View>
+
+                <CompleteTutorial setTutorialVisible={setTutorialVisible} />
+              </Animated.View>
+              {/* <GestureRecognizer
+                onSwipeLeft={onSwipeLeft}
+                onSwipeRight={onSwipeRight}
+                config={config}
+                style={{
+                  flex: 1,
+                }}> */}
+              {/* {screens[indexes]} */}
+              {/* <View
+                  style={{
+                    marginTop:
+                      matchingProfileData?.length < 1 &&
+                      !screen &&
+                      Dimensions.get('window').height / 2,
+                  }}> */}
+              {/* <ScrollView
+                  ref={scrollRef}
+                  horizontal
+                  pagingEnabled
+                  scrollEnabled={false}
+                  showsHorizontalScrollIndicator={false}>
+                  <FirstTutorial />
+                  <SecondTutorial />
+                  <ThirdTutorial scrollRef={scrollRef} setIndex={setIndex} />
+                  <ForthTutorial swiperRef={swiperRef} />
+                  <FifthTutorial swiperRef={swiperRef} />
+                  <CompleteTutorial setTutorialVisible={setTutorialVisible} />
+                </ScrollView> */}
+              {/* <FlatList
+                    ref={swiperRef}
+                    data={tutorialSteps}
+                    horizontal
+                    pagingEnabled
+                    scrollEnabled={false} // Disable manual scroll to force gesture use
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={(_, index) => index.toString()}
+                    renderItem={({item}) => (
+                      <View style={{width, height}}>{item}</View>
+                    )}
+                  /> */}
+              {/* </View> */}
+              {/* </GestureRecognizer> */}
+
+              {/* <Swiper
+                height={Dimensions.get('window').height}
+                ref={swiperRef}
+                loop={false}
+                scrollEnabled={(() => {
+                  // Return true or false based on your logic
+                  return currentModalIndex === 2 ? false : true; // Replace with your condition
+                })()}
+                showsPagination={true}
+                dotStyle={styles.dot}
+                activeDotStyle={styles.activeDot}
+                onIndexChanged={index => {
+                  // if (index === 0) {
+                  //   swiperRef.current.scrollBy(1);
+                  // } else {
+                  setCurrentMOdalIndex(index);
+                  // }
+                }}>
+                <FirstTutorial />
+                <SecondTutorial />
+                <ThirdTutorial swiperRef={swiperRef} />
+                <ForthTutorial swiperRef={swiperRef} />
+                <FifthTutorial swiperRef={swiperRef} />
+                <CompleteTutorial setTutorialVisible={setTutorialVisible} />
+              </Swiper> */}
+            </View>
+          </BlurView>
+          <View
+            style={{
+              position: 'absolute',
+              bottom: insets.bottom === 0 ? scaledValue(20) : insets.bottom,
+              width: '100%',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            {Array.from({length: TOTAL_SCREENS}).map((_, i) => {
+              const widthAnim = scrollX.interpolate({
+                inputRange: [(i - 1) * width, i * width, (i + 1) * width],
+                outputRange: [10, 22.6, 10],
+                extrapolate: 'clamp',
+              });
+
+              const borderRadiusAnim = scrollX.interpolate({
+                inputRange: [(i - 1) * width, i * width, (i + 1) * width],
+                outputRange: [10, 8, 10],
+                extrapolate: 'clamp',
+              });
+
+              const opacityAnim = scrollX.interpolate({
+                inputRange: [(i - 1) * width, i * width, (i + 1) * width],
+                outputRange: [0.5, 1, 0.5],
+                extrapolate: 'clamp',
+              });
+
               return (
-                <>
-                  {matchingProfileData?.length < 1 && !screen ? (
-                    <View
-                      style={{
-                        flex: 1,
-                        alignSelf: 'center',
-                        justifyContent: 'center',
-                      }}>
-                      <GText
-                        text={'No additional matching\nprofiles available.'}
-                        style={{
-                          color: '#fff',
-                          textAlign: 'center',
-                          fontSize: scaledValue(25),
-                        }}
-                      />
-                    </View>
-                  ) : (
-                    <>
-                      {tutorialVisible && (
-                        <Modal
-                          visible={tutorialVisible}
-                          transparent
-                          animationType="fade"
-                          style={{margin: 0, padding: 0}}>
-                          <BlurView
-                            style={{
-                              width,
-                              height,
-                            }}
-                            blurType="light"
-                            blurAmount={2.5}
-                            reducedTransparencyFallbackColor="white">
-                            <View style={styles.tutorialContainer}>
-                              {currentModalIndex != 5 && (
-                                <View
-                                  style={{
-                                    // backgroundColor: 'red',
-                                    top: insets.top + scaledValue(13),
-                                    position: 'absolute',
-                                    right: scaledValue(32),
-                                    zIndex: 100,
-                                  }}>
-                                  <GTextButton
-                                    onPress={() => {
-                                      setTutorialVisible(false);
-                                      dispatch(setShowTutorial(false));
-                                    }}
-                                    title={'Skip Tutorial'}
-                                    titleStyle={{
-                                      color: colors.offWhite,
-                                      fontSize: scaledValue(16),
-                                      fontFamily: fonts.SUSE_MEDIUM,
-                                    }}
-                                  />
-                                </View>
-                              )}
-                              <Swiper
-                                height={Dimensions.get('window').height}
-                                ref={swiperRef}
-                                loop={false}
-                                scrollEnabled={false}
-                                showsPagination={true}
-                                dotStyle={styles.dot}
-                                activeDotStyle={styles.activeDot}
-                                onIndexChanged={index =>
-                                  setCurrentMOdalIndex(index)
-                                }>
-                                <FirstTutorial />
-                                <SecondTutorial />
-                                <ThirdTutorial swiperRef={swiperRef} />
-                                <ForthTutorial swiperRef={swiperRef} />
-                                <FifthTutorial swiperRef={swiperRef} />
-                                <CompleteTutorial
-                                  setTutorialVisible={setTutorialVisible}
-                                />
-                              </Swiper>
-                            </View>
-                          </BlurView>
-                        </Modal>
-                      )}
-                      <UserContent
-                        item={item}
-                        pan={pan}
-                        screen={screen}
-                        animateCard={animateCard}
-                        send_connect_request_hit={send_connect_request_hit}
-                        send_unconnect_request_hit={send_unconnect_request_hit}
-                        opacityAni={opacityAnim}
-                        scaleAnim={scaleAnim}
-                        slideAnim={slideAnim}
-                        refRBSheet={refRBSheet}
-                        navigation={navigation}
-                        setReduceImgSize={setReduceImgSize}
-                        dispatch={dispatch}
-                        savedProfileData={savedProfileData}
-                        setMatchingProfileData={setMatchingProfileData}
-                        matchingProfileData={matchingProfileData}
-                        setData={setUserList}
-                        data={userList}
-                        setUserList={setUserListData}
-                        userList={userListData}
-                      />
-                    </>
-                  )}
-                </>
+                <Animated.View
+                  key={`dot-${i}`}
+                  style={[
+                    {
+                      height: 10,
+                      backgroundColor: '#fff',
+                      marginHorizontal: scaledValue(3.5),
+                    },
+                    {
+                      width: widthAnim,
+                      borderRadius: borderRadiusAnim,
+                      opacity: opacityAnim,
+                    },
+                  ]}
+                />
               );
-            }}
-          />
+            })}
+          </View>
         </View>
-      </GestureRecognizer>
+      )}
     </LinearGradient>
   );
 };

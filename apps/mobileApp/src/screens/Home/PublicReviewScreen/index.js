@@ -215,15 +215,26 @@ const PublicReviewScreen = ({navigation, route}) => {
           gap: scaledValue(4),
           marginTop: scaledValue(20),
         }}>
-        <GText
-          medium
-          text={`${userData?.fullName}, ${userData?.age}`}
-          style={{
-            fontSize: scaledValue(33),
-            color: colors.charcoal,
-            letterSpacing: scaledValue(33 * -0.03),
-          }}
-        />
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <GText
+            medium
+            text={`${userData?.fullName}`}
+            style={{
+              fontSize: scaledValue(33),
+              color: colors.charcoal,
+              letterSpacing: scaledValue(33 * -0.03),
+            }}
+          />
+          <GText
+            medium
+            text={userData?.age ? `, ${userData?.age}` : ''}
+            style={{
+              fontSize: scaledValue(33),
+              color: colors.charcoal,
+              letterSpacing: scaledValue(33 * -0.03),
+            }}
+          />
+        </View>
         {userData?.emailDomainVerified === 1 && (
           <Image
             source={Images.Verified_fill}

@@ -13,7 +13,7 @@ const {width} = Dimensions.get('window');
 const CompleteTutorial = ({setTutorialVisible}) => {
   const dispatch = useAppDispatch();
   const userData = useAppSelector(state => state.auth.user);
-  const user = userData?.userType === 0 ? 'Mentee' : 'Mentor';
+  const user = userData?.userType === 0 ? 'Mentor' : 'Mentee';
   const gradientText = `Find Your ${user} Now`;
 
   return (

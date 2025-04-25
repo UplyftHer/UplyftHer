@@ -53,7 +53,6 @@ const SearchScreen = ({navigation}) => {
     setSearchText(text);
     refreshData({
       search: text,
-      // filter: selectedFilter,
     });
   };
 
@@ -72,7 +71,7 @@ const SearchScreen = ({navigation}) => {
       search: searchText || '',
       filter: selectedFilter,
     });
-  }, [selectedFilter]);
+  }, [selectedFilter?.length > 0]);
 
   const insets = useSafeAreaInsets();
   const renderItem = ({item, index}) => {
@@ -209,7 +208,7 @@ const SearchScreen = ({navigation}) => {
             <FlatList
               data={data}
               showsVerticalScrollIndicator={false}
-              onEndReached={() => loadMore()}
+              onEndReached={loadMore}
               ListEmptyComponent={() => {
                 return (
                   <View

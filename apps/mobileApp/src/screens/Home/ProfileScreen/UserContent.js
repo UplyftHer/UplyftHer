@@ -194,36 +194,6 @@ const UserContent = ({
           fullImageStyle={styles.userImg}
           content={() => (
             <>
-              {/* {tutorialVisible && (
-                <Modal
-                  transparent
-                  animationType="fade"
-                  // statusBarTranslucent
-                  style={{height: '100%'}}>
-                  <BlurView
-                    style={{width, height}}
-                    blurType="light"
-                    blurAmount={2.5}
-                    reducedTransparencyFallbackColor="white">
-                    <View style={styles.tutorialContainer}>
-                      <Swiper
-                        ref={swiperRef}
-                        loop={false}
-                        scrollEnabled={false}
-                        showsPagination={true}
-                        dotStyle={styles.dot}
-                        activeDotStyle={styles.activeDot}
-                        onIndexChanged={index => setCurrentMOdalIndex(index)}>
-                        <ThirdTutorial
-                          setTutorialVisible={setTutorialVisible}
-                        />
-                        <SecondTutorial />
-                        <FirstTutorial />
-                      </Swiper>
-                    </View>
-                  </BlurView>
-                </Modal>
-              )} */}
               <LinearGradient
                 colors={['#4B164C00', '#4B164C90', '#4B164C']}
                 start={{x: 0, y: 0}}
@@ -291,17 +261,15 @@ const UserContent = ({
                     </View>
                   </View>
 
-                  {/* <Animated.View
-                    style={[styles.box, pan.getLayout()]}
-                    {...panResponder.panHandlers}> */}
                   {screen === 'BlockList' ? null : (
                     <TouchableOpacity
                       activeOpacity={0.9}
                       onPress={() => {
-                        navigation?.navigate('PublicReviewScreen', {
-                          userData: item,
-                          screen: screen,
-                        });
+                        alert('hey');
+                        // navigation?.navigate('PublicReviewScreen', {
+                        //   userData: item,
+                        //   screen: screen,
+                        // });
                       }}
                       style={styles.swipeView}>
                       <Image
@@ -317,8 +285,6 @@ const UserContent = ({
                       />
                     </TouchableOpacity>
                   )}
-
-                  {/* </Animated.View> */}
 
                   <View
                     style={{
