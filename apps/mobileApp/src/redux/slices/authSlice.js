@@ -15,6 +15,7 @@ const initialState = {
   industryList: [],
   interestsList: [],
   showTutorial: true,
+  isNewNotification: false,
 };
 
 export const sign_up = createAsyncThunk(
@@ -497,6 +498,9 @@ const authSlice = createSlice({
     setShowTutorial: (state, action) => {
       state.showTutorial = action.payload;
     },
+    setNewNotification: (state, action) => {
+      state.isNewNotification = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(sign_in.pending, state => {
@@ -589,5 +593,6 @@ export const {
   setUserData,
   setOnBoarding,
   setShowTutorial,
+  setNewNotification,
 } = authSlice.actions;
 export default authSlice.reducer;

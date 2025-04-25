@@ -23,9 +23,6 @@ const BottomSheet = props => {
           borderTopLeftRadius: scaledValue(24),
           backgroundColor: colors.offWhite,
         },
-      }}
-      customModalProps={{
-        statusBarTranslucent: true,
       }}>
       <View
         style={{

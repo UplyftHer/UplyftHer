@@ -59,11 +59,11 @@ const ChangePassword = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar
+      {/* <StatusBar
         translucent
         backgroundColor="transparent"
         barStyle="dark-content"
-      />
+      /> */}
 
       <GText
         text={`Your new password must be different \nfrom previous used passwords`}

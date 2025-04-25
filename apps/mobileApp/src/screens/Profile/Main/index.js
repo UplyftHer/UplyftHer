@@ -236,11 +236,11 @@ const Profile = ({navigation}) => {
       bounces={false}
       showsVerticalScrollIndicator={false}
       style={styles.scrollView}>
-      <StatusBar
+      {/* <StatusBar
         translucent
         backgroundColor="transparent"
         barStyle="light-content"
-      />
+      /> */}
       <ImageBackground
         source={Images.profile_background}
         style={styles.imageBackground}>
@@ -282,36 +282,35 @@ const Profile = ({navigation}) => {
           <Image source={Images.Logout} style={styles.logoutIcon} />
           <GText semiBold text={'Logout'} style={styles.logoutText} />
         </TouchableOpacity>
-        <BottomSheet
-          logoutRBSheetRef={logoutRBSheetRef}
-          contentText={
-            'You are about to logout from the Uplyfther, Please confirm to continue.'
-          }
-          headerText={'Are you sure?'}
-          firstButtonTitle={'Cancel'}
-          secondButtonTitle={'Logout'}
-          onPress={async () => {
-            logoutRBSheetRef?.current?.close();
-            // dispatch(logout());
-            setTimeout(async () => {
-              dispatch(
-                logout_user({
-                  deviceToken:
-                    (await AsyncStorage.getItem('fcmToken')) || '1234',
-                }),
-              ).then(res => {
-                if (logout_user.fulfilled.match(res)) {
-                  dispatch(setNotifications([]));
-                  dispatch(setUpComingMeetingList([]));
-                  dispatch(setSavedProfile([]));
-                  dispatch(setPreviousInteractedMatches([]));
-                  setMatchingProfileData([]);
-                }
-              });
-            }, 300);
-          }}
-        />
       </View>
+      <BottomSheet
+        logoutRBSheetRef={logoutRBSheetRef}
+        contentText={
+          'You are about to logout from the Uplyfther, Please confirm to continue.'
+        }
+        headerText={'Are you sure?'}
+        firstButtonTitle={'Cancel'}
+        secondButtonTitle={'Logout'}
+        onPress={async () => {
+          logoutRBSheetRef?.current?.close();
+          // dispatch(logout());
+          setTimeout(async () => {
+            dispatch(
+              logout_user({
+                deviceToken: (await AsyncStorage.getItem('fcmToken')) || '1234',
+              }),
+            ).then(res => {
+              if (logout_user.fulfilled.match(res)) {
+                dispatch(setNotifications([]));
+                dispatch(setUpComingMeetingList([]));
+                dispatch(setSavedProfile([]));
+                dispatch(setPreviousInteractedMatches([]));
+                setMatchingProfileData([]);
+              }
+            });
+          }, 300);
+        }}
+      />
       <OptionMenuSheet
         refRBSheet={refRBReasonsSheet}
         options={deleteAccountReasons}

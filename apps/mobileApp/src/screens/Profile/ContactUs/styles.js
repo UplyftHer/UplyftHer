@@ -54,12 +54,13 @@ export const styles = StyleSheet.create({
     width: '92%',
   }),
   submitRequestItemName: (selectedSubmitRequest, item) => ({
-    color: selectedSubmitRequest ? colors.themeColor : colors.black,
+    color: selectedSubmitRequest == item ? colors.themeColor : colors.black,
     fontSize: getFontSize(16),
     lineHeight: scaledValue(16),
-    fontFamily: selectedSubmitRequest
-      ? fonts.BE_VIETNAM_SEMIBOLD
-      : fonts.BE_VIETNAM_REGULAR,
+    fontFamily:
+      selectedSubmitRequest === item
+        ? fonts.BE_VIETNAM_SEMIBOLD
+        : fonts.BE_VIETNAM_REGULAR,
   }),
   radioButton: {
     width: scaledValue(16),

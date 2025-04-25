@@ -336,7 +336,7 @@ const ContactUs = ({navigation}) => {
                       text={item?.name}
                       style={styles.submitRequestItemName(
                         selectedSubmitRequest?.id,
-                        item,
+                        item?.id,
                       )}
                     />
                   </TouchableOpacity>
@@ -415,7 +415,7 @@ const ContactUs = ({navigation}) => {
                       text={item?.name}
                       style={styles.submitRequestItemName(
                         selectedSubmitRequestTo?.id,
-                        item,
+                        item?.id,
                       )}
                     />
                   </TouchableOpacity>

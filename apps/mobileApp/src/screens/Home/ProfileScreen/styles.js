@@ -92,6 +92,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: scaledHeightValue(24),
     gap: scaledValue(4),
+    zIndex: 100,
   },
   swipingText: {
     color: colors.peachy,
@@ -291,4 +292,11 @@ export const styles = StyleSheet.create({
 
   skipButton: {position: 'absolute', top: 40, right: 20},
   skipButtonText: {color: 'white', fontSize: 16},
+  screen: {
+    width,
+    height,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
 });

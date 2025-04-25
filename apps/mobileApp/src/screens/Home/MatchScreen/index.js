@@ -95,11 +95,11 @@ const MatchScreen = ({navigation, route}) => {
   return (
     <View style={styles.container}>
       <ImageBackground source={Images.gradientBackground} style={styles.imgBg}>
-        <StatusBar
+        {/* <StatusBar
           translucent
           backgroundColor="transparent"
           barStyle="dark-content" // or 'light-content' based on your design
-        />
+        /> */}
 
         <GText medium style={styles.headerTitle} text="It's a Match! 💃" />
 

@@ -34,11 +34,11 @@ const FeedbackScreen = ({navigation}) => {
   };
   return (
     <View style={styles.container}>
-      <StatusBar
+      {/* <StatusBar
         translucent
         backgroundColor="transparent"
         barStyle="dark-content"
-      />
+      /> */}
       <KeyboardAvoidingView
         style={styles.keyboardAvoidingStyle}
         behavior={Platform.OS === 'ios' ? 'padding' : null}

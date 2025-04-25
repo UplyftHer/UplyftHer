@@ -149,22 +149,24 @@ const BasicInfo = ({navigation, route}) => {
       style={styles.container}
       keyboardShouldPersistTaps="handled"
       extraHeight={Platform.OS == 'ios' ? scaledValue(200) : ''}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={{marginTop: insets.top + scaledValue(10)}}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            marginTop: scaledHeightValue(7),
+            marginTop: insets.top + scaledValue(17),
           }}>
           <TouchableOpacity
             activeOpacity={1}
             onPress={() => {
               navigation?.goBack();
             }}
-            style={{position: 'absolute', left: 0}}>
+            style={{
+              position: 'absolute',
+              left: 0,
+              paddingHorizontal: scaledValue(20),
+            }}>
             <Image
               source={Images.leftArrow}
               tintColor={colors.themeColor}
@@ -193,7 +195,7 @@ const BasicInfo = ({navigation, route}) => {
           }}
         />
 
-        <View style={{gap: scaledValue(0)}}>
+        <View style={{paddingHorizontal: scaledValue(20)}}>
           <Input
             value={field?.full_name}
             placeholder={'Full name*'}
@@ -302,7 +304,7 @@ const BasicInfo = ({navigation, route}) => {
             value={field?.['company name']}
             placeholder={'Company Name'}
             onChangeText={handleSearch}
-            rightIcon={Images.Cross}
+            rightIcon={searchText && Images.Cross}
             onPressRightIcon={() => {
               setData([]);
               setSearchText('');

@@ -20,11 +20,22 @@ const UserCard = props => {
         end={{x: 0, y: 1}}
         style={styles.gradient}>
         <View style={[styles.userDetailsView, props.userDetailStyle]}>
-          <GText
-            beVietnamSemiBold
-            text={props.userName}
-            style={styles.userName}
-          />
+          <View style={{flexDirection: 'row'}}>
+            <GText
+              componentProps={{
+                numberOfLines: 1,
+                ellipsizeMode: 'tail',
+              }}
+              beVietnamSemiBold
+              text={props.userName}
+              style={[styles.userName]}
+            />
+            <GText
+              beVietnamSemiBold
+              text={props.userAge ? `, ${props.userAge}` : ''}
+              style={styles.userName}
+            />
+          </View>
           {props?.location && (
             <GText
               beVietnamBold

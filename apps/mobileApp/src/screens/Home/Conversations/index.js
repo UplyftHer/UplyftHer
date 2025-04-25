@@ -161,11 +161,11 @@ const Conversations = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar
+      {/* <StatusBar
         translucent
         backgroundColor="transparent"
         barStyle="dark-content"
-      />
+      /> */}
       <ImageBackground
         source={Images.gradientRect}
         resizeMode="cover"

@@ -2,13 +2,12 @@ import {Dimensions, StyleSheet} from 'react-native';
 import fonts from '../../../../utils/fonts';
 import {colors} from '../../../../../assets/colors';
 import {scaledHeightValue, scaledValue} from '../../../../utils/design.utils';
-const deviceW = Dimensions.get('window').width;
+const deviceW = Dimensions.get('screen').width;
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.offWhite,
-    paddingHorizontal: scaledValue(20),
   },
   headerText1: {
     color: colors.black,

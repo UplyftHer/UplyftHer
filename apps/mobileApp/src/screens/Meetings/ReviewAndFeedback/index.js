@@ -84,11 +84,11 @@ const ReviewAndFeedback = ({navigation, route}) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar
+      {/* <StatusBar
         translucent
         backgroundColor="transparent"
         barStyle="dark-content"
-      />
+      /> */}
       <KeyboardAwareScrollView
         bounces={false}
         style={styles.keyboardAvoidingStyle}

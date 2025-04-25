@@ -12,7 +12,7 @@ const FirstTutorial = () => {
   const translateX = useRef(new Animated.Value(50)).current;
   const opacity = useRef(new Animated.Value(1)).current;
   const userData = useAppSelector(state => state.auth.user);
-  const user = userData?.userType === 0 ? 'mentee' : 'mentor';
+  const user = userData?.userType === 0 ? 'mentor' : 'mentee';
   const swipeLeft = 'Swipe Left';
   const swipeLeftToView = `to view the\nnext ${user}`;
 
@@ -67,10 +67,12 @@ export default FirstTutorial;
 
 const styles = StyleSheet.create({
   container: {
-    width,
+    // width,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: scaledValue(20),
+    width: '100%',
+    height: '100%',
   },
   innerView: {
     justifyContent: 'center',
