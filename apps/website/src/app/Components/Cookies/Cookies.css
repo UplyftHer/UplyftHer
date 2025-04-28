@@ -19,7 +19,37 @@
     font-weight: 400;
     color: #262626;
     margin: 0;
+
 }
+.CookiePara{
+    overflow: auto;
+    max-height: 270px;
+}
+.CookiePara ol , .CookiePara ul {
+    padding: 0px !important;
+    margin: 0px !important;
+}
+.CookiePara ol , .CookiePara ul li {
+    list-style-type: none !important;
+
+}
+.CookiePara ol , .CookiePara ul li em {
+   font-size: 18px !important;
+
+}
+
+.Cookiescrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 8px;
+    background-color: #FFF4EC; 
+    border-radius: 4px;
+}
+  
+.Cookiescrollbar::-webkit-scrollbar-thumb {
+    background: #966B9D;
+}
+
+
 
 .TopCokieInner{
     display: flex;
