@@ -1522,7 +1522,7 @@ const profileController = {
             );
 
             //res.status(200).json(profile);
-            return res.json({ status: 1, message: 'Profile details', data: matchedUsers });
+            return res.json({ status: 1, message: 'Profile details', data: matchedUsers?.[0] });
         } catch (error) {
             //res.status(500).json({ message: 'Error fetching profile', error });
             return res.json({ status: 0, message: error.message });
