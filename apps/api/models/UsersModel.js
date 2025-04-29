@@ -53,6 +53,7 @@ const userSchema = new mongoose.Schema({
     interests: [{ 
         interestId: { type: String },
         name: { type: String },
+        icon: { type: String },
     }], 
     bio: { 
         type: String, 
