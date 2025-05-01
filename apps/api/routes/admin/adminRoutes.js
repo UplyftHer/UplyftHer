@@ -19,7 +19,7 @@ router.post("/signup", AdminController.signup);
 router.post('/sendCongratulationsEmail', AdminController.sendCongratulationsEmail);
 router.get('/getAlluser', AdminController.getAllUsers);
 router.post('/update-status', AdminController.updateUserStatus);
-router.delete('/deleteUser/:userId', AdminController.deleteUser);
+router.delete('/deleteUser/:cognitoUserId', AdminController.deleteUser);
 
 
 
