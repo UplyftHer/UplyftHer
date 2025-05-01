@@ -242,29 +242,101 @@ updateUserStatus: async (req, res) => {
     
     // Delete User API
     deleteUser: async (req, res) => {
-        const { userId } = req.params;
+        
+       
+        const { cognitoUserId } = req.params; 
+        //console.log(cognitoUserId);
+        
 
         try {
-            const user = await UsersModel.findByIdAndDelete(userId);
-
+            const user = await UsersModel.findOne({ cognitoUserId });
+            console.log(user);
+            
             if (!user) {
-                return res.json({ status: 0, message: 'User not found' });
+                return res.status(404).json({ status: 0, message: `User not found with ID: ${cognitoUserId}` });
             }
+            
+            
 
-            return res.json({
-                status: 1,
-                message: 'User deleted successfully'
-            });
-        } catch (error) {
-            return res.json({
-                status: 0,
-                message: 'Error deleting user',
-                error: error.message
-            });
-        }
-    },
+                     const params = {
+                           UserPoolId: process.env.COGNITO_USER_POOL_ID,
+                           Username: cognitoUserId,
+                       };
+                      
 
-    };
+                       await cognito.adminDeleteUser(params).promise();
+                       await UsersModel.deleteMany({ cognitoUserId });
+                       await AvailabilityModel.deleteMany({ cognitoUserId });
+                       await BlockedUsers.deleteMany({
+                           $or: [
+                               { cognitoUserId: cognitoUserId }, 
+                               { blockedUserId: cognitoUserId }
+                           ]
+                       });
+                       await BookMeetingsModel.deleteMany({
+                           $or: [
+                               { cognitoUserId: cognitoUserId }, 
+                               { cognitoUserIdMenter: cognitoUserId }
+                           ]
+                       });
+                       await ChatModel.deleteMany({
+                           $or: [
+                               { fromId: cognitoUserId }, 
+                               { toId: cognitoUserId }
+                           ]
+                       });
+                       await ConnectedUserModel.deleteMany({
+                           $or: [
+                               { cognitoUserId: cognitoUserId }, 
+                               { cognitoUserIdSave: cognitoUserId }
+                           ]
+                       });
+                       await feedbackModel.deleteMany({
+                           $or: [
+                               { fromId: cognitoUserId }, 
+                               { toId: cognitoUserId }
+                           ]
+                       });
+                       await interactedUserModel.deleteMany({
+                           $or: [
+                               { fromcognitoUserId: cognitoUserId }, 
+                               { tocognitoUserId: cognitoUserId }
+                           ]
+                       });
+                       await NotificationModel.deleteMany({
+                           $or: [
+                               { fromCognitoId: cognitoUserId }, 
+                               { toCognitoId: cognitoUserId }
+                           ]
+                       });
+                       await SavedProfilesModel.deleteMany({
+                           $or: [
+                               { cognitoUserId: cognitoUserId }, 
+                               { cognitoUserIdSave: cognitoUserId }
+                           ]
+                       });
+                       await UnConnectedUserModel.deleteMany({
+                           $or: [
+                               { cognitoUserId: cognitoUserId }, 
+                               { cognitoUserIdSave: cognitoUserId }
+                           ]
+                       });
+           
+            
+                    return res.json({
+                        status: 1,
+                        message: 'User deleted successfully'
+                    });
+                } catch (error) {
+                    return res.json({
+                        status: 0,
+                        message: 'Error deleting user',
+                        error: error.message
+                    });
+                }
+            },
+
+            };
 
 module.exports = AdminController;
 
