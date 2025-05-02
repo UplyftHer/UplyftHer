@@ -19,8 +19,8 @@ router.post("/signup", AdminController.signup);
 router.post('/sendCongratulationsEmail', AdminController.sendCongratulationsEmail);
 router.get('/getAlluser', AdminController.getAllUsers);
 router.post('/update-status', AdminController.updateUserStatus);
+router.post('/get-admin-content', AdminController.getAdminContent);
 router.delete('/deleteUser/:cognitoUserId', AdminController.deleteUser);
-
 
 
 // industriesrouter
@@ -82,6 +82,7 @@ router.delete('/social-links/:id', SocialLinksController.deleteSocialLink);
 
 router.get('/cookies', CookiesController.getCookies);
 router.post('/cookies', CookiesController.saveOrUpdateCookies);
+
 
 
 
