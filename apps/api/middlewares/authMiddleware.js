@@ -43,8 +43,8 @@ const authMiddleware = async (req, res, next) => {
         const user = await UsersModel.findOne({cognitoUserId:decoded.username}); 
         if (!user) {
             console.log('User not found');
-            return res.json({ status: 0, message: 'User not found' });
-            //return res.status(404).json({ status: 0, message: 'User not found' });
+            //return res.json({ status: 0, message: 'User not found' });
+            return res.status(403).json({ status: 0, message: 'User not found' });
         }
         else if (user.isActive == 0) {
             console.log('User is not active');
