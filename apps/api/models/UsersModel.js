@@ -99,9 +99,9 @@ const userSchema = new mongoose.Schema({
         default:1   //from admin active 1, inactive 0
     },
     communicationPreferences: {
-        videoCall: { type: Number, default: 0 },
-        audioCall: { type: Number, default: 0 },
-        inPerson: { type: Number, default: 0 },
+        videoCall: { type: Number, default: 1 },
+        audioCall: { type: Number, default: 1 },
+        inPerson: { type: Number, default: 1 },
     },
 },
 {
