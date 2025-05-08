@@ -34,9 +34,9 @@ function Landingpage() {
     const fetchSocials = async () => {
       try {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}api/admin/social-links`);
-         console.log('theredata', response)
+        // console.log('theredata', response)
         if (response.data && response.data.socialLinks.length > 0) {
-          console.log('theredata', response)
+         // console.log('theredata', response)
           setSocials(response.data.socialLinks);
         }
       } catch (error) {
@@ -294,16 +294,17 @@ function Landingpage() {
           <div className="FollowusDiv" data-aos="fade-up"data-aos-anchor-placement="top-bottom">
             <span>Follow us</span>
             <div className="social">
-                        
-             {socials.map((item) => (
-            item.accountStatus === 1 && (
-              <Link key={item._id} target="_blank" href={item.url} rel="noopener noreferrer">
-                <img src={item.image} alt={item.name} style={{ width: 30, height: 30 }} />
-              </Link>
-            )
-            ))}
-
-              
+       
+            {socials.map((item) => {
+            if (item.accountStatus === 1 && item.url) {
+            return (
+            <Link key={item._id} target="_blank" href={item.url} rel="noopener noreferrer">
+            <img src={item.image} alt={item.name} style={{ width: 30, height: 30 }} />
+            </Link>
+            );
+            }
+            return null;
+            })}
 
               {/* <Link target='_blank' href="https://www.instagram.com/accounts/login/?hl=en"><FaInstagram /></Link>
               <Link target='_blank' href="https://web.whatsapp.com/"> <FaWhatsapp /></Link>
