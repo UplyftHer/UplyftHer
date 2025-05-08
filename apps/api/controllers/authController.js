@@ -620,6 +620,11 @@ const authController = {
                 const checkEmail = await UsersModel.findOne({ email: email }, { email: 1, isCreateProfile:1, cognitoUserId:1 });
                 if (checkEmail) {
                     //return res.json({ status: 0, message: "Email already exists!" });
+                    const filter = { cognitoUserId: checkEmail.cognitoUserId };
+                    const update = {
+                       $addToSet: { deviceToken }
+                    };
+                    const profile = await UsersModel.findOneAndUpdate(filter, update, { new: true });
                     
                     const accessTokenRes = jwt.sign({username:checkEmail.cognitoUserId},process.env.JWT_SECRET,{expiresIn:process.env.JWT_EXPIRE_TIME});
                     let response = {
