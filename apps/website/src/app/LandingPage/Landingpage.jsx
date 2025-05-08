@@ -294,12 +294,15 @@ function Landingpage() {
           <div className="FollowusDiv" data-aos="fade-up"data-aos-anchor-placement="top-bottom">
             <span>Follow us</span>
             <div className="social">
-              
-              {socials.map((item) => (
-                <Link key={item._id}target="_blank"href={item.url} rel="noopener noreferrer">
-                  <img src={item.image} alt={item.name} style={{ width: 30, height: 30 }}/>
-                </Link>
-                ))}
+                        
+             {socials.map((item) => (
+            item.accountStatus === 1 && (
+              <Link key={item._id} target="_blank" href={item.url} rel="noopener noreferrer">
+                <img src={item.image} alt={item.name} style={{ width: 30, height: 30 }} />
+              </Link>
+            )
+            ))}
+
               
 
               {/* <Link target='_blank' href="https://www.instagram.com/accounts/login/?hl=en"><FaInstagram /></Link>
