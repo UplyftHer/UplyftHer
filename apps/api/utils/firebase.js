@@ -8,16 +8,17 @@ admin.initializeApp({
 // Crypto Encrypting text
 async function FirebaseData(data) {
   try {
-    var userRecord = await admin.auth().createUser({
-      email: data.email,
-      emailVerified: false,
-      //phoneNumber: data.phone,
-      password: "123456789",
-      displayName: data.first_name + " " + data.last_name,
-      //photoURL: 'http://www.example.com/12345678/photo.png',
-      disabled: false,
-    });
-    return { status: 1, uid: userRecord.uid };
+    // var userRecord = await admin.auth().createUser({
+    //   email: data.email,
+    //   emailVerified: false,
+    //   //phoneNumber: data.phone,
+    //   password: "",
+    //   displayName: data.first_name + " " + data.last_name,
+    //   //photoURL: 'http://www.example.com/12345678/photo.png',
+    //   disabled: false,
+    // });
+    // return { status: 1, uid: userRecord.uid };
+    return { status: 1 };
   } catch (err) {
     return { status: 0, error: err };
   }

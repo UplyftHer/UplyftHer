@@ -507,7 +507,7 @@ const meetingController = {
                 start_time: new Date().toISOString(),
                 duration: 60, // 60 minutes
                 timezone: "Asia/Kolkata",
-                password: "secure123", // Add passcode for security
+                //password: "", // Add passcode for security
                 settings: {
                     host_video: true,
                     participant_video: false,
