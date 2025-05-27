@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Images} from '../../../../utils';
 import GText from '../../../../components/GText';
 import {styles} from './styles';
@@ -17,10 +17,37 @@ import {scaledHeightValue, scaledValue} from '../../../../utils/design.utils';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useAppSelector} from '../../../../redux/store/storeUtils';
 import {showToast} from '../../../../components/Toast';
+import HeaderButton from '../../../../components/HeaderButton';
 
 const SelectInterests = ({navigation, route}) => {
   const {fieldParams} = route?.params;
   const interestsList = useAppSelector(state => state.auth.interestsList);
+
+  useEffect(() => {
+    configureHeader();
+  }, []);
+
+  const configureHeader = () => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <HeaderButton
+          icon={Images.leftArrow}
+          onPress={() => navigation.goBack()}
+          tintColor={'#966B9D'}
+          iconStyle={{
+            width: scaledValue(40),
+            height: scaledValue(40),
+          }}
+          style={{paddingHorizontal: scaledValue(20)}}
+        />
+      ),
+      headerTitle: () => (
+        <Text style={styles.headerText1}>
+          Profile Setup <Text style={styles.headerText2}>(2 of 3)</Text>
+        </Text>
+      ),
+    });
+  };
 
   const insets = useSafeAreaInsets();
   const [selectedItems, setSelectedItems] = useState([]);
@@ -31,7 +58,7 @@ const SelectInterests = ({navigation, route}) => {
     } else {
       setSelectedItems([
         ...selectedItems,
-        {interestId: item._id, name: item.name},
+        {interestId: item._id, name: item.name, icon: item?.icon},
       ]);
     }
   };
@@ -61,10 +88,8 @@ const SelectInterests = ({navigation, route}) => {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <View>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{marginTop: insets.top + scaledValue(10)}}>
-          <View
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {/* <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -87,7 +112,7 @@ const SelectInterests = ({navigation, route}) => {
             <Text style={styles.headerText1}>
               Profile Setup <Text style={styles.headerText2}>(2 of 3)</Text>
             </Text>
-          </View>
+          </View> */}
           {/* <Text style={styles.headerText1}>
             Profile Setup <Text style={styles.headerText2}>(2 of 3)</Text>
           </Text> */}

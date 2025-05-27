@@ -312,11 +312,18 @@ const PublicReviewScreen = ({navigation, route}) => {
         }}
       />
       <View style={styles.careerListView}>
-        {userData?.interests?.slice(0, 5)?.map((item, index) => (
+        {userData?.interests?.map((item, index) => (
           <TouchableOpacity
             disabled={true}
             key={index}
             style={styles.careerCardTouchable}>
+            <GImage
+              image={item?.icon}
+              style={{
+                width: scaledValue(16),
+                height: scaledValue(16),
+              }}
+            />
             <GText text={item?.name} style={styles.skillText} />
           </TouchableOpacity>
         ))}

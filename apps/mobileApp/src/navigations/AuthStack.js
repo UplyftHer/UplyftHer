@@ -74,21 +74,32 @@ const AuthStack = ({navigation, route}) => {
         <Stack.Screen
           name="BasicInfo"
           component={BasicInfo}
-          options={{
-            headerShown: false,
-          }}
+          options={props =>
+            getScreenOptions({
+              ...props,
+              title: '',
+            })
+          }
         />
         <Stack.Screen
           name="SelectInterests"
           component={SelectInterests}
-          options={{
-            headerShown: false,
-          }}
+          options={props =>
+            getScreenOptions({
+              ...props,
+              title: '',
+            })
+          }
         />
         <Stack.Screen
           name="AddBio"
           component={AddBio}
-          options={{headerShown: false}}
+          options={props =>
+            getScreenOptions({
+              ...props,
+              title: '',
+            })
+          }
         />
         <Stack.Screen
           name="LinkedinLogin"

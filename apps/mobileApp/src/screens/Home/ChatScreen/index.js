@@ -32,6 +32,7 @@ import {io} from 'socket.io-client';
 import {enable_meeting} from '../../../redux/slices/communicationSlice';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {SOCKET_URL} from '../../../constants';
+import {showToast} from '../../../components/Toast';
 
 const ChatScreen = ({navigation, route}) => {
   const {otherUserData, setData} = route?.params;
@@ -186,8 +187,15 @@ const ChatScreen = ({navigation, route}) => {
       console.log('herehrehehe', msg);
 
       if (msg?.status === 1) {
-        if (otherUserData?.cognitoUserIdSave === userData?.cognitoUserId) {
-          setEnableMeeting(1);
+        console.log(
+          'abc123',
+          otherUserData?.cognitoUserIdSave,
+          userData?.cognitoUserId,
+        );
+        if (otherUserData?.chatId === msg?.connectedId) {
+          if (userData?.cognitoUserId === msg?.receivercognitoUserId) {
+            setEnableMeeting(1);
+          }
         }
       }
     });
@@ -228,132 +236,146 @@ const ChatScreen = ({navigation, route}) => {
 
   return (
     <>
-      {/* <StatusBar backgroundColor="#A45EB0" barStyle="dark-content" /> */}
+      <StatusBar backgroundColor="#A45EB0" barStyle="dark-content" />
       {editCheck ? (
-        <LinearGradient
-          colors={['#A45EB0', '#A45EB0', '#DA7575']}
-          style={{
-            paddingTop: insets.top,
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingHorizontal: scaledValue(15),
-            height: scaledValue(130),
-          }}>
-          <TouchableOpacity
-            onPress={() => {
-              setEditCheck(false);
-              setSelectMessage('');
-              setInputMessage('');
+        <LinearGradient colors={['#A45EB0', '#A45EB0', '#DA7575']}>
+          <View
+            style={{
+              marginTop: insets.top,
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingHorizontal: scaledValue(15),
+              height: scaledValue(90),
             }}>
-            <Image
-              source={Images.leftArrow}
-              style={styles.headerLeftArrowImage}
+            <TouchableOpacity
+              onPress={() => {
+                setEditCheck(false);
+                setSelectMessage('');
+                setInputMessage('');
+              }}>
+              <Image
+                source={Images.leftArrow}
+                style={styles.headerLeftArrowImage}
+              />
+            </TouchableOpacity>
+            <GText
+              satoshiMedium
+              text={'Edit message'}
+              style={[
+                {
+                  paddingLeft: scaledValue(15),
+                  color: '#fff',
+                  fontSize: scaledValue(20),
+                  letterSpacing: scaledValue(16 * -0.03),
+                },
+              ]}
             />
-          </TouchableOpacity>
-          <GText
-            satoshiMedium
-            text={'Edit message'}
-            style={[
-              {
-                paddingLeft: scaledValue(15),
-                color: '#fff',
-                fontSize: scaledValue(20),
-                letterSpacing: scaledValue(16 * -0.03),
-              },
-            ]}
-          />
+          </View>
         </LinearGradient>
       ) : (
         <LinearGradient
           colors={['#A45EB0', '#A45EB0', '#DA7575']}
-          style={[styles.headerContainer(statusBarHeight, insets.top)]}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}>
-            <Image
-              source={Images.leftArrow}
-              tintColor={colors.offWhite}
-              style={styles.headerLeftArrowImage}
-            />
-          </TouchableOpacity>
-          <View style={styles.profileContainer}>
-            <GImage
-              image={otherUserData?.profilePic}
-              style={styles.profileImage}
-            />
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: scaledValue(4),
-              }}>
-              <GText
-                semiBold
-                text={otherUserData?.fullName}
-                style={styles.profileName}
-              />
-              {otherUserData?.emailDomainVerified === 1 && (
-                <Image
-                  source={Images.verified}
-                  style={{width: scaledValue(16), height: scaledValue(16)}}
-                />
-              )}
-            </View>
-          </View>
-          {selectMessage ? (
-            <TouchableOpacity
-              onPress={() => {
-                // setSelectMessage('');
-                setEditCheck(true);
-                setInputMessage(selectMessage?.message);
-                inputRef?.current?.focus();
-              }}
-              style={{width: scaledValue(36), height: scaledValue(36)}}>
-              <GText semiBold text={'Edit'} style={styles.profileName} />
-            </TouchableOpacity>
-          ) : userData?.userType === 1 && enableMeeting === 1 ? (
-            <View style={{width: scaledValue(36), height: scaledValue(36)}} />
-          ) : (
+          style={{
+            borderBottomLeftRadius: scaledValue(35),
+            borderBottomRightRadius: scaledValue(35),
+            marginBottom: scaledValue(12),
+          }}>
+          <View style={[styles.headerContainer(statusBarHeight, insets.top)]}>
             <TouchableOpacity
               activeOpacity={0.8}
-              style={[
-                styles.calendarButton,
-                {
-                  backgroundColor:
-                    userData?.userType === 1 || enableMeeting === 1
-                      ? colors.offWhite
-                      : 'transparent',
-                },
-              ]}
-              disabled={userData?.userType === 0 && enableMeeting === 0}
-              onPress={() => {
-                if (userData?.userType === 1) {
-                  refRBSheet?.current?.open();
-                } else if (userData?.userType === 0) {
-                  if (enableBookingSession === 1) {
-                    navigation?.navigate('StackScreens', {
-                      screen: 'BookMeeting',
-                      params: {
-                        otherUserData: otherUserData,
-                        mentorData: extraData,
-                        meetingData: {},
-                      },
-                    });
-                  } else if (enableBookingSession === 0) {
-                    navigation?.navigate('StackScreens', {
-                      screen: 'BookSession',
-                      params: {
-                        setData: setData,
-                        otherUserData: otherUserData,
-                        setEnableBookingSession: setEnableBookingSession,
-                        mentorData: extraData,
-                      },
-                    });
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}>
+              <Image
+                source={Images.leftArrow}
+                tintColor={colors.offWhite}
+                style={styles.headerLeftArrowImage}
+              />
+            </TouchableOpacity>
+            <View style={styles.profileContainer}>
+              <GImage
+                image={otherUserData?.profilePic}
+                style={styles.profileImage}
+              />
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: scaledValue(4),
+                }}>
+                <GText
+                  semiBold
+                  text={otherUserData?.fullName}
+                  style={styles.profileName}
+                />
+                {otherUserData?.emailDomainVerified === 1 && (
+                  <Image
+                    source={Images.verified}
+                    style={{width: scaledValue(16), height: scaledValue(16)}}
+                  />
+                )}
+              </View>
+            </View>
+            {selectMessage ? (
+              <TouchableOpacity
+                onPress={() => {
+                  // setSelectMessage('');
+                  setEditCheck(true);
+                  setInputMessage(selectMessage?.message);
+                  inputRef?.current?.focus();
+                }}
+                style={{width: scaledValue(36), height: scaledValue(36)}}>
+                <GText semiBold text={'Edit'} style={styles.profileName} />
+              </TouchableOpacity>
+            ) : userData?.userType === 1 && enableMeeting === 1 ? (
+              <View style={{width: scaledValue(36), height: scaledValue(36)}} />
+            ) : (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={[
+                  styles.calendarButton,
+                  {
+                    backgroundColor:
+                      // userData?.userType === 1 || enableMeeting === 1
+                      //   ?
+                      colors.offWhite,
+                    // : 'transparent',
+                  },
+                ]}
+                // disabled={userData?.userType === 0 && enableMeeting === 0}
+                onPress={() => {
+                  if (userData?.userType === 1) {
+                    refRBSheet?.current?.open();
+                  } else if (userData?.userType === 0) {
+                    if (enableMeeting === 1) {
+                      if (enableBookingSession === 1) {
+                        navigation?.navigate('StackScreens', {
+                          screen: 'BookMeeting',
+                          params: {
+                            otherUserData: otherUserData,
+                            mentorData: extraData,
+                            meetingData: {},
+                          },
+                        });
+                      } else if (enableBookingSession === 0) {
+                        navigation?.navigate('StackScreens', {
+                          screen: 'BookSession',
+                          params: {
+                            setData: setData,
+                            otherUserData: otherUserData,
+                            setEnableBookingSession: setEnableBookingSession,
+                            mentorData: extraData,
+                          },
+                        });
+                      }
+                    } else if (enableMeeting === 0) {
+                      showToast(
+                        0,
+                        'Mentor has not enabled the meeting room yet.',
+                      );
+                    }
                   }
-                }
-              }}>
-              {userData?.userType === 1 || enableMeeting === 1 ? (
+                }}>
+                {/* {userData?.userType === 1 || enableMeeting === 1 ? ( */}
                 <Image
                   source={
                     userData?.userType === 1
@@ -366,9 +388,10 @@ const ChatScreen = ({navigation, route}) => {
                       : styles.calendarImage
                   }
                 />
-              ) : null}
-            </TouchableOpacity>
-          )}
+                {/* ) : null} */}
+              </TouchableOpacity>
+            )}
+          </View>
         </LinearGradient>
       )}
       <KeyboardAvoidingView

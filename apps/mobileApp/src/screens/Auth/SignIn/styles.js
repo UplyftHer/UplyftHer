@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
     height: scaledValue(170),
     width: '100%',
     marginTop: scaledValue(-10),
-   resizeMode:"cover",
+    resizeMode: 'cover',
   },
   containerView: {
     marginTop:
@@ -34,7 +34,7 @@ export const styles = StyleSheet.create({
     borderTopRightRadius: scaledValue(32),
   },
   input: {
-width:'100%',
+    width: '100%',
     height: scaledHeightValue(48),
     marginBottom: scaledValue(15),
     backgroundColor: 'transparent',
@@ -44,10 +44,10 @@ width:'100%',
     height: scaledHeightValue(357),
     width: scaledValue(355),
     alignItems: 'center',
-    
-      alignSelf: 'center',
+
+    alignSelf: 'center',
     // marginHorizontal: scaledValue(20),
-    width:deviceW-40,
+    width: deviceW - 40,
 
     marginTop: 80,
   },
@@ -56,7 +56,6 @@ width:'100%',
     height: scaledValue(20),
     width: scaledValue(20),
     tintColor: colors.themeColor,
-  
   },
   forgotText: {
     color: colors.themeColor,
@@ -68,7 +67,6 @@ width:'100%',
     height: scaledHeightValue(48),
     borderRadius: scaledValue(12),
     marginBottom: scaledHeightValue(40),
-    paddingHorizontal: scaledValue(30),
   },
   imageStyle: {
     height: scaledValue(18),
@@ -77,7 +75,8 @@ width:'100%',
   textStyle: {
     fontSize: scaledValue(19),
     letterSpacing: scaledValue(19 * -0.03),
-    padding: scaledValue(10),
+    paddingHorizontal: scaledValue(10),
+    marginHorizontal: scaledValue(30),
   },
   customButton: {
     backgroundColor: colors.azure,
@@ -118,7 +117,7 @@ width:'100%',
   forgotPasswordText: {
     marginTop: scaledValue(-10),
     width: '100%',
-    alignItems:"flex-end",
+    alignItems: 'flex-end',
   },
   loginViaText: {
     color: colors.darkPurple,

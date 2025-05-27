@@ -48,12 +48,12 @@ export const styles = StyleSheet.create({
     lineHeight: scaledHeightValue(22.8),
     letterSpacing: scaledValue(19 * -0.03),
     fontFamily: fonts.SUSE_MEDIUM,
+    marginHorizontal: scaledValue(24),
   },
   editProfileButton: {
     marginTop: scaledValue(20),
     height: scaledValue(40),
     alignSelf: 'center',
-    paddingHorizontal: scaledValue(24),
   },
   optionsList: {
     marginHorizontal: scaledValue(20),

@@ -15,10 +15,10 @@ const CalendarCard = props => {
       }
       start={{x: 0.5, y: 1}}
       end={{x: 0.5, y: 0}}
-      style={styles.calendarContainer}>
+      style={styles.calendarContainerGradient}>
       <TouchableOpacity
         disabled={props?.disabled}
-        style={{alignItems: 'center'}}
+        style={styles.calendarContainer}
         onPress={props?.onPress}>
         <GText
           beVietnamSemiBold
@@ -43,11 +43,7 @@ const CalendarCard = props => {
 export default CalendarCard;
 
 const styles = StyleSheet.create({
-  calendarContainer: {
-    paddingHorizontal: scaledValue(8),
-    paddingVertical: scaledValue(13.5),
-    alignItems: 'center',
-    width: scaledValue(64),
+  calendarContainerGradient: {
     borderRadius: scaledValue(8),
     // iOS Shadow
     shadowColor: colors.inputPlaceholder,
@@ -56,6 +52,13 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     // Android Shadow
     elevation: 10,
+  },
+  calendarContainer: {
+    paddingHorizontal: scaledValue(8),
+    paddingVertical: scaledValue(13.5),
+    alignItems: 'center',
+    width: scaledValue(64),
+    borderRadius: scaledValue(8),
   },
   monthText: selectDate => ({
     fontSize: scaledValue(14),

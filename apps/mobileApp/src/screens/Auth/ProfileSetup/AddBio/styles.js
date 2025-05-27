@@ -25,7 +25,7 @@ export const styles = StyleSheet.create({
     color: colors.inputPlaceholder,
   },
   basicInfoText: {
-    marginTop: scaledHeightValue(33),
+    marginTop: scaledHeightValue(15),
     textAlign: 'center',
     fontSize: scaledHeightValue(23),
     fontFamily: fonts.SUSE_MEDIUM,

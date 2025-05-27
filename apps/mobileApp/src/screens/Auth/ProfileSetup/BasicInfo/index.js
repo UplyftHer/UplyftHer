@@ -15,7 +15,7 @@ import {colors} from '../../../../../assets/colors';
 import GradientButton from '../../../../components/GradientButton';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {scaledHeightValue, scaledValue} from '../../../../utils/design.utils';
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import OptionMenuSheet from '../../../../components/OptionMenuSheet';
 import {
   useAppDispatch,
@@ -27,6 +27,7 @@ import countriescities from '../../../../../assets/countriescities.json';
 import {get_cities_api} from '../../../../redux/slices/authSlice';
 import useDataFactory from '../../../../components/UseDataFactory/useDataFactory';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import HeaderButton from '../../../../components/HeaderButton';
 
 const BasicInfo = ({navigation, route}) => {
   const {responseData} = route?.params;
@@ -62,6 +63,29 @@ const BasicInfo = ({navigation, route}) => {
     city: '',
     userType,
   });
+
+  useEffect(() => {
+    configureHeader();
+  }, []);
+
+  const configureHeader = () => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <HeaderButton
+          icon={Images.leftArrow}
+          onPress={() => navigation.goBack()}
+          tintColor={'#966B9D'}
+          iconStyle={styles.headerIconStyle}
+          style={{paddingHorizontal: scaledValue(20)}}
+        />
+      ),
+      headerTitle: () => (
+        <Text style={styles.headerText1}>
+          Profile Setup <Text style={styles.headerText2}>(1 of 3)</Text>
+        </Text>
+      ),
+    });
+  };
 
   const handleTextChange = input => {
     const filteredText = input
@@ -150,7 +174,7 @@ const BasicInfo = ({navigation, route}) => {
       keyboardShouldPersistTaps="handled"
       extraHeight={Platform.OS == 'ios' ? scaledValue(200) : ''}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View
+        {/* <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -176,7 +200,7 @@ const BasicInfo = ({navigation, route}) => {
           <Text style={styles.headerText1}>
             Profile Setup <Text style={styles.headerText2}>(1 of 3)</Text>
           </Text>
-        </View>
+        </View> */}
         <GText text="Basic Info" medium style={styles.basicInfoText} />
         <GText
           text={`Help us personalize your experience by\n sharing a few details about yourself.`}

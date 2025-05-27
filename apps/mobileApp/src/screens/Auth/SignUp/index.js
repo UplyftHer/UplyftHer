@@ -77,7 +77,7 @@ const SignUp = ({navigation}) => {
                 {
                   title: 'Notification',
                   message:
-                    'Uplyfther needs access to your notification ' +
+                    'UplyftHer needs access to your notification ' +
                     'so you can get Updates',
                   buttonNeutral: 'Ask Me Later',
                   buttonNegative: 'Cancel',
@@ -239,6 +239,7 @@ const SignUp = ({navigation}) => {
                       navigation?.navigate('TermsPrivacy', {
                         url: TERMS_CONDITIONS_URL,
                         screen: 'Terms and Conditions',
+                        type: 'terms',
                       });
                     }}
                     style={styles.agreePart2}>
@@ -251,6 +252,7 @@ const SignUp = ({navigation}) => {
                       navigation?.navigate('TermsPrivacy', {
                         url: PRIVACY_POLICY_URL,
                         screen: 'Privacy Policy',
+                        type: 'privacy',
                       });
                     }}
                     style={styles.agreePart2}>

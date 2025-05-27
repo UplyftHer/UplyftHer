@@ -60,7 +60,6 @@ export const styles = StyleSheet.create({
   gradientStyle: {
     height: scaledHeightValue(48),
     width: deviceW - 40,
-    marginTop: scaledValue(73),
   },
   buttonText: {
     fontSize: scaledValue(19),

@@ -43,6 +43,7 @@ const MatchScreen = ({navigation, route}) => {
 
               if (itemToUpdate) {
                 // Update `isRead` to 1
+
                 if (
                   !itemToUpdate?.startConversation?.includes(
                     userData?.cognitoUserId,
@@ -77,7 +78,7 @@ const MatchScreen = ({navigation, route}) => {
 
             if (itemToUpdate) {
               // Update `isRead` to 1
-              itemToUpdate.startConversation = 1;
+              itemToUpdate.startConversation = userData?.cognitoUserId;
 
               // Log the updated item for debugging
               console.log('Updated item:', itemToUpdate);
@@ -95,11 +96,11 @@ const MatchScreen = ({navigation, route}) => {
   return (
     <View style={styles.container}>
       <ImageBackground source={Images.gradientBackground} style={styles.imgBg}>
-        {/* <StatusBar
+        <StatusBar
           translucent
           backgroundColor="transparent"
           barStyle="dark-content" // or 'light-content' based on your design
-        /> */}
+        />
 
         <GText medium style={styles.headerTitle} text="It's a Match! 💃" />
 

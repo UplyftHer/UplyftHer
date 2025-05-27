@@ -15,7 +15,11 @@ import HeaderButton from '../../../components/HeaderButton';
 import GText from '../../../components/GText';
 import ContactOption from '../../../components/ContactOption';
 import {colors} from '../../../../assets/colors';
-import {scaledHeightValue, scaledValue} from '../../../utils/design.utils';
+import {
+  getFontSize,
+  scaledHeightValue,
+  scaledValue,
+} from '../../../utils/design.utils';
 import fonts from '../../../utils/fonts';
 import Input from '../../../components/Input';
 import GradientButton from '../../../components/GradientButton';
@@ -468,10 +472,20 @@ const ContactUs = ({navigation}) => {
                     />
                     <GText
                       text={item?.name}
-                      style={styles.submitRequestItemName(
-                        selectedConfirmTerms.includes(item.id), // Pass boolean for styling
-                        item,
-                      )}
+                      style={{
+                        color: selectedConfirmTerms.includes(item.id)
+                          ? colors.themeColor
+                          : colors.black,
+                        fontSize: getFontSize(16),
+                        lineHeight: scaledValue(16),
+                        fontFamily: selectedConfirmTerms.includes(item.id)
+                          ? fonts.BE_VIETNAM_SEMIBOLD
+                          : fonts.BE_VIETNAM_REGULAR,
+                      }}
+                      // style={styles.submitRequestItemName(
+                      //   selectedConfirmTerms.includes(item.id), // Pass boolean for styling
+                      //   item?.id,
+                      // )}
                     />
                   </TouchableOpacity>
                 ))}
@@ -506,12 +520,42 @@ export default ContactUs;
 const lawsList = [
   {
     id: 0,
-    title: 'Personal laws',
+    title: 'Brazil’s General Data Protection Law (LGPD)',
     textColor: '#3E3E3E',
   },
   {
     id: 1,
-    title: 'Labour',
+    title: 'California Consumer Privacy Act (CCPA)',
+    textColor: '#3E3E3E',
+  },
+  {
+    id: 2,
+    title: 'Colorado Privacy Act (CPA)',
+    textColor: '#3E3E3E',
+  },
+  {
+    id: 3,
+    title: 'Connecticut Data Privacy Act (CTDPA)',
+    textColor: '#3E3E3E',
+  },
+  {
+    id: 4,
+    title: 'Oregon Consumer Privacy Act (OCPA)',
+    textColor: '#3E3E3E',
+  },
+  {
+    id: 5,
+    title: 'South Africa’s Protection of Personal Information Act (POPIA)',
+    textColor: '#3E3E3E',
+  },
+  {
+    id: 6,
+    title: 'Utah Consumer Privacy Act (UCPA)',
+    textColor: '#3E3E3E',
+  },
+  {
+    id: 7,
+    title: 'Virginia Consumer Data Protection Act (VCDPA)',
     textColor: '#3E3E3E',
   },
 ];

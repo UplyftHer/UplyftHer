@@ -41,7 +41,7 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.darkShadeOfPurple,
     borderWidth: scaledValue(2.5),
     borderColor: colors.themeColor,
-    marginBottom: scaledValue(18),
+    marginBottom: scaledValue(8),
     alignSelf: 'center',
   },
   leftArrowStyle: insets => ({
@@ -78,8 +78,8 @@ export const styles = StyleSheet.create({
     fontSize: getFontSize(16),
     color: colors.darkPurple,
     letterSpacing: scaledValue(16 * -0.03),
-    paddingHorizontal: scaledValue(12),
     fontFamily: fonts.SUSE_REGULAR,
+    maxWidth: scaledValue(115),
   },
   swipeImage: {
     resizeMode: 'contain',
@@ -189,9 +189,15 @@ export const styles = StyleSheet.create({
   },
 
   careerCardView: {
-    marginTop: scaledHeightValue(18),
-    marginHorizontal: scaledValue(10),
+    marginTop: scaledHeightValue(10),
+    paddingHorizontal: scaledValue(25),
     marginBottom: scaledHeightValue(18),
+    width: Dimensions.get('screen').width,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    rowGap: scaledValue(8),
+    columnGap: scaledValue(4),
   },
   careerListView: {
     flexDirection: 'row',
@@ -204,8 +210,12 @@ export const styles = StyleSheet.create({
     height: scaledHeightValue(35),
     borderRadius: scaledValue(24),
     justifyContent: 'center',
-    // marginTop: scaledValue(8),
     backgroundColor: colors.offWhite,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: scaledValue(12),
+    gap: scaledValue(5),
   },
   leftArrowView: insets => ({
     paddingLeft: scaledValue(24.06),
@@ -214,9 +224,9 @@ export const styles = StyleSheet.create({
     zIndex: 10,
     elevation: 100,
     shadowColor: '#000000',
-    shadowOffset: {width: 0, height: 10},
-    shadowOpacity: 0.5,
-    shadowRadius: scaledValue(8),
+    shadowOffset: {width: -5, height: 10},
+    shadowOpacity: 0.7,
+    shadowRadius: scaledValue(10),
     borderRadius: scaledValue(8),
   }),
   renderContainer: {

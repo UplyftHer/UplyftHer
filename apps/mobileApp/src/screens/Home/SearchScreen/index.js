@@ -28,7 +28,9 @@ import CustomActivityIndicator from '../../../components/CustomActivityIndicator
 const SearchScreen = ({navigation}) => {
   const [searchText, setSearchText] = useState('');
   const userData = useAppSelector(state => state.auth.user);
+  const [inputValue, setInputValue] = useState('');
 
+  const newNotification = useAppSelector(state => state.auth.isNewNotification);
   const {
     loading: loading,
     data,
@@ -71,7 +73,7 @@ const SearchScreen = ({navigation}) => {
       search: searchText || '',
       filter: selectedFilter,
     });
-  }, [selectedFilter?.length > 0]);
+  }, [selectedFilter?.length]);
 
   const insets = useSafeAreaInsets();
   const renderItem = ({item, index}) => {
@@ -116,6 +118,11 @@ const SearchScreen = ({navigation}) => {
     );
   };
 
+  const debouncedSearch = debounce(text => {
+    setSearchText(text);
+    refreshData({search: text, filter: selectedFilter});
+  }, 600);
+
   return (
     <View style={styles.container}>
       <View
@@ -126,21 +133,43 @@ const SearchScreen = ({navigation}) => {
         <View style={styles.searchView}>
           <View style={{width: scaledValue(186)}}>
             <TextInput
-              value={selectedFilter}
-              onChangeText={debounce(handleSearch, 600)}
+              // value={selectedFilter}
+              value={inputValue}
+              // onChangeText={debounce(handleSearch, 600)}
+              onChangeText={text => {
+                setInputValue(text); // Immediate update so you can type
+                debouncedSearch(text); // Debounced API call
+              }}
               placeholder="Search by interest"
               style={styles.searchViewInput}
               placeholderTextColor={'#7E7E7E'}
             />
           </View>
-          <Image
-            style={styles.searchImage}
-            source={Images.searchIconWithoutBorder}
-          />
+          {searchText ? (
+            <TouchableOpacity
+              onPress={() => {
+                setInputValue('');
+                setSearchText('');
+                refreshData({
+                  search: '',
+                  filter: selectedFilter,
+                });
+              }}>
+              <Image style={styles.searchImage} source={Images.Cross} />
+            </TouchableOpacity>
+          ) : (
+            <Image
+              style={styles.searchImage}
+              source={Images.searchIconWithoutBorder}
+            />
+          )}
         </View>
         <TouchableOpacity
           onPress={() => navigation.navigate('NotificationScreen')}>
-          <Image style={styles.bellIcon} source={Images.bellIcon} />
+          <Image
+            style={styles.bellIcon}
+            source={newNotification ? Images.bellIcon : Images.noBellIcon}
+          />
         </TouchableOpacity>
       </View>
       <View style={styles.contentView}>
@@ -155,18 +184,24 @@ const SearchScreen = ({navigation}) => {
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              gap: scaledValue(8),
+              // gap: scaledValue(8),
             }}>
             {selectedFilter?.length > 0 && (
               <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: scaledValue(4),
+                }}
                 onPress={() => {
                   setSelectedFilter([]);
                   setSelectedIndex([]);
                 }}>
                 <GText
-                  text={'Clear All'}
+                  text={'Clear'}
                   style={{fontSize: scaledValue(14), color: colors.black}}
                 />
+                <Image source={Images.Cross} style={styles.searchImage} />
               </TouchableOpacity>
             )}
             <FlatList

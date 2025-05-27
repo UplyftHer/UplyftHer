@@ -78,7 +78,6 @@ export const styles = StyleSheet.create({
     height: scaledHeightValue(48),
     width: scaledValue(295),
     alignSelf: 'center',
-    paddingHorizontal: scaledValue(20),
     marginBottom: scaledHeightValue(28),
   },
 

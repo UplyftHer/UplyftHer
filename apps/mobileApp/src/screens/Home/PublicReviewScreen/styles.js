@@ -35,6 +35,9 @@ export const styles = StyleSheet.create({
     borderWidth: scaledValue(1),
     paddingHorizontal: scaledValue(12),
     borderColor: '#4B164C33',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: scaledValue(5),
   },
   careerListView: {
     flexDirection: 'row',

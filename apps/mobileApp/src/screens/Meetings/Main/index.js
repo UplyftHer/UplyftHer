@@ -31,6 +31,7 @@ import {
   setUpComingMeetingList,
 } from '../../../redux/slices/bookMeetingSlice';
 import GImage from '../../../components/GImage';
+import GradientButton from '../../../components/GradientButton';
 
 const Meetings = ({navigation}) => {
   const logoutRBSheetRef = useRef();
@@ -43,7 +44,6 @@ const Meetings = ({navigation}) => {
   const upComingMeetingList = useAppSelector(
     state => state.meetings.upComingMeetingList,
   );
-  console.log('upComingMeetingListupComingMeetingList', upComingMeetingList);
 
   useEffect(() => {
     configureHeader();
@@ -71,16 +71,6 @@ const Meetings = ({navigation}) => {
       }),
     );
   };
-
-  // const {
-  //   loading: loading,
-  //   data: upComingLists,
-  //   setData,
-  //   refreshData,
-  //   loadMore,
-  //   Placeholder,
-  //   Loader,
-  // } = useDataFactory('upComingMeetingsList', true, '', 'POST');
 
   const {
     loading: pastMeetingLoading,
@@ -146,6 +136,7 @@ const Meetings = ({navigation}) => {
           />
         </View>
         <TouchableOpacity
+          hitSlop={{top: 20, bottom: 20, left: 50, right: 50}}
           onPress={() => {
             setSelectedMeetingToDelete(item);
             deleteButton();
@@ -338,6 +329,14 @@ const Meetings = ({navigation}) => {
     </View>
   );
 
+  const desc =
+    authState?.userType === 1
+      ? `You haven’t hosted a session yet — explore potential mentees and take the first step in your mentoring journey.`
+      : 'You haven’t booked any sessions yet — discover inspiring mentors and start your journey today.';
+
+  const button =
+    authState?.userType === 1 ? 'Discover Mentees' : 'Find Mentors';
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -345,6 +344,7 @@ const Meetings = ({navigation}) => {
         renderItem={renderItem}
         onEndReached={pastMeetingLoadMore}
         ListFooterComponent={pastMeetingLoader}
+        contentContainerStyle={{flexGrow: 1}}
         ListEmptyComponent={() => {
           return (
             <>
@@ -356,11 +356,42 @@ const Meetings = ({navigation}) => {
                       flex: 1,
                       justifyContent: 'center',
                       alignItems: 'center',
-                      marginTop: Dimensions.get('window').height / 3,
+                      // marginTop: Dimensions.get('window').height / 3,
                     }}>
                     <GText
-                      text={'No meetings yet!'}
-                      style={{fontSize: scaledValue(20)}}
+                      semiBold
+                      text={'Your Next Uplyft Starts Here!'}
+                      style={{
+                        fontSize: scaledValue(22),
+                        textAlign: 'center',
+                        marginBottom: scaledValue(12),
+                      }}
+                    />
+                    <GText
+                      medium
+                      text={desc}
+                      style={{
+                        fontSize: scaledValue(16),
+                        textAlign: 'center',
+                        color: '#555',
+                        marginBottom: scaledValue(20),
+                      }}
+                    />
+                    <GradientButton
+                      title={button}
+                      onPress={() => {
+                        navigation?.navigate('StackScreens', {
+                          screen: 'ProfileScreen',
+                          params: {
+                            searchUserData: {},
+                            screen: '',
+                            itemIndex: '',
+                          },
+                        });
+                      }}
+                      style={styles.gradientButton}
+                      gradientstyle={styles.gradientButton}
+                      textstyle={styles.textStyle}
                     />
                   </View>
                 )}
@@ -420,7 +451,14 @@ const Meetings = ({navigation}) => {
               </>
             )}
             {pastMeetingData?.length > 0 && (
-              <Text style={styles.pastMeetingText}>
+              <Text
+                style={[
+                  styles.pastMeetingText,
+                  {
+                    marginTop:
+                      upComingMeetingList?.length > 0 ? 0 : scaledValue(10),
+                  },
+                ]}>
                 Past Meetings{' '}
                 <Text
                   style={
