@@ -13,7 +13,6 @@ const UserCard = props => {
       style={styles.cardContainer(props?.index)}
       onPress={props.onPress}>
       <GImage image={props?.itemData?.profilePic} style={styles.userImage} />
-      {/* <Image source={props?.userImage} style={styles.userImage} /> */}
       <LinearGradient
         colors={['#4B164C00', '#4B164C']}
         start={{x: 0, y: 0}}
@@ -28,7 +27,7 @@ const UserCard = props => {
               }}
               beVietnamSemiBold
               text={props.userName}
-              style={[styles.userName]}
+              style={styles.userName}
             />
             <GText
               beVietnamSemiBold
@@ -45,17 +44,19 @@ const UserCard = props => {
           )}
         </View>
         {props?.label && (
-          <LinearGradient
-            colors={['#DA7575', '#A45EB0']}
-            start={{x: 0.5, y: 1.5}}
-            end={{x: 0.5, y: 0}}
-            style={styles.labelView}>
-            <GText
-              beVietnamMedium
-              text={props?.label}
-              style={styles.labelText}
-            />
-          </LinearGradient>
+          <View style={styles.labelView}>
+            <LinearGradient
+              colors={['#DA7575', '#A45EB0']}
+              start={{x: 0.5, y: 1.5}}
+              end={{x: 0.5, y: 0}}
+              style={styles.labelGradient}>
+              <GText
+                beVietnamMedium
+                text={props?.label}
+                style={styles.labelText}
+              />
+            </LinearGradient>
+          </View>
         )}
       </LinearGradient>
     </TouchableOpacity>
@@ -105,17 +106,21 @@ const styles = StyleSheet.create({
     lineHeight: scaledValue(15.6),
   },
   labelView: {
-    position: 'absolute',
-    bottom: 0,
-    paddingVertical: scaledValue(4),
+    marginTop: 'auto',
     borderTopRightRadius: scaledValue(8),
     borderTopLeftRadius: scaledValue(8),
+    overflow: 'hidden',
     width: scaledValue(80),
+  },
+  labelGradient: {
     alignItems: 'center',
+    borderTopRightRadius: scaledValue(8),
+    borderTopLeftRadius: scaledValue(8),
   },
   labelText: {
     fontSize: scaledValue(11),
     lineHeight: scaledValue(14.3),
     color: colors.white,
+    marginVertical: scaledValue(4),
   },
 });

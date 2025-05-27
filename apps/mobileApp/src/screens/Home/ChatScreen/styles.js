@@ -12,7 +12,6 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: scaledValue(12),
   }),
 
   calendarButton: {

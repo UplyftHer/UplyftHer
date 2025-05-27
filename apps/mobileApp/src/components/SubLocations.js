@@ -38,7 +38,14 @@ const SubLocations = props => {
   };
 
   useEffect(() => {
-    setFilteredOptions(options.filter(o => o[titleKey].includes(search)));
+    setFilteredOptions(
+      options.filter(o =>
+        o[titleKey].toLowerCase().includes(search.trim().toLowerCase()),
+      ),
+    );
+    // setFilteredOptions(
+    //   options.filter(o => o[titleKey].includes(search.trim())),
+    // );
   }, [search, props]);
   return (
     <RBSheet

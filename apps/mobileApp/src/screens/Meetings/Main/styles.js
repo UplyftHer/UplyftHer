@@ -124,4 +124,15 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  gradientButton: {
+    height: scaledHeightValue(48),
+    borderRadius: scaledValue(12),
+    marginBottom: scaledHeightValue(40),
+  },
+  textStyle: {
+    fontSize: scaledValue(19),
+    letterSpacing: scaledValue(19 * -0.03),
+    paddingHorizontal: scaledValue(10),
+    marginHorizontal: scaledValue(30),
+  },
 });

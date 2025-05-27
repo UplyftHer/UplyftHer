@@ -13,41 +13,43 @@ const ProfileCard = ({image, name, likes, place, emailDomainVerified}) => {
       colors={['#DA7575', '#A45EB0']}
       start={{x: 0.5, y: 1}}
       end={{x: 0.5, y: 0}}
-      style={styles.profileCardContainer}>
-      <View style={styles.backgroundView}>
-        <GImage image={image} style={styles.profileImage} />
-        {/* <Image source={image} style={styles.profileImage} /> */}
-      </View>
-      <View style={styles.textview}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: scaledValue(4),
-          }}>
-          <Text style={styles.nameStyle}>{name}</Text>
-          {emailDomainVerified === 1 && (
+      style={styles.profileCardGradient}>
+      <View style={styles.profileCardContainer}>
+        <View style={styles.backgroundView}>
+          <GImage image={image} style={styles.profileImage} />
+          {/* <Image source={image} style={styles.profileImage} /> */}
+        </View>
+        <View style={styles.textview}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: scaledValue(4),
+            }}>
+            <Text style={styles.nameStyle}>{name}</Text>
+            {emailDomainVerified === 1 && (
+              <Image
+                source={Images.verified}
+                style={{width: scaledValue(16), height: scaledValue(16)}}
+              />
+            )}
+          </View>
+          <View style={styles.likesview}>
             <Image
-              source={Images.verified}
-              style={{width: scaledValue(16), height: scaledValue(16)}}
+              source={Images.heart}
+              style={styles.heartImage}
+              resizeMode="contain"
             />
-          )}
-        </View>
-        <View style={styles.likesview}>
-          <Image
-            source={Images.heart}
-            style={styles.heartImage}
-            resizeMode="contain"
-          />
-          <Text style={styles.likesText}>{likes}</Text>
-        </View>
-        <View style={styles.placeview}>
-          <Image
-            source={Images.location}
-            style={styles.locationImage}
-            resizeMode="contain"
-          />
-          <Text style={styles.placeText}>{place}</Text>
+            <Text style={styles.likesText}>{likes}</Text>
+          </View>
+          <View style={styles.placeview}>
+            <Image
+              source={Images.location}
+              style={styles.locationImage}
+              resizeMode="contain"
+            />
+            <Text style={styles.placeText}>{place}</Text>
+          </View>
         </View>
       </View>
     </LinearGradient>
@@ -57,13 +59,16 @@ const ProfileCard = ({image, name, likes, place, emailDomainVerified}) => {
 export default ProfileCard;
 
 const styles = StyleSheet.create({
+  profileCardGradient: {
+    borderRadius: scaledValue(12),
+    marginTop: scaledValue(22),
+    marginBottom: scaledValue(40),
+    marginHorizontal: scaledValue(20),
+  },
   profileCardContainer: {
     borderRadius: scaledValue(12),
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: scaledValue(22),
-    marginBottom: scaledValue(40),
-    marginHorizontal: scaledValue(20),
     paddingHorizontal: scaledValue(16),
     paddingVertical: scaledValue(16),
   },

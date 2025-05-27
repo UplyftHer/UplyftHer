@@ -1,4 +1,4 @@
-import {StyleSheet, TouchableOpacity} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import {scaledValue} from '../../../utils/design.utils';
 import GText from '../../../components/GText';
@@ -22,7 +22,7 @@ const TimeButton = props => {
         start={{x: 0.5, y: 1}}
         end={{x: 0.5, y: 0}}
         style={[
-          styles.timeContainer,
+          styles.timeContainerGradient,
           {
             opacity:
               props?.meetingData?.slot === props?.item?.slotname
@@ -32,11 +32,13 @@ const TimeButton = props => {
                 : 1,
           },
         ]}>
-        <GText
-          beVietnamSemiBold
-          text={props?.item?.slotname}
-          style={[styles.timeText, props?.textStyle]}
-        />
+        <View style={styles.timeContainer}>
+          <GText
+            beVietnamSemiBold
+            text={props?.item?.slotname}
+            style={[styles.timeText, props?.textStyle]}
+          />
+        </View>
       </LinearGradient>
     </TouchableOpacity>
   );
@@ -52,6 +54,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     backgroundColor: colors.offWhite,
     shadowRadius: scaledValue(8),
+    borderRadius: scaledValue(8),
+  },
+  timeContainerGradient: {
     borderRadius: scaledValue(8),
   },
   timeContainer: {

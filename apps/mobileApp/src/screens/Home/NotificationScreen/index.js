@@ -79,7 +79,7 @@ const NotificationScreen = ({navigation}) => {
     <TouchableOpacity
       disabled={item?.isTakeAction !== 1 || item?.type === 'meeting'}
       onPress={() => {
-        if (item?.startConversation.includes(userData?.cognitoUserId)) {
+        if (item?.startConversation?.includes(userData?.cognitoUserId)) {
           navigation.navigate('Inbox');
         } else {
           navigation.navigate('MatchScreen', {
@@ -108,11 +108,11 @@ const NotificationScreen = ({navigation}) => {
                 title="Accept"
                 gradientstyle={{
                   height: scaledValue(30),
-                  paddingHorizontal: scaledValue(20),
                 }}
                 textstyle={{
                   fontSize: scaledValue(14),
                   letterSpacing: scaledValue(14 * -0.02),
+                  marginHorizontal: scaledValue(20),
                 }}
                 onPress={() => handleAction(item.requestId, 1, item._id, item)}
               />
@@ -142,11 +142,11 @@ const NotificationScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      {/* <StatusBar
+      <StatusBar
         backgroundColor="#A45EB0"
         barStyle="dark-content"
         translucent
-      /> */}
+      />
       <LinearGradient
         colors={['#A45EB0', '#A45EB0', '#DA7575']}
         style={[

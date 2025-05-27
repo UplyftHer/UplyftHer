@@ -167,11 +167,11 @@ const MeetingConfirmed = ({navigation, route}) => {
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} style={{flexGrow: 1}}>
-        {/* <StatusBar
+        <StatusBar
           translucent
           backgroundColor="transparent"
           barStyle="dark-content"
-        /> */}
+        />
 
         <Image source={Images.whiteLines} style={styles.whiteLines} />
         <View style={styles.headerTitileView(insets)}>

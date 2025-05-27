@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Images} from '../../../../utils';
 import GText from '../../../../components/GText';
 import {styles} from './styles';
@@ -24,10 +24,10 @@ import {openSettings, PERMISSIONS, request} from 'react-native-permissions';
 import {useAppDispatch} from '../../../../redux/store/storeUtils';
 import {edit_user_profile} from '../../../../redux/slices/authSlice';
 import fonts from '../../../../utils/fonts';
+import HeaderButton from '../../../../components/HeaderButton';
 
 const AddBio = ({navigation, route}) => {
   const {fieldParams} = route?.params;
-  console.log('fieldParams', fieldParams);
 
   const wordLimit = 200;
   const dispatch = useAppDispatch();
@@ -42,6 +42,48 @@ const AddBio = ({navigation, route}) => {
     }
   };
 
+  useEffect(() => {
+    configureHeader();
+  }, []);
+
+  const configureHeader = () => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <HeaderButton
+          icon={Images.leftArrow}
+          onPress={() => navigation.goBack()}
+          tintColor={'#966B9D'}
+          iconStyle={{width: scaledValue(40), height: scaledValue(40)}}
+          style={{paddingHorizontal: scaledValue(20)}}
+        />
+      ),
+      headerTitle: () => (
+        <Text style={styles.headerText1}>
+          Profile Setup <Text style={styles.headerText2}>(3 of 3)</Text>
+        </Text>
+      ),
+    });
+  };
+
+  // const preferenceTexts = [
+  //   {
+  //     text1: '“I would like a',
+  //     text2: fieldParams?.userType === 0 ? 'mentee' : 'mentor',
+  //     color: colors.themeColor,
+  //   },
+  //   {text1: 'from the ', text2: fieldParams?.industry, color: colors.softRed},
+  //   {
+  //     text1: 'with expertise in',
+  //     text2: fieldParams?.occupation,
+  //     color: colors.peachy,
+  //   },
+  //   {
+  //     text1: 'who is based in',
+  //     text2: fieldParams?.city,
+  //     color: colors.themeColor,
+  //   },
+  // ];
+
   const preferenceTexts = [
     {
       text1: '“I would like a',
@@ -49,17 +91,19 @@ const AddBio = ({navigation, route}) => {
       color: colors.themeColor,
     },
     {text1: 'from the ', text2: fieldParams?.industry, color: colors.softRed},
-    {
-      text1: 'with expertise in',
-      text2: fieldParams?.occupation,
-      color: colors.peachy,
-    },
+    fieldParams?.occupation !== ''
+      ? {
+          text1: 'with expertise in',
+          text2: fieldParams?.occupation,
+          color: colors.peachy,
+        }
+      : null,
     {
       text1: 'who is based in',
       text2: fieldParams?.city,
       color: colors.themeColor,
     },
-  ];
+  ].filter(Boolean); // removes any null or false values
 
   const handlePicker = async () => {
     if (Platform.OS == 'android') {
@@ -210,10 +254,8 @@ const AddBio = ({navigation, route}) => {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : ''}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={{marginTop: insets.top + scaledValue(10)}}>
-        <View
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -233,7 +275,7 @@ const AddBio = ({navigation, route}) => {
           <Text style={styles.headerText1}>
             Profile Setup <Text style={styles.headerText2}>(3 of 3)</Text>
           </Text>
-        </View>
+        </View> */}
         {/* <Text style={styles.headerText1}>
           Profile Setup <Text style={styles.headerText2}>(3 of 3)</Text>
         </Text> */}

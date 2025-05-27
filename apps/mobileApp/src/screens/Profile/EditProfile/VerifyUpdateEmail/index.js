@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import HeaderButton from '../../../../components/HeaderButton';
 import {Images} from '../../../../utils';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {scaledValue} from '../../../../utils/design.utils';
+import {scaledHeightValue, scaledValue} from '../../../../utils/design.utils';
 import {styles} from './styles';
 import GText from '../../../../components/GText';
 import {
@@ -44,7 +44,7 @@ const VerifyEditEMail = ({navigation, route}) => {
     });
   };
 
-  const {newEmail} = route?.params;
+  const {newEmail, setFields} = route?.params;
   const [value, setValue] = useState('');
   const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
   const [timerCount, setTimer] = useState(30);
@@ -64,6 +64,7 @@ const VerifyEditEMail = ({navigation, route}) => {
 
     dispatch(verify_edit_user_email(api_credential)).then(res => {
       if (verify_edit_user_email.fulfilled.match(res)) {
+        setFields(prevFields => ({...prevFields, email: newEmail}));
         navigation?.goBack();
       }
     });
@@ -173,12 +174,17 @@ const VerifyEditEMail = ({navigation, route}) => {
           </Text>
         </TouchableOpacity>
       </View>
-      <GradientButton
-        title={'Submit'}
-        onPress={confirm_otp_hit}
-        gradientstyle={styles.gradientStyle}
-        textstyle={styles.buttonText}
-      />
+      <View
+        style={{
+          marginTop: scaledValue(73),
+        }}>
+        <GradientButton
+          title={'Submit'}
+          onPress={confirm_otp_hit}
+          gradientstyle={styles.gradientStyle}
+          textstyle={styles.buttonText}
+        />
+      </View>
     </KeyboardAwareScrollView>
   );
 };

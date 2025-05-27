@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
     color: colors.inputPlaceholder,
   },
   basicInfoText: {
-    marginTop: scaledHeightValue(33),
+    marginTop: scaledHeightValue(15),
     textAlign: 'center',
     fontSize: scaledValue(23),
     fontFamily: fonts.SUSE_MEDIUM,
@@ -68,4 +68,5 @@ export const styles = StyleSheet.create({
     lineHeight: scaledHeightValue(20.8),
     letterSpacing: scaledValue(16 * -0.02),
   },
+  headerIconStyle: {width: scaledValue(40), height: scaledValue(40)},
 });

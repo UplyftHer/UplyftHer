@@ -11,7 +11,6 @@ export const styles = StyleSheet.create({
   headerContainer: (statusBarHeight, insets) => ({
     borderBottomLeftRadius: scaledValue(35),
     borderBottomRightRadius: scaledValue(35),
-    paddingHorizontal: scaledValue(20),
 
     flexDirection: 'row',
     alignItems: 'center',

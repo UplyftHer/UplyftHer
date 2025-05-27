@@ -2,8 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import store from '../redux/store';
 import {API_BASE_URL} from '../constants';
-import {logout, updateUser} from '../redux/slices/authSlice';
+import {logout, logout_user, updateUser} from '../redux/slices/authSlice';
 import {getUser} from '../utils/constant.utils';
+import {showToast} from '../components/Toast';
 
 // ADD A REQUEST INTERCEPTOR
 axios.interceptors.request.use(
@@ -40,7 +41,12 @@ axios.interceptors.response.use(
       originalRequest.url === '/auth/refreshToken'
     ) {
       console.log('Run2');
-      store.dispatch(logout());
+      showToast(0, 'Session expired, please login again');
+      store.dispatch(
+        logout_user({
+          deviceToken: (await AsyncStorage.getItem('fcmToken')) || '1234',
+        }),
+      );
       // apiLogout(userData);
       return Promise.reject(error);
     }

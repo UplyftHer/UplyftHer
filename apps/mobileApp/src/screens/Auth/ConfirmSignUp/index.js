@@ -77,7 +77,11 @@ const ConfirmSignUp = ({navigation, route}) => {
     let input = {
       email: responseData?.data?.email,
     };
-    dispatch(resend_confirmation_code(input));
+    dispatch(resend_confirmation_code(input)).then(res => {
+      if (resend_confirmation_code.fulfilled.match(res)) {
+        setTimer(30);
+      }
+    });
   };
 
   const maskEmail = email => {

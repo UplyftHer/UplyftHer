@@ -44,7 +44,6 @@ export const styles = StyleSheet.create({
     fontSize: scaledValue(28),
     fontFamily: fonts.SUSE_MEDIUM,
     color: colors.charcoal,
-    lineHeight: scaledValue(33.6),
     letterSpacing: scaledValue(28 * -0.03),
   },
 

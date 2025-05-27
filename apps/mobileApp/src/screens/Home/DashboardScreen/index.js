@@ -151,7 +151,7 @@ const DashboardScreen = ({navigation, route}) => {
       headerLeft: () => (
         <View style={styles.headerLeftView}>
           <TouchableOpacity
-            hitSlop={{top: 20, bottom: 20, left: 50, right: 50}}
+            hitSlop={{top: 100, bottom: 100, left: 100, right: 100}}
             onPress={() => {
               setShowModal(true);
             }}
@@ -159,6 +159,10 @@ const DashboardScreen = ({navigation, route}) => {
             style={styles.headerTextView}>
             <Image source={Images.mapPin} style={styles.headerIcons} />
             <GText
+              componentProps={{
+                numberOfLines: 1,
+                ellipsizeMode: 'tail',
+              }}
               text={`${userData?.city || userData?.location}`}
               style={styles.locationText}
             />
@@ -629,11 +633,11 @@ const DashboardScreen = ({navigation, route}) => {
               title={'Confirm'}
               gradientstyle={{
                 height: scaledValue(35),
-                paddingHorizontal: scaledValue(25),
               }}
               textstyle={{
                 fontSize: scaledValue(14),
                 letterSpacing: scaledValue(14 * -0.02),
+                marginHorizontal: scaledValue(25),
               }}
               onPress={() => {
                 setShowModal(false);

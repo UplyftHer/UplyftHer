@@ -79,7 +79,6 @@ export const styles = StyleSheet.create({
   },
   gradientStyle: {
     height: scaledValue(40),
-    paddingHorizontal: scaledValue(24),
   },
   weekText: {
     fontSize: scaledValue(19),
@@ -174,7 +173,7 @@ export const styles = StyleSheet.create({
     color: colors.charcoal,
     fontFamily: fonts?.BE_VIETNAM_SEMIBOLD,
     fontSize: scaledValue(16),
-    lineHeight: scaledHeightValue(20.8),
+    // lineHeight: scaledHeightValue(20.8),
     paddingVertical: scaledValue(5),
   },
   timeFormatView: {
@@ -215,6 +214,7 @@ export const styles = StyleSheet.create({
   dateButtonText: {
     fontSize: scaledValue(14),
     letterSpacing: scaledValue(14 * -0.02),
+    marginHorizontal: scaledValue(24),
     // color: colors.themeColor,
   },
   dateTile: {

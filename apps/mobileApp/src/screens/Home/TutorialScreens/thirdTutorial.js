@@ -18,7 +18,13 @@ const ThirdTutorial = ({goToNextManually}) => {
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.container}>
-      <View style={styles.innerView}>
+      <View
+        style={[
+          styles.innerView,
+          {
+            // marginBottom: insets.top,
+          },
+        ]}>
         <GText medium text={'Tap the Check'} style={styles.tapTextStyle} />
         <GText medium text={'to connect'} style={styles.tapTextStyle2} />
         <Image source={Images.animatedArrowDown} style={styles.arrowImgStyle} />
@@ -41,13 +47,15 @@ export default ThirdTutorial;
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: '100%',
+    height: '100%', // for ios
     justifyContent: 'flex-end', // important for bottom align
     alignItems: 'center',
     // backgroundColor: 'rgba(0,0,0,0.6)', // semi-transparent if desired
     position: 'absolute', // can overlay over anything
     top: 0,
     left: 0,
+    // top: 20,
+    // height: Dimensions.get('screen').height, // for android
   },
   innerView: {
     // height: '100%',

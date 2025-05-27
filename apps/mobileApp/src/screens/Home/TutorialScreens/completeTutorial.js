@@ -59,7 +59,6 @@ const styles = StyleSheet.create({
   },
   gradientStyle: {
     height: scaledValue(48),
-    paddingHorizontal: scaledValue(40),
     marginTop: scaledValue(16),
   },
   buttonTextStyle: {
@@ -67,9 +66,11 @@ const styles = StyleSheet.create({
     fontSize: scaledValue(19),
     letterSpacing: scaledValue(19 * -0.03),
     lineHeight: scaledHeightValue(19 * 1.2),
+    marginRight: scaledValue(40),
   },
   imgStyle: {
     height: scaledValue(20),
     width: scaledValue(20),
+    marginLeft: scaledValue(40),
   },
 });

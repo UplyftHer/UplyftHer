@@ -773,6 +773,83 @@ export const get_company_names = createAsyncThunk(
   },
 );
 
+export const get_users_detail = createAsyncThunk(
+  'profile/getUserProfile',
+  async (credentials, {rejectWithValue, dispatch, getState}) => {
+    const authState = getState()?.auth;
+
+    console.log('add_Availability_api_credentials', credentials);
+    try {
+      dispatch(setLoading(true));
+
+      const response = await API({
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        route: 'profile/getUserProfile',
+        body: credentials,
+        method: 'POST',
+      });
+
+      dispatch(setLoading(false));
+      console.log('getUserProfile_response=>>', JSON.stringify(response?.data));
+      if (response?.data?.status !== 1) {
+        return rejectWithValue(response?.data);
+      }
+
+      return response?.data;
+    } catch (error) {
+      dispatch(setLoading(false));
+      console.log('getUserProfile_error==>', error?.message);
+      if (error?.message === 'Network Error') {
+        showToast(0, validationError[error?.message]);
+      }
+
+      showToast(0, validationError[error.response.data?.message]);
+
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const get_content_detail = createAsyncThunk(
+  'admin/get-admin-content',
+  async (credentials, {rejectWithValue, dispatch, getState}) => {
+    const authState = getState()?.auth;
+
+    try {
+      dispatch(setLoading(true));
+
+      const response = await API({
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        route: 'admin/get-admin-content',
+        body: credentials,
+        method: 'POST',
+      });
+
+      dispatch(setLoading(false));
+      console.log('content_response=>>', JSON.stringify(response?.data));
+      if (response?.data?.status !== 1) {
+        return rejectWithValue(response?.data);
+      }
+
+      return response?.data;
+    } catch (error) {
+      dispatch(setLoading(false));
+      console.log('content_error==>', error?.message);
+      if (error?.message === 'Network Error') {
+        showToast(0, validationError[error?.message]);
+      }
+
+      showToast(0, validationError[error.response.data?.message]);
+
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+
 const profileSlice = createSlice({
   name: 'profile',
   initialState,

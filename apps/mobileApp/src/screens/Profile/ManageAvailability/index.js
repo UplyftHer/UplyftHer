@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -7,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Modal from 'react-native-modal';
 import {styles} from './styles';
 import HeaderButton from '../../../components/HeaderButton';
@@ -53,7 +54,8 @@ const ManageAvailability = ({navigation}) => {
   const [selectDayToDelete, setSelectDayToDelete] = useState({});
   const [selectDayToDeleteSlot, setSelectDayToDeleteSlot] = useState({});
   // console.log('selectDayToDeleteSlot', selectDayToDeleteSlot);
-
+  const minuteRef = useRef({});
+  const dateRef = useRef({});
   const [date, setDate] = useState('');
   const [selectedDays, setSelectedDays] = useState([]);
   const [isSelectDate, setIsSelectDate] = useState([]);
@@ -77,9 +79,6 @@ const ManageAvailability = ({navigation}) => {
     dispatch(get_my_availability()).then(res => {
       if (get_my_availability.fulfilled.match(res)) {
         setMyAvailability(res?.payload);
-        // setMyAvailability({
-        //   slots: [],
-        // });
       }
     });
   };
@@ -408,6 +407,19 @@ const ManageAvailability = ({navigation}) => {
   };
 
   const handleToggle = (toggleStates, setMainToggleStats, type) => {
+    if (toggleStates) {
+      // Count how many toggles are currently ON
+      const activeToggles = [videoCall, audioCall, chat].filter(
+        state => state,
+      ).length;
+
+      // If only one toggle is active, prevent turning it off
+      if (activeToggles === 1) {
+        showToast(0, 'At least one preferences must be selected.');
+
+        return; // Do nothing if it's the last active toggle
+      }
+    }
     setMainToggleStats(!toggleStates);
     dispatch(
       communicationPreference({type: type, status: !toggleStates ? 1 : 0}),
@@ -720,7 +732,7 @@ const ManageAvailability = ({navigation}) => {
       ...daysInput,
       slots: daysInput?.slots?.map(day => ({
         ...day,
-        slot: day.slot.filter(item => item !== null),
+        slot: day?.slot?.filter(item => item !== null),
       })),
     };
 
@@ -735,23 +747,64 @@ const ManageAvailability = ({navigation}) => {
     };
     // console.log('cleanedDateData12', JSON.stringify(cleanedDateData));
 
+    // if (select?.title === 'Days') {
+    //   if (selectedDays?.length > 0) {
+    //     console.log('cleanedWeekDaysDatsas', cleanedWeekDaysData);
+
+    //     dispatch(add_Availability(cleanedWeekDaysData)).then(res => {
+    //       if (add_Availability.fulfilled.match(res)) {
+    //         const modifiedData = cleanedWeekDaysData?.slots.forEach(
+    //           slotItem => {
+    //             slotItem.slot.forEach(timeItem => {
+    //               timeItem._id = 1;
+    //             });
+    //           },
+    //         );
+    //         console.log(
+    //           'cleanedWeekDaysData0',
+    //           JSON.stringify(cleanedWeekDaysData),
+    //         );
+
+    //         console.log('modifiedDatamodifiedData', modifiedData);
+
+    //         const updatedData = mergeData(myAvailability, cleanedWeekDaysData);
+    //         setMyAvailability(updatedData);
+    //         setSelectedDays([]);
+    //       }
+    //     });
+    //   } else {
+    //     showToast(0, 'Fill slots before adding a new availability.');
+    //   }
+    // }
     if (select?.title === 'Days') {
       if (selectedDays?.length > 0) {
+        console.log('cleanedWeekDaysData', cleanedWeekDaysData);
+
+        // Check for undefined slots
+        const hasUndefinedSlots = cleanedWeekDaysData?.slots?.some(
+          day => day.slot === undefined,
+        );
+
+        if (hasUndefinedSlots) {
+          showToast(
+            0,
+            'One or more days have undefined slot data. Please fill all slots.',
+          );
+          return;
+        }
+
         dispatch(add_Availability(cleanedWeekDaysData)).then(res => {
           if (add_Availability.fulfilled.match(res)) {
-            const modifiedData = cleanedWeekDaysData?.slots.forEach(
-              slotItem => {
-                slotItem.slot.forEach(timeItem => {
-                  timeItem._id = 1;
-                });
-              },
-            );
+            cleanedWeekDaysData?.slots.forEach(slotItem => {
+              slotItem.slot.forEach(timeItem => {
+                timeItem._id = 1;
+              });
+            });
+
             console.log(
-              'cleanedWeekDaysData0',
+              'cleanedWeekDaysData',
               JSON.stringify(cleanedWeekDaysData),
             );
-
-            console.log('modifiedDatamodifiedData', modifiedData);
 
             const updatedData = mergeData(myAvailability, cleanedWeekDaysData);
             setMyAvailability(updatedData);
@@ -928,7 +981,8 @@ const ManageAvailability = ({navigation}) => {
                 <GText text={preference.name} style={styles.preferenceText} />
                 <ToggleButton
                   toggleState={preference.toggleState}
-                  setToggleState={val =>
+                  setToggleState={preference.setMainToggleState}
+                  onPress={val =>
                     handleToggle(
                       preference.toggleState,
                       preference.setMainToggleState,
@@ -1102,14 +1156,28 @@ const ManageAvailability = ({navigation}) => {
                                   return time?._id ? false : true; // Replace with your condition
                                 })()} // Immediately Invoked Function Expression (IIFE)
                                 maxLength={2}
-                                onChangeText={text =>
+                                onChangeText={text => {
                                   handleTimeChange(
                                     index,
                                     slotIndex,
                                     'hour',
                                     text,
-                                  )
-                                }
+                                  );
+
+                                  const number = parseInt(text, 10);
+                                  if (
+                                    (text.length === 2 &&
+                                      number >= 1 &&
+                                      number <= 12) ||
+                                    (number >= 2 && number <= 9)
+                                  ) {
+                                    const nextInput =
+                                      minuteRef.current?.[
+                                        `${index}-${slotIndex}`
+                                      ];
+                                    nextInput?.focus();
+                                  }
+                                }}
                                 style={styles.inputStyle}
                               />
                               <GText
@@ -1118,6 +1186,14 @@ const ManageAvailability = ({navigation}) => {
                                 style={styles.threeDotText}
                               />
                               <TextInput
+                                ref={ref => {
+                                  if (ref) {
+                                    if (!minuteRef.current)
+                                      minuteRef.current = {};
+                                    minuteRef.current[`${index}-${slotIndex}`] =
+                                      ref;
+                                  }
+                                }}
                                 keyboardType="number-pad"
                                 placeholder="MM"
                                 placeholderTextColor={'#ccc'}
@@ -1426,14 +1502,26 @@ const ManageAvailability = ({navigation}) => {
                             })()}
                             value={slot.hour}
                             maxLength={2}
-                            onChangeText={text =>
+                            onChangeText={text => {
                               handleTimeDateChange(
                                 index,
                                 slotIndex,
                                 'hour',
                                 text,
-                              )
-                            }
+                              );
+
+                              const number = parseInt(text, 10);
+                              if (
+                                (text.length === 2 &&
+                                  number >= 1 &&
+                                  number <= 12) ||
+                                (number >= 2 && number <= 9)
+                              ) {
+                                const nextInput =
+                                  dateRef.current?.[`${index}-${slotIndex}`];
+                                nextInput?.focus();
+                              }
+                            }}
                             style={styles.inputStyle}
                           />
                           <GText
@@ -1442,6 +1530,12 @@ const ManageAvailability = ({navigation}) => {
                             style={styles.threeDotText}
                           />
                           <TextInput
+                            ref={ref => {
+                              if (ref) {
+                                if (!dateRef.current) dateRef.current = {};
+                                dateRef.current[`${index}-${slotIndex}`] = ref;
+                              }
+                            }}
                             keyboardType="number-pad"
                             placeholder={'MM'}
                             placeholderTextColor={'#ccc'}
@@ -1702,11 +1796,11 @@ const ManageAvailability = ({navigation}) => {
               title={'Confirm'}
               gradientstyle={{
                 height: scaledValue(30),
-                paddingHorizontal: scaledValue(20),
               }}
               textstyle={{
                 fontSize: scaledValue(14),
                 letterSpacing: scaledValue(14 * -0.02),
+                marginHorizontal: scaledValue(20),
               }}
               onPress={() => {
                 deleteAllSlots(selectDayToDelete);
@@ -1771,11 +1865,11 @@ const ManageAvailability = ({navigation}) => {
               title={'Confirm'}
               gradientstyle={{
                 height: scaledValue(30),
-                paddingHorizontal: scaledValue(20),
               }}
               textstyle={{
                 fontSize: scaledValue(14),
                 letterSpacing: scaledValue(14 * -0.02),
+                marginHorizontal: scaledValue(20),
               }}
               onPress={() => {
                 deleteSpecificSlot(selectDayToDeleteSlot);

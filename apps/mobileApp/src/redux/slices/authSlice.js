@@ -173,6 +173,7 @@ export const confirm_signup = createAsyncThunk(
       showToast(response?.data?.status, response?.data?.message);
 
       if (response?.data?.status === 1) {
+        navigationContainerRef?.goBack();
         navigationContainerRef?.navigate('BasicInfo', {
           responseData: response?.data,
         });
