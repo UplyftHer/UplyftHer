@@ -23,7 +23,17 @@ const cookieParser = require("cookie-parser");
 const path = require("path");
 const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
+const { rateLimit } = require("express-rate-limit")
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // Max 100 requests per IP
+  message: 'Too many requests, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(limiter);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(fileUpload());
 app.use(bodyParser.json());
