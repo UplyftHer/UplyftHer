@@ -43,7 +43,6 @@ const styles = StyleSheet.create({
     // width: scaledValue(107),
     height: scaledValue(40),
     borderRadius: scaledValue(12),
-    padding: scaledValue(1.2),
     // borderWidth: scaledValue(1),
   },
 
@@ -56,6 +55,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: scaledValue(4),
+    margin: scaledValue(1.2),
   },
   buttonText: {
     fontSize: scaledValue(14),

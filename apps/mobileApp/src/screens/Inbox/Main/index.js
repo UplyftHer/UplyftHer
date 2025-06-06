@@ -114,7 +114,7 @@ const Inbox = ({navigation}) => {
                     cognitoUserIdSave: item?.connectUserDetail?.cognitoUserId,
                     chatId: item?._id,
                   },
-                  setData: setNewConversationList,
+                  setData: setConversationData,
                 },
               });
             } else {
@@ -129,8 +129,8 @@ const Inbox = ({navigation}) => {
                   },
                   screen: 'Inbox',
                   requestId: item?._id,
+                  setData: setConversationData,
                 },
-                setData: setNewConversationList,
               });
             }
           }}

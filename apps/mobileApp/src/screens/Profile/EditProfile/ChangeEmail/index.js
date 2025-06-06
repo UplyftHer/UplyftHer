@@ -15,7 +15,7 @@ import {
 } from '../../../../redux/store/storeUtils';
 import {edit_user_email} from '../../../../redux/slices/profileSlice';
 
-const ChangeEmail = ({navigation}) => {
+const ChangeEmail = ({navigation, route}) => {
   useEffect(() => {
     configureHeader();
   }, []);
@@ -49,6 +49,7 @@ const ChangeEmail = ({navigation}) => {
       if (edit_user_email.fulfilled.match(res)) {
         navigation?.replace('VerifyEditEMail', {
           newEmail: newEmail,
+          setFields: route?.params?.setFields,
         });
       }
     });

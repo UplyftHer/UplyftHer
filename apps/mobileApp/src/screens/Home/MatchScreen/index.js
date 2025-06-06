@@ -43,6 +43,7 @@ const MatchScreen = ({navigation, route}) => {
 
               if (itemToUpdate) {
                 // Update `isRead` to 1
+
                 if (
                   !itemToUpdate?.startConversation?.includes(
                     userData?.cognitoUserId,
@@ -77,7 +78,7 @@ const MatchScreen = ({navigation, route}) => {
 
             if (itemToUpdate) {
               // Update `isRead` to 1
-              itemToUpdate.startConversation = 1;
+              itemToUpdate.startConversation = userData?.cognitoUserId;
 
               // Log the updated item for debugging
               console.log('Updated item:', itemToUpdate);

@@ -56,14 +56,16 @@ const EditProfile = ({navigation}) => {
   const wordLimit = 200;
   const refRBSheetCountry = useRef();
   const refRBSheetCity = useRef();
+  console.log('interestsListinterestsList', interestsList);
+
   const [inputValue, setInputValue] = useState(authState?.bio);
   const [apiCallImage, setApiCallImage] = useState();
   const [image, setImage] = useState();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    // dispatch(get_industry_api());
-    // dispatch(get_interests_api());
+    dispatch(get_industry_api());
+    dispatch(get_interests_api());
   }, []);
 
   const [isFocused, setIsFocused] = useState(false);
@@ -310,7 +312,7 @@ const EditProfile = ({navigation}) => {
   };
 
   useEffect(() => {
-    // getCitiesData(authState);
+    getCitiesData(authState);
   }, [authState?.iso2]);
 
   const [countryId, setCountryId] = useState();
@@ -345,6 +347,7 @@ const EditProfile = ({navigation}) => {
           {!isLabel2 && !isCountry && !isCity && (
             <Input
               showLabel
+              // contentStyle={{textAlignVertical: 'top'}}
               value={isBio ? inputValue : fields[key]}
               rightIcon={
                 key === 'company name' &&
@@ -432,8 +435,12 @@ const EditProfile = ({navigation}) => {
 
           {isEmail && (
             <GTextButton
-              onPress={() => navigation?.navigate('ChangeEmail')}
-              title={'Change email'}
+              onPress={() =>
+                navigation?.navigate('ChangeEmail', {
+                  setFields: setFields,
+                })
+              }
+              title={'Change Email'}
               style={{
                 alignSelf: 'flex-end',
                 position: 'absolute',
@@ -648,7 +655,6 @@ const EditProfile = ({navigation}) => {
           setSelectLocation(val);
           getCitiesData(val);
           setSubSelectLocation([]);
-          // setDetails({...details, country: val.iso3});
           setFields({...fields, country: val?.name, city: ''});
           refRBSheetCountry?.current?.close();
         }}
@@ -660,10 +666,6 @@ const EditProfile = ({navigation}) => {
         search={true}
         onChoose={val => {
           setSubSelectLocation(val);
-          // setSelectCity(val);
-          // setDetails({...details, city: val[0]});
-          // console.log('val[]', val[0]);
-
           setFields({...fields, city: val[0]});
           refRBSheetCity?.current?.close();
         }}

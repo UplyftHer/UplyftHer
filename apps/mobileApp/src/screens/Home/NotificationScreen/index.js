@@ -29,11 +29,18 @@ import GradientBorderButton from '../../../components/GradientBorderButton';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {accept_decline_request} from '../../../redux/slices/notificationSlice';
 import useDataFactory from '../../../components/UseDataFactory/useDataFactory';
+import {useEffect} from 'react';
+import {setNewNotification} from '../../../redux/slices/authSlice';
 
 const NotificationScreen = ({navigation}) => {
   const userData = useAppSelector(state => state.auth.user);
   const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(setNewNotification(false));
+  }, []);
+
   const {loading, data, setData, refreshData, loadMore, Placeholder, Loader} =
     useDataFactory('notificationsList', true, '', 'POST');
 
@@ -72,7 +79,7 @@ const NotificationScreen = ({navigation}) => {
     <TouchableOpacity
       disabled={item?.isTakeAction !== 1 || item?.type === 'meeting'}
       onPress={() => {
-        if (item?.startConversation.includes(userData?.cognitoUserId)) {
+        if (item?.startConversation?.includes(userData?.cognitoUserId)) {
           navigation.navigate('Inbox');
         } else {
           navigation.navigate('MatchScreen', {
@@ -101,11 +108,11 @@ const NotificationScreen = ({navigation}) => {
                 title="Accept"
                 gradientstyle={{
                   height: scaledValue(30),
-                  paddingHorizontal: scaledValue(20),
                 }}
                 textstyle={{
                   fontSize: scaledValue(14),
                   letterSpacing: scaledValue(14 * -0.02),
+                  marginHorizontal: scaledValue(20),
                 }}
                 onPress={() => handleAction(item.requestId, 1, item._id, item)}
               />

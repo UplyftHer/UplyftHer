@@ -21,7 +21,6 @@ import {colors} from '../../../../assets/colors';
 import ProfileCard from './ProfileCard';
 import CalendarCard from './CalendarCard';
 import TimeButton from './TimeCard';
-import {dateData, modeData, timing} from '../../../utils/constant.utils';
 import GradientButton from '../../../components/GradientButton';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useAppDispatch, useAppSelector} from '../../../redux/store/storeUtils';
@@ -33,15 +32,14 @@ import {
 } from '../../../redux/slices/bookMeetingSlice';
 import fonts from '../../../utils/fonts';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {get_users_detail} from '../../../redux/slices/profileSlice';
 
 const BookMeeting = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
   const {otherUserData, mentorData, meetingData} = route?.params;
-  console.log('mentorDatamentorData', mentorData);
 
   const gradientColors = [colors.offWhite, colors.offWhite];
   const userData = useAppSelector(state => state.auth.user);
-  console.log('userDatauserDatauserDatauserData1', userData?.cognitoUserId);
 
   const upComingMeetingList = useAppSelector(
     state => state.meetings.upComingMeetingList,
@@ -50,9 +48,27 @@ const BookMeeting = ({navigation, route}) => {
 
   const wordLimit = 200;
   const [isFocused, setIsFocused] = useState(false);
-  const [isSelectMode, setIsSelectMode] = useState(
-    meetingData?.mode || 'videoCall',
-  );
+  const [userInfo, setUserInfo] = useState({});
+  console.log('userInfouserInfo', userInfo);
+
+  useEffect(() => {
+    setIsSelectMode(() => {
+      if (meetingData?.mode) {
+        return meetingData.mode;
+      } else if (userInfo?.communicationPreferences?.videoCall === 1) {
+        return 'videoCall';
+      } else if (userInfo?.communicationPreferences?.audioCall === 1) {
+        return 'audioCall';
+      } else if (userInfo?.communicationPreferences?.inPerson === 1) {
+        return 'inPerson';
+      } else {
+        return null;
+      }
+    });
+  }, [userInfo]);
+
+  const [isSelectMode, setIsSelectMode] = useState({});
+
   const [meetingDate, setMeetingDate] = useState(meetingData?.date || '');
   const [meetingTitle, setMeetingTitle] = useState(
     meetingData?.meetingTitle || '',
@@ -96,9 +112,13 @@ const BookMeeting = ({navigation, route}) => {
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [selectedDate, setSelectedDate] = useState({}); // Store selected date with month, day, and year
   const [availableSlots, setAvailableSlots] = useState([]);
+
   const [selectSlot, setSelectSlot] = useState('');
   const [selectDate, setSelectDate] = useState();
   // Function to generate dates for any month and year
+
+  console.log('userInfouserInfo', userInfo);
+
   const generateDatesForMonth = (year, month) => {
     const dates = [];
     const daysInMonth = new Date(year, month + 1, 0).getDate(); // Get the number of days in the month
@@ -280,6 +300,7 @@ const BookMeeting = ({navigation, route}) => {
 
   useEffect(() => {
     get_available_slots_hit();
+    get_user_info();
   }, []);
 
   const get_available_slots_hit = selectData => {
@@ -297,6 +318,22 @@ const BookMeeting = ({navigation, route}) => {
     dispatch(get_available_slots(input)).then(res => {
       if (get_available_slots.fulfilled.match(res)) {
         setAvailableSlots(res?.payload?.slots);
+      }
+    });
+  };
+
+  const get_user_info = selectData => {
+    const input = {
+      cognitoUserId:
+        userData?.userType === 1
+          ? userData?.cognitoUserId
+          : otherUserData?.cognitoUserId,
+    };
+    dispatch(get_users_detail(input)).then(res => {
+      if (get_users_detail.fulfilled.match(res)) {
+        if (res.payload?.status === 1) {
+          setUserInfo(res.payload?.data);
+        }
       }
     });
   };
@@ -362,6 +399,24 @@ const BookMeeting = ({navigation, route}) => {
     }
   };
 
+  const modeData = [
+    {
+      title: '🎥 Video Call',
+      mode: 'videoCall',
+      active: userInfo?.communicationPreferences?.videoCall,
+    },
+    {
+      title: '📞 Phone Call',
+      mode: 'audioCall',
+      active: userInfo?.communicationPreferences?.audioCall,
+    },
+    {
+      title: '☕️ In-person',
+      mode: 'inPerson',
+      active: userInfo?.communicationPreferences?.inPerson,
+    },
+  ];
+
   return (
     <KeyboardAwareScrollView
       bounces={false}
@@ -383,11 +438,28 @@ const BookMeeting = ({navigation, route}) => {
         <View style={styles.modeContainer}>
           {modeData?.map((item, index) => (
             <GradientBorderButton
-              disabled={meetingData?.date && true}
+              // disabled={
+              //   (meetingData?.date && true) ||
+              //   userInfo?.communicationPreferences?.videoCall === 0 ||
+              //   userInfo?.communicationPreferences?.audioCall === 0 ||
+              //   userInfo?.communicationPreferences?.inPerson === 0
+              // }
+              disabled={
+                // meetingData?.date ||
+                (item.mode === 'videoCall' &&
+                  userInfo?.communicationPreferences?.videoCall === 0) ||
+                (item.mode === 'audioCall' &&
+                  userInfo?.communicationPreferences?.audioCall === 0) ||
+                (item.mode === 'inPerson' &&
+                  userInfo?.communicationPreferences?.inPerson === 0)
+              }
               activeOpacity={0.8}
               key={index}
               title={item.title}
-              buttonStyle={{width: scaledValue(107)}}
+              buttonStyle={{
+                width: scaledValue(107),
+                opacity: item?.active === 0 ? 0.3 : 1,
+              }}
               onPress={() => setIsSelectMode(item?.mode)}
               inner={{
                 backgroundColor:

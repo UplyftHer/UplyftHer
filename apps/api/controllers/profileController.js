@@ -674,7 +674,7 @@ const profileController = {
         } catch (error) {
             //res.status(500).json({ message: 'Error saving profile', error });
             let errormessage = error.message;
-            if(error.message == "Access Token has expired")
+            if(error.message == "Access Token has expired" || error.message == "Missing required key 'AccessToken' in params")
             {
                 //return res.json({ status: 0, message: errormessage });
                 res.status(401).json({ status: 0, message: errormessage });
@@ -1522,7 +1522,7 @@ const profileController = {
             );
 
             //res.status(200).json(profile);
-            return res.json({ status: 1, message: 'Profile details', data: matchedUsers });
+            return res.json({ status: 1, message: 'Profile details', data: matchedUsers?.[0] });
         } catch (error) {
             //res.status(500).json({ message: 'Error fetching profile', error });
             return res.json({ status: 0, message: error.message });
@@ -2929,23 +2929,33 @@ const profileController = {
 
 
             if (search) {
-                finddata.$or = [
-                    { fullName: { $regex: search, $options: "i" } },
-                    //{ location: { $regex: search, $options: "i" } },
-                    //{ "interests.name": { $regex: search, $options: "i" } }
+                finddata.$and = [
+                    {
+                        $or: [
+                          // Uncomment these if you want to include them
+                          // { fullName: { $regex: search, $options: "i" } },
+                          // { location: { $regex: search, $options: "i" } },
+                          { "interests.name": { $regex: search, $options: "i" } },
+                        ],
+                    },
                 ];
+                // finddata.$or = [
+                //     //{ fullName: { $regex: search, $options: "i" } },
+                //     //{ location: { $regex: search, $options: "i" } },
+                //     { "interests.name": { $regex: search, $options: "i" } }
+                // ];
             }
 
 
             if (filter && Array.isArray(filter) && filter.length > 0) {
                 finddata.interests = {
                     $elemMatch: {
-                        interestId: { $in: filter },
+                        name: { $in: filter },
                     },
                 };
             }
 
-            //console.log("finddata",finddata);
+            console.log("finddata",finddata);
 
             const users = await UsersModel.find(finddata).lean();
 

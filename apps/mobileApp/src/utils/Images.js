@@ -67,6 +67,7 @@ export const greyCalendar = require('../../assets/images/calendarGrey.png');
 export const clock = require('../../assets/images/clock.png');
 export const cup = require('../../assets/images/coffee.png');
 export const bellIcon = require('../../assets/images/bellIcon.png');
+export const noBellIcon = require('../../assets/images/no_bell.png');
 export const UnCheck = require('../../assets/images/Uncheck-button.png');
 export const Check = require('../../assets/images/check-button.png');
 export const PlusCircle = require('../../assets/images/plus-circle.png');

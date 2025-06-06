@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   ImageBackground,
   ScrollView,
@@ -116,6 +117,7 @@ const Profile = ({navigation}) => {
         params: {
           url: ABOUT_US,
           screen: 'About Us',
+          type: 'about',
         },
       });
     } else if (index === 5) {
@@ -124,6 +126,7 @@ const Profile = ({navigation}) => {
         params: {
           url: TERMS_CONDITIONS_URL,
           screen: 'Terms and Conditions',
+          type: 'terms',
         },
       });
     } else if (index === 6) {
@@ -132,6 +135,7 @@ const Profile = ({navigation}) => {
         params: {
           url: PRIVACY_POLICY_URL,
           screen: 'Privacy Policy',
+          type: 'privacy',
         },
       });
     } else if (index === 8) {
@@ -179,55 +183,152 @@ const Profile = ({navigation}) => {
     });
   };
 
+  // const deleteAccountReasons = [
+  //   {
+  //     id: 1,
+  //     title: 'Lack of relevant mentors or mentees',
+  //     textColor: colors.themeColor,
+  //     action: () => {
+  //       Alert.alert(
+  //         'Delete account!',
+  //         'Are you sure you want to delete your account? This will permanently erase your account and information.',
+  //         [
+  //           {
+  //             text: "Yes! I'm",
+  //             onPress: async () => {
+  //               deleteAccount('Lack of relevant mentors or mentees');
+  //             },
+  //             style: 'destructive',
+  //           },
+  //           {
+  //             text: 'No',
+  //             onPress: () => console.log('Cancel Pressed'),
+  //             style: 'cancel',
+  //           },
+  //         ],
+  //         {
+  //           cancelable: false,
+  //         },
+  //       );
+  //       // deleteAccount('Lack of relevant mentors or mentees');
+  //     },
+  //   },
+  //   {
+  //     id: 2,
+  //     title: 'Poor matchmaking or compatibility issues',
+  //     textColor: colors.themeColor,
+  //     action: () => deleteAccount('Poor matchmaking or compatibility issues'),
+  //   },
+  //   {
+  //     id: 3,
+  //     title: 'Limited communication features',
+  //     textColor: colors.themeColor,
+  //     action: () => deleteAccount('Limited communication features'),
+  //   },
+  //   {
+  //     id: 4,
+  //     title: 'Inactive or unresponsive users',
+  //     textColor: colors.themeColor,
+  //     action: () => deleteAccount('Inactive or unresponsive users'),
+  //   },
+  //   {
+  //     id: 5,
+  //     title: 'Privacy concerns regarding personal information',
+  //     textColor: colors.themeColor,
+  //     action: () =>
+  //       deleteAccount('Privacy concerns regarding personal information'),
+  //   },
+  //   {
+  //     id: 6,
+  //     title: 'Lack of progress or value from mentorship',
+  //     textColor: colors.themeColor,
+  //     action: () => deleteAccount('Lack of progress or value from mentorship'),
+  //   },
+  //   {
+  //     id: 7,
+  //     title: 'Difficulty in scheduling sessions',
+  //     textColor: colors.themeColor,
+  //     action: () => deleteAccount('Difficulty in scheduling sessions'),
+  //   },
+  //   {
+  //     id: 8,
+  //     title: 'Poor user experience or app performance',
+  //     textColor: colors.themeColor,
+  //     action: () => deleteAccount('Poor user experience or app performance'),
+  //   },
+  // ];
+
+  const confirmDelete = reason => {
+    Alert.alert(
+      'Delete account!',
+      'Are you sure you want to delete your account? This will permanently erase your account and information.',
+      [
+        {
+          text: "Yes! I'm",
+          onPress: async () => {
+            deleteAccount(reason);
+          },
+          style: 'destructive',
+        },
+        {
+          text: 'No',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
   const deleteAccountReasons = [
     {
       id: 1,
       title: 'Lack of relevant mentors or mentees',
       textColor: colors.themeColor,
-      action: () => deleteAccount('Lack of relevant mentors or mentees'),
+      action: () => confirmDelete('Lack of relevant mentors or mentees'),
     },
     {
       id: 2,
       title: 'Poor matchmaking or compatibility issues',
       textColor: colors.themeColor,
-      action: () => deleteAccount('Poor matchmaking or compatibility issues'),
+      action: () => confirmDelete('Poor matchmaking or compatibility issues'),
     },
     {
       id: 3,
       title: 'Limited communication features',
       textColor: colors.themeColor,
-      action: () => deleteAccount('Limited communication features'),
+      action: () => confirmDelete('Limited communication features'),
     },
     {
       id: 4,
       title: 'Inactive or unresponsive users',
       textColor: colors.themeColor,
-      action: () => deleteAccount('Inactive or unresponsive users'),
+      action: () => confirmDelete('Inactive or unresponsive users'),
     },
     {
       id: 5,
       title: 'Privacy concerns regarding personal information',
       textColor: colors.themeColor,
       action: () =>
-        deleteAccount('Privacy concerns regarding personal information'),
+        confirmDelete('Privacy concerns regarding personal information'),
     },
     {
       id: 6,
       title: 'Lack of progress or value from mentorship',
       textColor: colors.themeColor,
-      action: () => deleteAccount('Lack of progress or value from mentorship'),
+      action: () => confirmDelete('Lack of progress or value from mentorship'),
     },
     {
       id: 7,
       title: 'Difficulty in scheduling sessions',
       textColor: colors.themeColor,
-      action: () => deleteAccount('Difficulty in scheduling sessions'),
+      action: () => confirmDelete('Difficulty in scheduling sessions'),
     },
     {
       id: 8,
       title: 'Poor user experience or app performance',
       textColor: colors.themeColor,
-      action: () => deleteAccount('Poor user experience or app performance'),
+      action: () => confirmDelete('Poor user experience or app performance'),
     },
   ];
 
@@ -282,36 +383,35 @@ const Profile = ({navigation}) => {
           <Image source={Images.Logout} style={styles.logoutIcon} />
           <GText semiBold text={'Logout'} style={styles.logoutText} />
         </TouchableOpacity>
-        <BottomSheet
-          logoutRBSheetRef={logoutRBSheetRef}
-          contentText={
-            'You are about to logout from the Uplyfther, Please confirm to continue.'
-          }
-          headerText={'Are you sure?'}
-          firstButtonTitle={'Cancel'}
-          secondButtonTitle={'Logout'}
-          onPress={async () => {
-            logoutRBSheetRef?.current?.close();
-            // dispatch(logout());
-            setTimeout(async () => {
-              dispatch(
-                logout_user({
-                  deviceToken:
-                    (await AsyncStorage.getItem('fcmToken')) || '1234',
-                }),
-              ).then(res => {
-                if (logout_user.fulfilled.match(res)) {
-                  dispatch(setNotifications([]));
-                  dispatch(setUpComingMeetingList([]));
-                  dispatch(setSavedProfile([]));
-                  dispatch(setPreviousInteractedMatches([]));
-                  setMatchingProfileData([]);
-                }
-              });
-            }, 300);
-          }}
-        />
       </View>
+      <BottomSheet
+        logoutRBSheetRef={logoutRBSheetRef}
+        contentText={
+          'You are about to logout from the UplyftHer. Please confirm to continue.'
+        }
+        headerText={'Are you sure?'}
+        firstButtonTitle={'Cancel'}
+        secondButtonTitle={'Logout'}
+        onPress={async () => {
+          logoutRBSheetRef?.current?.close();
+          // dispatch(logout());
+          setTimeout(async () => {
+            dispatch(
+              logout_user({
+                deviceToken: (await AsyncStorage.getItem('fcmToken')) || '1234',
+              }),
+            ).then(res => {
+              if (logout_user.fulfilled.match(res)) {
+                dispatch(setNotifications([]));
+                dispatch(setUpComingMeetingList([]));
+                dispatch(setSavedProfile([]));
+                dispatch(setPreviousInteractedMatches([]));
+                setMatchingProfileData([]);
+              }
+            });
+          }, 300);
+        }}
+      />
       <OptionMenuSheet
         refRBSheet={refRBReasonsSheet}
         options={deleteAccountReasons}

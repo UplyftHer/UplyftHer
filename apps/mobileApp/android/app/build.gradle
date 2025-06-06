@@ -79,13 +79,16 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.mobileapp"
+    namespace "com.mobile.uplyfther"
     defaultConfig {
-        applicationId "com.mobileapp"
+        applicationId "com.mobile.uplyfther"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+    }
+    lint {
+        baseline = file("lint-baseline.xml")
     }
     signingConfigs {
         debug {

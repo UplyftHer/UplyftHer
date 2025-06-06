@@ -215,15 +215,26 @@ const PublicReviewScreen = ({navigation, route}) => {
           gap: scaledValue(4),
           marginTop: scaledValue(20),
         }}>
-        <GText
-          medium
-          text={`${userData?.fullName}, ${userData?.age}`}
-          style={{
-            fontSize: scaledValue(33),
-            color: colors.charcoal,
-            letterSpacing: scaledValue(33 * -0.03),
-          }}
-        />
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <GText
+            medium
+            text={`${userData?.fullName}`}
+            style={{
+              fontSize: scaledValue(33),
+              color: colors.charcoal,
+              letterSpacing: scaledValue(33 * -0.03),
+            }}
+          />
+          <GText
+            medium
+            text={userData?.age ? `, ${userData?.age}` : ''}
+            style={{
+              fontSize: scaledValue(33),
+              color: colors.charcoal,
+              letterSpacing: scaledValue(33 * -0.03),
+            }}
+          />
+        </View>
         {userData?.emailDomainVerified === 1 && (
           <Image
             source={Images.Verified_fill}
@@ -301,11 +312,18 @@ const PublicReviewScreen = ({navigation, route}) => {
         }}
       />
       <View style={styles.careerListView}>
-        {userData?.interests?.slice(0, 5)?.map((item, index) => (
+        {userData?.interests?.map((item, index) => (
           <TouchableOpacity
             disabled={true}
             key={index}
             style={styles.careerCardTouchable}>
+            <GImage
+              image={item?.icon}
+              style={{
+                width: scaledValue(16),
+                height: scaledValue(16),
+              }}
+            />
             <GText text={item?.name} style={styles.skillText} />
           </TouchableOpacity>
         ))}

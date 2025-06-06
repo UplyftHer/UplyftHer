@@ -92,7 +92,7 @@ export const styles = StyleSheet.create({
     letterSpacing: scaledValue(28 * -0.03),
     textAlign: 'center',
     color: colors.offWhite,
-    lineHeight: scaledHeightValue(33.6),
+    // lineHeight: scaledHeightValue(33.6),
   },
   subtitleStyle: {
     fontSize: scaledValue(14),

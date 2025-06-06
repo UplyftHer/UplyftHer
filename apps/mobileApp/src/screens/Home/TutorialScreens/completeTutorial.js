@@ -13,7 +13,7 @@ const {width} = Dimensions.get('window');
 const CompleteTutorial = ({setTutorialVisible}) => {
   const dispatch = useAppDispatch();
   const userData = useAppSelector(state => state.auth.user);
-  const user = userData?.userType === 0 ? 'Mentee' : 'Mentor';
+  const user = userData?.userType === 0 ? 'Mentor' : 'Mentee';
   const gradientText = `Find Your ${user} Now`;
 
   return (
@@ -59,7 +59,6 @@ const styles = StyleSheet.create({
   },
   gradientStyle: {
     height: scaledValue(48),
-    paddingHorizontal: scaledValue(40),
     marginTop: scaledValue(16),
   },
   buttonTextStyle: {
@@ -67,9 +66,11 @@ const styles = StyleSheet.create({
     fontSize: scaledValue(19),
     letterSpacing: scaledValue(19 * -0.03),
     lineHeight: scaledHeightValue(19 * 1.2),
+    marginRight: scaledValue(40),
   },
   imgStyle: {
     height: scaledValue(20),
     width: scaledValue(20),
+    marginLeft: scaledValue(40),
   },
 });

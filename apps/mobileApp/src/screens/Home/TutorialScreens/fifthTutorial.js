@@ -14,22 +14,33 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const {width} = Dimensions.get('window');
 
-const FifthTutorial = ({swiperRef}) => {
+const FifthTutorial = ({goToNextManually}) => {
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.container}>
-      <View style={styles.innerView}>
+      <View
+        style={[
+          styles.innerView,
+          {
+            // marginBottom: insets.top,
+          },
+        ]}>
         <GText medium text={'Tap Bookmark'} style={styles.tapTextStyle} />
         <GText medium text={'to save for later'} style={styles.tapTextStyle2} />
-        <Image source={Images.animatedArrowDown} style={styles.arrowImgStyle} />
-        <View style={styles.tapView(insets)}>
-          <TouchableOpacity
-            onPress={() => {
-              swiperRef.current.scrollBy(1);
-            }}
-            style={styles.tapTouchView}>
-            <Image source={Images.bookmark} style={styles.bookmarkImgStyle} />
-          </TouchableOpacity>
+        <View style={{marginRight: scaledValue(27)}}>
+          <Image
+            source={Images.animatedArrowDown}
+            style={styles.arrowImgStyle}
+          />
+          <View style={styles.tapView(insets)}>
+            <TouchableOpacity
+              onPress={() => {
+                goToNextManually();
+              }}
+              style={styles.tapTouchView}>
+              <Image source={Images.bookmark} style={styles.bookmarkImgStyle} />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -40,16 +51,25 @@ export default FifthTutorial;
 
 const styles = StyleSheet.create({
   container: {
-    width,
-    justifyContent: 'center',
-    paddingHorizontal: scaledValue(20),
-    position: 'absolute',
-    bottom: 0,
+    width: '100%',
+    height: '100%', // for ios
+    justifyContent: 'flex-end', // important for bottom align
+    alignItems: 'center',
+    // backgroundColor: 'rgba(0,0,0,0.6)', // semi-transparent if desired
+    position: 'absolute', // can overlay over anything
+    top: 0,
+    left: 0,
+    // height: Dimensions.get('screen').height, // for android
   },
   innerView: {
-    height: '100%',
-    marginRight: scaledValue(50),
+    // height: '100%',
+    // marginRight: scaledValue(50),
     alignItems: 'flex-end',
+    // height: '100%',
+    // marginLeft: scaledValue(50),
+    // alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: scaledValue(43),
   },
   tapTextStyle: {
     color: colors.peachy,
@@ -66,6 +86,7 @@ const styles = StyleSheet.create({
   arrowImgStyle: {
     width: scaledValue(61),
     height: scaledValue(127),
+    marginLeft: scaledValue(5),
   },
   tapView: insets => ({
     height: scaledValue(72),

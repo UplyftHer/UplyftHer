@@ -10,6 +10,7 @@ const useDataFactory = (
   method = 'GET',
   route,
   url = '',
+  headers,
 ) => {
   const EmptyPlaceholder = () =>
     !loading && (
@@ -147,6 +148,7 @@ const useDataFactory = (
         route: routes[type],
         body: body,
         method: method,
+        headers: headers,
       }).then(response => {
         if (response.status === 26) {
           setInternetFailed(true);

@@ -60,12 +60,12 @@ export const styles = StyleSheet.create({
     height: scaledHeightValue(68),
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: scaledValue(50),
+    borderRadius: scaledValue(34),
   },
   userImage: {
     width: scaledValue(60),
     height: scaledHeightValue(60),
-    borderRadius: scaledValue(50),
+    borderRadius: scaledValue(30),
     color: colors.charcoal,
   },
 
@@ -114,12 +114,12 @@ export const styles = StyleSheet.create({
     fontSize: scaledValue(19),
     fontFamily: fonts.SUSE_MEDIUM,
     letterSpacing: scaledValue(19 * -0.03),
+    marginHorizontal: scaledValue(20),
   },
   gradientStyle: {
     height: scaledHeightValue(48),
     width: scaledValue(295),
     alignSelf: 'center',
-    paddingHorizontal: scaledValue(20),
   },
   scannerMainView: {
     flexDirection: 'row',

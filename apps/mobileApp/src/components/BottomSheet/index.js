@@ -4,8 +4,10 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import fonts from '../../utils/fonts';
 import {colors} from '../../../assets/colors';
 import {scaledValue} from '../../utils/design.utils';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const BottomSheet = props => {
+  const insets = useSafeAreaInsets();
   return (
     <RBSheet
       ref={props.logoutRBSheetRef}
@@ -22,10 +24,8 @@ const BottomSheet = props => {
           borderTopRightRadius: scaledValue(24),
           borderTopLeftRadius: scaledValue(24),
           backgroundColor: colors.offWhite,
+          marginBottom: insets.bottom === 0 ? -30 : 0,
         },
-      }}
-      customModalProps={{
-        statusBarTranslucent: true,
       }}>
       <View
         style={{

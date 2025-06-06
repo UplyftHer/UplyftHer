@@ -97,6 +97,21 @@ const CheckInbox = ({navigation, route}) => {
     dispatch(forgot_password(input));
   };
 
+  const maskEmail = email => {
+    const [local, domain] = email.split('@');
+
+    // Mask local part: keep first 3 characters, add *
+    const maskedLocal =
+      local.length > 3 ? local.slice(0, 3) + '*' : local + '*';
+
+    // Mask domain part: just show `.com` (or last part)
+    const domainParts = domain.split('.');
+    const tld = domainParts.pop(); // get the last part like 'com'
+    const maskedDomain = '*'.repeat(7) + '.' + tld;
+
+    return `${maskedLocal}@${maskedDomain}`;
+  };
+
   return (
     <KeyboardAwareScrollView
       extraHeight={Platform.OS == 'ios' ? scaledValue(100) : ''}
@@ -110,7 +125,9 @@ const CheckInbox = ({navigation, route}) => {
         <GText text="Check your inbox" medium style={styles.emailText} />
 
         <GText
-          text={`We’ve sent a One-Time Password (OTP) \nto your email ${responseData?.data?.email}. \nEnter it below to verify your account.`}
+          text={`We’ve sent a One-Time Password (OTP) \nto your email ${maskEmail(
+            responseData?.data?.email,
+          )}. \nEnter it below to verify your account.`}
           beVietnamRegular
           style={styles.content}
         />

@@ -55,7 +55,8 @@ const SocialLinksController = {
             
             for (let i = 0; i < socialLinks.length; i++) {
                 if (socialLinks[i].image) {
-                    socialLinks[i].image = await getSignedUrl(socialLinks[i].image);
+                    //socialLinks[i].image = await getSignedUrl(socialLinks[i].image);
+                    socialLinks[i].image = `${process.env.BASE_URL_IMAGE}/${socialLinks[i].image}`;
                 }
             }
 

@@ -109,6 +109,7 @@ const MeetingConfirmed = ({navigation}) => {
             fontSize: scaledValue(19),
             lineHeight: scaledValue(22.8),
             letterSpacing: scaledValue(19 * -0.03),
+            marginHorizontal: scaledValue(20),
           }}
         />
       </View>

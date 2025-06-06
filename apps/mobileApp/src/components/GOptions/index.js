@@ -24,7 +24,14 @@ const GOptions = props => {
     );
   };
   useEffect(() => {
-    setFilteredOptions(options.filter(o => o[titleKey].includes(search)));
+    setFilteredOptions(
+      options.filter(o =>
+        o[titleKey].toLowerCase().includes(search.trim().toLowerCase()),
+      ),
+    );
+    // setFilteredOptions(
+    //   options.filter(o => o[titleKey].includes(search.trim())),
+    // );
   }, [search, props]);
 
   return (
@@ -75,6 +82,15 @@ const GOptions = props => {
                 backgroundColor: '#eee',
               }}
               onChangeText={text => setSearch(text)}
+            />
+          )}
+          {filteredOptions.length === 0 && (
+            <GText
+              style={{
+                textAlign: 'center',
+                marginTop: 100,
+              }}
+              text={'Country selection is currently unavailable.'}
             />
           )}
           {filteredOptions.slice(0, optionsCount).map((c, i) => (

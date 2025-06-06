@@ -11,6 +11,7 @@ const TermsController = require('../../controllers/admin/TermsController');
 const SocialLinksController = require('../../controllers/admin/SocialLinksController'); 
 const PrivacyPolicyController = require('../../controllers/admin/PrivacyPolicyController'); 
 const AboutUsController = require('../../controllers/admin/AboutUsController'); 
+const CookiesController = require('../../controllers/admin/CookiesController');
 
 router.post("/signup", AdminController.signup);
 // router.post('/confirmSignup', AdminController.confirmSignup);
@@ -18,8 +19,8 @@ router.post("/signup", AdminController.signup);
 router.post('/sendCongratulationsEmail', AdminController.sendCongratulationsEmail);
 router.get('/getAlluser', AdminController.getAllUsers);
 router.post('/update-status', AdminController.updateUserStatus);
-router.delete('/deleteUser/:userId', AdminController.deleteUser);
-
+router.post('/get-admin-content', AdminController.getAdminContent);
+router.delete('/deleteUser/:cognitoUserId', AdminController.deleteUser);
 
 
 // industriesrouter
@@ -78,6 +79,10 @@ router.post('/social-links', SocialLinksController.addSocialLink);
 router.get('/social-links/:id', SocialLinksController.getSocialLinkById);
 router.put('/social-links/:id', SocialLinksController.updateSocialLink);
 router.delete('/social-links/:id', SocialLinksController.deleteSocialLink);
+
+router.get('/cookies', CookiesController.getCookies);
+router.post('/cookies', CookiesController.saveOrUpdateCookies);
+
 
 
 

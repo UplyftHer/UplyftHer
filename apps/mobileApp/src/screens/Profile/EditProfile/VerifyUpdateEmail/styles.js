@@ -60,12 +60,20 @@ export const styles = StyleSheet.create({
   gradientStyle: {
     height: scaledHeightValue(48),
     width: deviceW - 40,
-    marginTop: scaledValue(73),
   },
   buttonText: {
     fontSize: scaledValue(19),
     fontFamily: fonts.SUSE_MEDIUM,
     lineHeight: scaledValue(22.8),
     letterSpacing: 19 * -0.03,
+  },
+  bottomText1: {
+    fontFamily: fonts.BE_VIETNAM_SEMIBOLD,
+    color: colors.black,
+    fontSize: scaledValue(16),
+    letterSpacing: scaledValue(19 * -0.04),
+  },
+  bottomText2: {
+    color: colors.themeColor,
   },
 });
