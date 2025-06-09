@@ -16,13 +16,14 @@ AWS.config.update({
 const cognito = new AWS.CognitoIdentityServiceProvider();
 
 async function getSignedUrl(keys) {
-  return new Promise((resolve, reject) => {
-    let params = { Bucket: S3_BUCKET_NAME, Key: keys, Expires: 1200 };
-    s3.getSignedUrl('getObject', params, (err, url) => {
-      if (err) reject(err);
-      resolve(url);
-    });
-  });
+  return `${process.env.BASE_URL_IMAGE}/${keys}`;
+  // return new Promise((resolve, reject) => {
+  //   let params = { Bucket: S3_BUCKET_NAME, Key: keys, Expires: 1200 };
+  //   s3.getSignedUrl('getObject', params, (err, url) => {
+  //     if (err) reject(err);
+  //     resolve(url);
+  //   });
+  // });
 }
 
 
@@ -101,35 +102,58 @@ const adminProfileController = {
       admin.email = email || admin.email;
       admin.status = status || admin.status;
 
-      // console.log('therer',req.files);
-
+      
       if (req.files && req.files.profilePic) {
-
-
         const photoFile = req.files.profilePic;
         const currentDate = Date.now();
-        const photoFileOrg = photoFile.name;
-        const documentFileName = `${currentDate}${photoFileOrg}`;
-        const filePathEvent = `Uploads/Images/${documentFileName}`;
+        const originalExt = path.extname(photoFile.name);
 
+        // Generate safe random filename
+        const randomName = crypto.randomBytes(16).toString('hex');
+        const documentFileName = `${currentDate}_${randomName}${originalExt}`;
+
+        const filePathEvent = path.join('Uploads/Images', documentFileName);
+
+        // Ensure directory exists
+        fs.mkdirSync(path.dirname(filePathEvent), { recursive: true });
+
+        // Move file
         await photoFile.mv(filePathEvent);
 
-        // Upload to S3
         try {
-          //console.log("picthere1",filePathEvent);
+            // Upload to S3
+            const imageurl = await uploadToS3(filePathEvent);
 
-          const imageurl = await uploadToS3(filePathEvent);
-          //console.log("S3 Image URL:", imageurl);
-          fs.unlinkSync(filePathEvent);
-          //console.log("picthere",imageurl);
+            // Clean up local file
+            fs.unlinkSync(filePathEvent);
 
-          admin.profilePic = filePathEvent;
+            // Save the S3 URL — NOT the local path
+            admin.profilePic = filePathEvent;
+
         } catch (uploadError) {
+            // Clean up local file
+            fs.unlinkSync(filePathEvent);
 
-          fs.unlinkSync(filePathEvent);  // Still clean up the local file
-          return res.json({ status: 0, errors: { message: 'Error uploading profile picture to S3' } });
+            return res.json({ status: 0, errors: { message: 'Error uploading profile picture to S3' } });
         }
-      }
+  }
+
+      // if (req.files && req.files.profilePic) {
+      //   const photoFile = req.files.profilePic;
+      //   const currentDate = Date.now();
+      //   const photoFileOrg = photoFile.name;
+      //   const documentFileName = `${currentDate}${photoFileOrg}`;
+      //   const filePathEvent = `Uploads/Images/${documentFileName}`;
+      //   await photoFile.mv(filePathEvent);
+      //   try {
+      //    const imageurl = await uploadToS3(filePathEvent);
+      //    fs.unlinkSync(filePathEvent);
+      //    admin.profilePic = filePathEvent;
+      //   } catch (uploadError) {
+      //     fs.unlinkSync(filePathEvent);  
+      //     return res.json({ status: 0, errors: { message: 'Error uploading profile picture to S3' } });
+      //   }
+      // }
 
 
 
