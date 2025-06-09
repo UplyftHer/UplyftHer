@@ -17,13 +17,14 @@ const s3 = new AWS.S3({
 const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME;
 
 async function getSignedUrl(key) {
-    return new Promise((resolve, reject) => {
-        const params = { Bucket: S3_BUCKET_NAME, Key: key, Expires: 1200 };
-        s3.getSignedUrl('getObject', params, (err, url) => {
-            if (err) reject(err);
-            resolve(url);
-        });
-    });
+    return `${process.env.BASE_URL_IMAGE}/${key}`;
+    // return new Promise((resolve, reject) => {
+    //     const params = { Bucket: S3_BUCKET_NAME, Key: key, Expires: 1200 };
+    //     s3.getSignedUrl('getObject', params, (err, url) => {
+    //         if (err) reject(err);
+    //         resolve(url);
+    //     });
+    // });
 }
 
 
@@ -77,22 +78,39 @@ const TestimonialsController = {
                
                 const photoFile = req.files.image;
                 const currentDate = Date.now();
-                const photoFileOrg = photoFile.name;
-                const documentFileName = `${currentDate}-${photoFileOrg}`;
-                filePathEvent = `Uploads/Images/${documentFileName}`;
+
+                // Extract original extension
+                const originalExt = path.extname(photoFile.name);
+
+                // Generate safe random filename (no user-controlled input in path!)
+                const randomName = crypto.randomBytes(16).toString('hex');
+                const documentFileName = `${currentDate}-${randomName}${originalExt}`;
+
+                
+                // Safe local path
+                filePathEvent = path.join('Uploads/Images', documentFileName);
+
+                // Ensure directory exists
+                fs.mkdirSync(path.dirname(filePathEvent), { recursive: true });
                 await photoFile.mv(filePathEvent);
 
-                //console.log("picthere1",filePathEvent);
+              
 
                 try {
                     imageUrl = await uploadToS3(filePathEvent);
-                    fs.unlinkSync(filePathEvent);
+                    // Delete local file (you said you still want to delete it)
+                    if (fs.existsSync(filePathEvent)) {
+                        fs.unlinkSync(filePathEvent);
+                    }
                 } catch (uploadError) {
-                    fs.unlinkSync(filePathEvent);
+                    // Delete local file (you said you still want to delete it)
+                    if (fs.existsSync(filePathEvent)) {
+                        fs.unlinkSync(filePathEvent);
+                    }
                     return res.json({ status: 0, errors: { message: 'Error uploading profile picture to S3' } });
                 }
             }
-            console.log("picthere1",filePathEvent);
+           
             const newTestimonial = new TestimonialsModel({
                 name,
                 age,
