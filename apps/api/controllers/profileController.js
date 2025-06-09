@@ -114,7 +114,7 @@ function convertTo24hr(time12hr) {
 }
 
 const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(email);
 };
 
@@ -176,7 +176,7 @@ const profileController = {
     },
 
     deleteUser: async (req, res) => {
-        console.log("process.env.JWT_SECRET", process.env.JWT_SECRET);
+        
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserId = decoded.username;
@@ -491,18 +491,30 @@ const profileController = {
                 isCreateProfile: 1
             };
             if (req.files && req.files.profilePic) {
-
                 var currentDate = Date.now();
                 let photoFile = req.files.profilePic;
-                let photoFileOrg = photoFile.name;
-                const documentFileName = currentDate + "" + photoFileOrg;
-                var filePathEvent = `Uploads/Images/${documentFileName}`;
 
+                // Sanitize file name: take only basename and strip unsafe characters
+                let originalExt = path.extname(photoFile.name);
+                let randomName = crypto.randomBytes(16).toString('hex'); // 32-char random string
+
+                const documentFileName = `${currentDate}_${randomName}${originalExt}`;
+                const filePathEvent = path.join('Uploads/Images', documentFileName);
+
+                // Ensure the directory exists (optional safety)
+                fs.mkdirSync(path.dirname(filePathEvent), { recursive: true });
+
+               
                 await photoFile.mv(filePathEvent);
-                var imageurl = await uploadToS3(filePathEvent);
-                fs.unlinkSync(filePathEvent);
-                update.profilePic = filePathEvent;
 
+                
+                const imageurl = await uploadToS3(filePathEvent);
+
+                
+                fs.unlinkSync(filePathEvent);
+
+                
+                update.profilePic = imageurl;
             }
 
             const profile = await UsersModel.findOneAndUpdate(filter, update, { new: true });

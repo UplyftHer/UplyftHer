@@ -119,25 +119,29 @@ const generateRandomString = (length = 12) => {
         throw new Error('Password length must be at least 8 characters.');
     }
 
-    // Ensure the password contains at least one of each required character type
-    let result = '';
-    result += upperCase[Math.floor(Math.random() * upperCase.length)];
-    result += lowerCase[Math.floor(Math.random() * lowerCase.length)];
-    result += numbers[Math.floor(Math.random() * numbers.length)];
-    result += specialCharacters[Math.floor(Math.random() * specialCharacters.length)];
+    const getRandomIndex = (max) => crypto.randomInt(0, max);
 
-    // Fill the remaining characters with a mix of all types
+    let result = '';
+    result += upperCase[getRandomIndex(upperCase.length)];
+    result += lowerCase[getRandomIndex(lowerCase.length)];
+    result += numbers[getRandomIndex(numbers.length)];
+    result += specialCharacters[getRandomIndex(specialCharacters.length)];
+
     const allCharacters = upperCase + lowerCase + numbers + specialCharacters;
+
     for (let i = result.length; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * allCharacters.length);
-        result += allCharacters[randomIndex];
+        result += allCharacters[getRandomIndex(allCharacters.length)];
     }
 
-    // Shuffle the result to ensure randomness
-    return result
+    // Secure shuffle
+    result = result
         .split('')
-        .sort(() => Math.random() - 0.5)
+        .map(value => ({ value, sort: crypto.randomInt(0, Number.MAX_SAFE_INTEGER) }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value)
         .join('');
+
+    return result;
 };
 
 
@@ -246,9 +250,9 @@ const authController = {
                 await cognito.adminDeleteUser(params).promise();
                 await UsersModel.deleteOne({ cognitoUserId:checkEmail.cognitoUserId });
             }
-            console.log(email,invitationCode);
+           
             let checkAdminInvitationCode = await AdminInvitationCode.findOne({email,invitationCode});
-            console.log("checkAdminInvitationCode",checkAdminInvitationCode);
+           
             let adminInvitationCode = 0;
             if(checkAdminInvitationCode)
             {
