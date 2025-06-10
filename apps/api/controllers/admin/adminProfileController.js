@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Admin = require('../../models/admin/adminprofileModel'); // Adjust path as needed
 const BookMeetingsModel = require('../../models/BookMeetingsModel');
 const UsersModel = require('../../models/UsersModel');
@@ -5,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const JWT_SECRET = process.env.JWT_SECRET;
 const AWS = require('aws-sdk');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 
 // Initialize AWS Cognito Identity Provider
 AWS.config.update({
@@ -65,7 +67,10 @@ const adminProfileController = {
     try {
       const { id } = req.body;
 
-
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.json({ status: 0, errors: { message: 'Invalid id format' } });
+          
+      }
       const admin = await Admin.findById(id);
       if (!admin) {
         return res.json({ status: 0, errors: { message: 'Invalid Admin ID' } });
@@ -92,6 +97,10 @@ const adminProfileController = {
   updateProfile: async (req, res) => {
     try {
       const { adminId } = req.body;
+      if (!mongoose.Types.ObjectId.isValid(adminId)) {
+        return res.json({ status: 0, errors: { message: 'Invalid adminId format' } });
+        
+      }
       const { name, email, role, status } = req.body;
       const admin = await Admin.findById(adminId);
       if (!admin) {
@@ -203,6 +212,9 @@ const adminProfileController = {
         return res.status(200).json({ errors: [{ msg: 'Please provide all required fields.' }] });
       }
 
+      if (!validator.isEmail(email)) {
+          return res.status(200).json({ status: 0, errors: { message: 'Invalid email format.' } });
+      }
       const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
       if (!passwordRegex.test(newPassword)) {
         return res.status(200).json({ errors: [{ msg: 'New password does not meet the required complexity (min 8 chars, 1 number, 1 special character).' }] });
@@ -237,6 +249,9 @@ const adminProfileController = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
+      if (!validator.isEmail(email)) {
+          return res.status(200).json({ status: 0, errors: { message: 'Invalid email format.' } });
+      }
       const admin = await Admin.findOne({ email });
       if (!admin) {
         return res.status(200).json({ status: 0, errors: { email: 'Email not found! Please enter a valid email' } });

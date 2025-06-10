@@ -74,6 +74,25 @@ const meetingController = {
                     message: "All fields are required",
                 });
             }
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
+            if (!mongoose.Types.ObjectId.isValid(meetingId)) {
+                return res.status(400).json({
+                    status: 0,
+                    message: "Invalid meetingId format",
+                });
+            }
+            // Validate date (YYYY-MM-DD)
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                return res.status(200).json({ status: 0, message: "Invalid date format (expected YYYY-MM-DD)" });
+            }
+            if (typeof slot !== 'string' || slot.trim() === '') {
+                return res.status(200).json({ status: 0, message: "Invalid slot" });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy }, // Query filter
                 {
@@ -126,8 +145,8 @@ const meetingController = {
 
             const checkMeetingExists = await BookMeetingsModel.findOne({
                 $or: [
-                    { _id: meetingId, date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserId, cognitoUserIdMenter: cognitoUserIdMy },
-                    { _id: meetingId, date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserIdMy, cognitoUserIdMenter: cognitoUserId },
+                    { _id: mongoose.Types.ObjectId(meetingId), date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserId, cognitoUserIdMenter: cognitoUserIdMy },
+                    { _id: mongoose.Types.ObjectId(meetingId), date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserIdMy, cognitoUserIdMenter: cognitoUserId },
                 ]
             })
             if (!checkMeetingExists) {
@@ -326,7 +345,7 @@ const meetingController = {
                 join_url:jsonResponse.join_url,
             }
 
-            const filter = { _id: meetingId };
+            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
             let update = {};
             update.status = 1;
             update.start_url = jsonResponse.start_url;
