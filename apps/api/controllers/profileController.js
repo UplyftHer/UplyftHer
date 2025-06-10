@@ -125,7 +125,10 @@ const profileController = {
         const { deviceToken } = req.body;
 
         try {
-
+            if (typeof deviceToken !== 'string' || deviceToken.trim() === '' || deviceToken.length > 512) {
+                return res.status(200).json({ status: 0, message: "Invalid deviceToken" });
+            }
+            
             const update = {
                 $pull: { deviceToken }
             };
@@ -148,6 +151,12 @@ const profileController = {
         const { email } = req.body;
 
         try {
+            if (!isValidEmail(email)) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Invalid email format",
+                });
+            }
             const user = await UsersModel.findOne({ email });
             console.log("useruser", user);
             if (!user) {
@@ -284,7 +293,7 @@ const profileController = {
         try {
             const { cognitoUserId, status, reason} = req.body;
 
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -491,6 +500,10 @@ const profileController = {
 
             if (parsedDataPreference.length === 0) {
                 return res.json({ status: 0, message: "Preference array cannot be empty." });
+            }
+
+            if (typeof organizationName !== 'string' || organizationName.trim() === '') {
+                return res.json({ status: 0, message: "Invalid organizationName" });
             }
             const filter = { cognitoUserId: decoded.username };
             const update = {
@@ -770,6 +783,9 @@ const profileController = {
                     status: 0,
                     message: "Invalid cognitoUserId",
                 });
+            }
+            if (typeof isMatchAvailibilty !== 'number' || (isMatchAvailibilty !== 0 && isMatchAvailibilty !== 1)) {
+                return res.status(200).json({ status: 0, message: "Invalid isMatchAvailibilty, must be 0 or 1" });
             }
             
             const filter = { cognitoUserId: cognitoUserId };
@@ -1326,7 +1342,7 @@ const profileController = {
 
         try {
 
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdSave !== 'string' || cognitoUserIdSave.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -1365,8 +1381,8 @@ const profileController = {
 
             // Check if the profile is already saved
             const existingEntry = await SavedProfilesModel.findOne({
-                cognitoUserId: cognitoUserId,
-                cognitoUserIdSave: cognitoUserIdSave,
+                cognitoUserId: cognitoUserId.trim(),
+                cognitoUserIdSave: cognitoUserIdSave.trim(),
             });
 
             if (status === "1") {
@@ -1396,8 +1412,8 @@ const profileController = {
                 }
                 // Remove profile from the SavedProfiles table
                 await SavedProfilesModel.deleteOne({
-                    cognitoUserId: cognitoUserId,
-                    cognitoUserIdSave: cognitoUserIdSave,
+                    cognitoUserId: cognitoUserId.trim(),
+                    cognitoUserIdSave: cognitoUserIdSave.trim(),
                 });
 
                 return res.status(200).json({
@@ -1560,7 +1576,7 @@ const profileController = {
         
         try {
 
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -1638,7 +1654,7 @@ const profileController = {
         
         try {
 
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -1706,7 +1722,7 @@ const profileController = {
         const { cognitoUserId } = req.body;
        
         try {
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -2476,7 +2492,7 @@ const profileController = {
         const { cognitoUserId, message } = req.body;
         
         try {
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -2730,7 +2746,7 @@ const profileController = {
         const offsetstart = parseInt(offset) || 0;
         
         try {
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -2877,7 +2893,7 @@ const profileController = {
 
       
         try {
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -3199,7 +3215,7 @@ const profileController = {
         const cognitoUserIdMy = decoded.username;
         const { cognitoUserId, date } = req.body;
         try {
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -3210,6 +3226,10 @@ const profileController = {
                     status: 0,
                     message: "All fields are required",
                 });
+            }
+            // Validate date (YYYY-MM-DD)
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                return res.status(200).json({ status: 0, message: "Invalid date format (expected YYYY-MM-DD)" });
             }
 
             // Convert the input date string to a Date object
@@ -3442,7 +3462,7 @@ const profileController = {
 
      
         try {
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -3453,6 +3473,22 @@ const profileController = {
                     status: 0,
                     message: "All fields are required",
                 });
+            }
+            // Validate date (YYYY-MM-DD)
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                return res.status(200).json({ status: 0, message: "Invalid date format (expected YYYY-MM-DD)" });
+            }
+            if (typeof slot !== 'string' || slot.trim() === '') {
+                return res.status(200).json({ status: 0, message: "Invalid slot" });
+            }
+            const allowedModes = ['videoCall', 'audioCall', 'inPerson'];
+            if (!allowedModes.includes(mode)) {
+                return res.status(200).json({ status: 0, message: "Invalid mode" });
+            }
+
+            // Validate meetingTitle (string, reasonable length)
+            if (typeof meetingTitle !== 'string' || meetingTitle.trim() === '' || meetingTitle.length > 200) {
+                return res.status(200).json({ status: 0, message: "Invalid meetingTitle" });
             }
 
             // Convert the input date string to a Date object
@@ -3740,7 +3776,7 @@ const profileController = {
 
         
         try {
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -3751,6 +3787,22 @@ const profileController = {
                     status: 0,
                     message: "All fields are required",
                 });
+            }
+            // Validate date (YYYY-MM-DD)
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                return res.status(200).json({ status: 0, message: "Invalid date format (expected YYYY-MM-DD)" });
+            }
+            if (typeof slot !== 'string' || slot.trim() === '') {
+                return res.status(200).json({ status: 0, message: "Invalid slot" });
+            }
+            const allowedModes = ['videoCall', 'audioCall', 'inPerson'];
+            if (!allowedModes.includes(mode)) {
+                return res.status(200).json({ status: 0, message: "Invalid mode" });
+            }
+
+            // Validate meetingTitle (string, reasonable length)
+            if (typeof meetingTitle !== 'string' || meetingTitle.trim() === '' || meetingTitle.length > 200) {
+                return res.status(200).json({ status: 0, message: "Invalid meetingTitle" });
             }
             if (!mongoose.Types.ObjectId.isValid(meetingId)) {
                 return res.status(400).json({
@@ -4039,7 +4091,7 @@ const profileController = {
         const cognitoUserIdMy = decoded.username;
         const { meetingId, cognitoUserId } = req.body;
         try {
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -4216,7 +4268,7 @@ const profileController = {
         const cognitoUserIdMy = decoded.username; 
         const { cognitoUserId, meetingId } = req.body;
         try {
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -4416,7 +4468,7 @@ const profileController = {
         const cognitoUserIdMy = decoded.username;
         const { cognitoUserId, meetingId, rating, feedback } = req.body;
         try {
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -4546,7 +4598,7 @@ const profileController = {
            
             const { cognitoUserId, offset = 0, limit = 10 } = req.body; 
 
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -4605,7 +4657,7 @@ const profileController = {
 
         //console.log("cognitoUserId",cognitoUserId);
         try {
-            if (typeof cognitoUserId1 !== 'string' || cognitoUserId1.trim() === '' && typeof cognitoUserId2 !== 'string' || cognitoUserId2.trim() === '') {
+            if (typeof cognitoUserId1 !== 'string' || cognitoUserId1.trim() === '' || typeof cognitoUserId2 !== 'string' || cognitoUserId2.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -5113,7 +5165,7 @@ const profileController = {
         const cognitoUserIdMy = decoded.username;
         const { cognitoUserId } = req.body;
         try {
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",
@@ -5192,7 +5244,7 @@ const profileController = {
 
         //console.log("cognitoUserId",cognitoUserId);
         try {
-            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' && typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
                     message: "Invalid cognitoUserId",

@@ -589,7 +589,7 @@ const authController = {
             }
             if(type == "signup")
             {
-                if(!invitationCode)
+                if(typeof invitationCode !== 'string' || !/^[A-Za-z0-9]{12}$/.test(invitationCode))
                 {
                     return res.status(200).json({
                         status: 0,
@@ -660,7 +660,7 @@ const authController = {
                 }
                 else
                 {
-                    if(!invitationCode)
+                    if(typeof invitationCode !== 'string' || !/^[A-Za-z0-9]{12}$/.test(invitationCode))
                     {
                         return res.json({ status: 0, message: "We couldn't find an account associated with your credentials. Please create an account before proceeding." });
                     }

@@ -24,6 +24,14 @@ const googleController = {
                     message: "All fields are required",
                 });
             }
+            if (typeof query !== 'string' || query.trim() === '' || query.length > 200) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Invalid query parameter",
+                });
+            }
+
+            
     
             const profile = await UsersModel.findOne({ cognitoUserId: cognitoUserIdMy });
             if (!profile) return res.json({ status: 0, message: "Profile not found" });
