@@ -495,6 +495,14 @@ const profileController = {
                 return res.json({ status: 0, message: "Interests array cannot be empty." });
             }
 
+            const sanitizedInterests = Array.isArray(parsedDataInterests)
+            ? parsedDataInterests.map(item => ({
+                interestId: typeof item.interestId === 'string' ? item.interestId.replace(/[$.]/g, '').trim() : '',
+                name: typeof item.name === 'string' ? item.name.replace(/[$.]/g, '').trim() : '',
+                icon: typeof item.icon === 'string' ? item.icon.replace(/[$.]/g, '').trim() : '',
+            }))
+            : [];
+
             // Validation for `preference`
             if (!Array.isArray(parsedDataPreference)) {
                 return res.json({ status: 0, message: "Preference must be an array." });
@@ -503,6 +511,13 @@ const profileController = {
             if (parsedDataPreference.length === 0) {
                 return res.json({ status: 0, message: "Preference array cannot be empty." });
             }
+
+            const sanitizedPreference = Array.isArray(parsedDataPreference)
+            ? parsedDataPreference.map(item => ({
+                preferenceId: typeof item.preferenceId === 'string' ? item.preferenceId.replace(/[$.]/g, '').trim() : '',
+                type: typeof item.type === 'string' ? item.type.replace(/[$.]/g, '').trim() : '',
+            }))
+            : [];
 
             if (typeof organizationName !== 'string' || organizationName.trim() === '') {
                 return res.json({ status: 0, message: "Invalid organizationName" });
@@ -516,12 +531,12 @@ const profileController = {
                 occupation: typeof occupation === 'string' ? occupation.trim() : '',
                 organizationName: typeof organizationName === 'string' ? organizationName.trim() : '',
                 industry: typeof industry === 'string' ? industry.trim() : '',
-                interests: Array.isArray(parsedDataInterests) ? parsedDataInterests : [],
+                interests: sanitizedInterests,
                 bio: typeof bio === 'string' ? bio.trim() : '',
                 country: typeof country === 'string' ? country.trim() : '',
                 city: typeof city === 'string' ? city.trim() : '',
                 iso2: typeof iso2 === 'string' ? iso2.trim() : '',
-                preference: Array.isArray(parsedDataPreference) ? parsedDataPreference : [],
+                preference: sanitizedPreference,
                 isCreateProfile: 1
             };
             if (req.files && req.files.profilePic) {
@@ -548,7 +563,7 @@ const profileController = {
                 fs.unlinkSync(filePathEvent);
 
                 
-                update.profilePic = imageurl;
+                update.profilePic = filePathEvent;
             }
 
             const profile = await UsersModel.findOneAndUpdate(filter, update, { new: true });
@@ -3483,6 +3498,7 @@ const profileController = {
             if (typeof slot !== 'string' || slot.trim() === '' || slot.length > 20) {
                 return res.status(200).json({ status: 0, message: "Invalid slot" });
             }
+            const safeSlot = slot.replace(/[$.]/g, '').trim().substring(0, 100);
             const allowedModes = ['videoCall', 'audioCall', 'inPerson'];
             if (!allowedModes.includes(mode)) {
                 return res.status(200).json({ status: 0, message: "Invalid mode" });
@@ -3589,7 +3605,7 @@ const profileController = {
                 cognitoUserIdMenter: cognitoUserId,
                 day: dayOfWeek,
                 date,
-                slot,
+                slot:safeSlot,
             });
 
             if (checkAlreadyBook) {
