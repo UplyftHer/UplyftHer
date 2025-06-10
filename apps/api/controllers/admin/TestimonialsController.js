@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
 const fs = require("fs");
 const TestimonialsModel = require('../../models/admin/TestimonialsModel');
@@ -155,6 +156,10 @@ const TestimonialsController = {
         try {
             const { id } = req.params;
             const { name, age, country, bio, status } = req.body;
+
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+               return res.status(200).json({ message: 'Invalid testimonial ID' });
+            }
 
             const testimonial = await TestimonialsModel.findById(id);
             if (!testimonial) {

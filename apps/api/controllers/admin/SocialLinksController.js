@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
 const fs = require("fs");
 const SocialLinksModel = require('../../models/admin/SocialLinksModel'); 
@@ -136,6 +137,9 @@ const SocialLinksController = {
     getSocialLinkById: async (req, res) => {
         try {
             const { id } = req.params;
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(200).json({ message: 'Invalid ID' });
+            }
             const socialLink = await SocialLinksModel.findById(id);
 
             if (!socialLink) {
@@ -158,6 +162,9 @@ const SocialLinksController = {
         try {
             const { id } = req.params;
             const { name, url, accountStatus } = req.body;
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(200).json({ message: 'Invalid ID' });
+            }
 
             const socialLink = await SocialLinksModel.findById(id);
             if (!socialLink) {
@@ -202,6 +209,9 @@ const SocialLinksController = {
     deleteSocialLink: async (req, res) => {
         try {
             const { id } = req.params;
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(200).json({ message: 'Invalid ID' });
+            }
             const socialLink = await SocialLinksModel.findById(id);
             if (!socialLink) {
                 return res.status(200).json({ message: 'Social link not found' });
