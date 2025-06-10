@@ -41,6 +41,10 @@ function getSecretHash(username) {
         .digest('base64');
 }
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 
 const AdminController = {
    
@@ -164,7 +168,8 @@ const AdminController = {
             if (status) filter.status = status;
             if (role) filter.role = role;
             if (search) {
-            const regex = new RegExp(search, 'i');
+            const escapedSearch = escapeRegExp(search);
+            const regex = new RegExp(escapedSearch, 'i');
             filter.$or = [
                 { name: { $regex: regex } },
                 { email: { $regex: regex } },

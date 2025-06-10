@@ -30,7 +30,10 @@ async function getSignedUrl(key) {
 
 
 async function uploadToS3(fileName) {
-    const fileContent = fs.readFileSync(fileName);
+    const filePath = path.join(__dirname, 'Uploads', 'Images', fileName);
+    // Read the file
+    const fileContent = fs.readFileSync(filePath);
+    
 
     const params = {
         Bucket: S3_BUCKET_NAME,
@@ -165,12 +168,15 @@ const TestimonialsController = {
                 age, 
                 country, 
                 bio, 
-                status
+                status,
+                image:""
             }
 
             if (req.files && req.files.image) {
                 const imageFile = req.files.image;
-                 filePath = `Uploads/Images/${Date.now()}-${imageFile.name}`;
+                const ext = path.extname(imageFile.name).toLowerCase();
+                const safeFileName = crypto.randomBytes(16).toString('hex') + ext;
+                filePath = path.join('Uploads', 'Images', `${Date.now()}-${safeFileName}`);
                 await imageFile.mv(filePath);
                 imageUrl = await uploadToS3(filePath);
                 savedata.image = filePath;

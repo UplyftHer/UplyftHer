@@ -4,7 +4,8 @@
   "main": "server.js",
   "private": true,
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "dependencies": {
     "aws-sdk": "^2.1691.0",
