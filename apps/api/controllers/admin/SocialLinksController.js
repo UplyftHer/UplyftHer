@@ -172,11 +172,22 @@ const SocialLinksController = {
             }
 
             let imageUrl = socialLink.image;
+            const nameSafe = typeof name === 'string' ? name.trim() : '';
+            const urlSafe = typeof url === 'string' ? url.trim() : '';
+
+            let accountStatusSafe = 1; 
+            if (accountStatus === '0' || accountStatus === 0) {
+            accountStatusSafe = 0;
+            } else if (accountStatus === '1' || accountStatus === 1) {
+            accountStatusSafe = 1;
+            } else if (typeof accountStatus !== 'undefined') {
+            return res.status(200).json({ message: 'Invalid accountStatus value' });
+            }
             //let filePath = "";
             let savedata = {
-                name,
-                 url,
-                accountStatus,
+                name:nameSafe,
+                url:urlSafe,
+                accountStatus:accountStatusSafe,
                 image:""
             }
 
