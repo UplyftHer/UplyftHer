@@ -509,19 +509,19 @@ const profileController = {
             }
             const filter = { cognitoUserId: decoded.username };
             const update = {
-                fullName,
-                age,
-                location,
-                userType,
-                occupation,
-                organizationName,
-                industry,
-                interests: parsedDataInterests,
-                bio,
-                country,
-                city,
-                iso2,
-                preference: parsedDataPreference,
+                fullName: typeof fullName === 'string' ? fullName.trim() : '',
+                age: typeof age === 'string' && /^\d+$/.test(age.trim()) ? age.trim() : '', // only allow string with digits
+                location: typeof location === 'string' ? location.trim() : '',
+                userType: userType === 0 || userType === 1 ? userType : 0, // you already checked this earlier
+                occupation: typeof occupation === 'string' ? occupation.trim() : '',
+                organizationName: typeof organizationName === 'string' ? organizationName.trim() : '',
+                industry: typeof industry === 'string' ? industry.trim() : '',
+                interests: Array.isArray(parsedDataInterests) ? parsedDataInterests : [],
+                bio: typeof bio === 'string' ? bio.trim() : '',
+                country: typeof country === 'string' ? country.trim() : '',
+                city: typeof city === 'string' ? city.trim() : '',
+                iso2: typeof iso2 === 'string' ? iso2.trim() : '',
+                preference: Array.isArray(parsedDataPreference) ? parsedDataPreference : [],
                 isCreateProfile: 1
             };
             if (req.files && req.files.profilePic) {
@@ -3797,6 +3797,7 @@ const profileController = {
             if (typeof slot !== 'string' || slot.trim() === '') {
                 return res.status(200).json({ status: 0, message: "Invalid slot" });
             }
+            const safeSlot = slot.replace(/[$.]/g, '').trim().substring(0, 100);
             const allowedModes = ['videoCall', 'audioCall', 'inPerson'];
             if (!allowedModes.includes(mode)) {
                 return res.status(200).json({ status: 0, message: "Invalid mode" });
@@ -3805,6 +3806,17 @@ const profileController = {
             // Validate meetingTitle (string, reasonable length)
             if (typeof meetingTitle !== 'string' || meetingTitle.trim() === '' || meetingTitle.length > 200) {
                 return res.status(200).json({ status: 0, message: "Invalid meetingTitle" });
+            }
+
+            let safePersonalNote = '';
+            if (typeof personalNote === 'string') {
+                safePersonalNote = personalNote.trim();
+                // Optionally enforce max length
+                if (safePersonalNote.length > 1000) {
+                    safePersonalNote = safePersonalNote.substring(0, 1000);
+                }
+            } else {
+                safePersonalNote = '';
             }
             if (!mongoose.Types.ObjectId.isValid(meetingId)) {
                 return res.status(400).json({
@@ -3917,7 +3929,7 @@ const profileController = {
                 cognitoUserIdMenter: cognitoUserId,
                 day: dayOfWeek,
                 date,
-                slot,
+                slot:safeSlot,
             });
 
             if (checkAlreadyBook) {
@@ -3944,8 +3956,8 @@ const profileController = {
                 cognitoUserIdMenter: cognitoUserId,
                 day: dayOfWeek,
                 date,
-                slot,
-                personalNote,
+                slot:safeSlot,
+                personalNote:safePersonalNote,
                 mode,
                 meetingTitle,
                 slot24

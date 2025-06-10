@@ -167,13 +167,34 @@ const TestimonialsController = {
             }
             
             let imageUrl = testimonial.image;
+            const nameSafe = typeof name === 'string' ? name.trim() : testimonial.name;
+
+            let ageSafe = testimonial.age;
+            if (typeof age !== 'undefined') {
+                if (!Number.isInteger(Number(age)) || Number(age) <= 0) {
+                    return res.status(200).json({ message: 'Invalid age' });
+                }
+                ageSafe = Number(age);
+            }
+            const countrySafe = typeof country === 'string' ? country.trim() : testimonial.country;
+            const bioSafe = typeof bio === 'string' ? bio.trim() : testimonial.bio;
+            let statusSafe = testimonial.status;
+            if (typeof status !== 'undefined') {
+                if (status === '0' || status === 0) {
+                    statusSafe = 0;
+                } else if (status === '1' || status === 1) {
+                    statusSafe = 1;
+                } else {
+                    return res.status(200).json({ message: 'Invalid status' });
+                }
+            }
             //let filePath = "";
             let savedata = {
-                name, 
-                age, 
-                country, 
-                bio, 
-                status,
+                name:nameSafe, 
+                age:ageSafe, 
+                country:countrySafe, 
+                bio:bioSafe, 
+                status:statusSafe,
                 image:""
             }
 
