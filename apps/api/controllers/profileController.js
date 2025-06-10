@@ -1951,9 +1951,9 @@ const profileController = {
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
 
-            // Check requestId valid
+            
             const checkRequest = await ConnectedUserModel.findOne({
-                _id: requestId,
+                _id: mongoose.Types.ObjectId(requestId),
                 cognitoUserIdSave: cognitoUserIdMy,
                 status: 0,
             });
@@ -1966,13 +1966,13 @@ const profileController = {
             }
 
             if (status == '1' || status == '2') {
-                const filter = { _id: requestId };
+                const filter = { _id: mongoose.Types.ObjectId(requestId) };
                 let update = {};
                 update.status = status;
                 const profile = await ConnectedUserModel.findOneAndUpdate(filter, { $set: update }, { new: true });
 
                 // notification table update
-                const filters = { _id: notificationId };
+                const filters = { _id: mongoose.Types.ObjectId(notificationId) };
                 // let updates = {}; 
                 // updates.isTakeAction = 1;
                 // await NotificationModel.findOneAndUpdate(filters, { $set: updates }, { new: true });
@@ -2658,9 +2658,15 @@ const profileController = {
             //console.log("myProfile",myProfile);
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
+            if (!mongoose.Types.ObjectId.isValid(messageId)) {
+                return res.status(400).json({
+                    status: 0,
+                    message: "Invalid messageId format",
+                });
+            }
 
             const chatDetail = await ChatModel.findOne(
-                { _id: messageId },
+                { _id: mongoose.Types.ObjectId(messageId) },
             );
             if (!chatDetail) return res.json({ status: 0, message: "Invalid messageId" });
 
@@ -2676,7 +2682,7 @@ const profileController = {
                 message: message,
                 isEdit: 1,
             };
-            const filter = { _id: messageId};
+            const filter = { _id: mongoose.Types.ObjectId(messageId)};
             const connectedUpdated = await ChatModel.findOneAndUpdate(filter, { $set: update }, { new: true });
             
 
@@ -3746,9 +3752,15 @@ const profileController = {
                     message: "All fields are required",
                 });
             }
+            if (!mongoose.Types.ObjectId.isValid(meetingId)) {
+                return res.status(400).json({
+                    status: 0,
+                    message: "Invalid meetingId format",
+                });
+            }
 
             let checkBooking = await BookMeetingsModel.findOne({
-                _id: meetingId
+                _id: mongoose.Types.ObjectId(meetingId)
             });
 
             if (!checkBooking) {
@@ -3872,7 +3884,7 @@ const profileController = {
             //     meetingTitle
             // });
             const slot24 = convertTo24hr(slot);
-            const filter = { _id: meetingId };
+            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
             let update = {
                 cognitoUserId: cognitoUserIdMy,
                 cognitoUserIdMenter: cognitoUserId,
@@ -3886,7 +3898,7 @@ const profileController = {
             };
             const bookmeetingslot = await BookMeetingsModel.findOneAndUpdate(filter, { $set: update }, { new: true });
 
-            const filter1 = { requestId: meetingId };
+            const filter1 = { requestId: mongoose.Types.ObjectId(meetingId) };
             const deletedNotification = await NotificationModel.deleteMany(filter1);
 
             const checkAndUpdateInteraction = await interactedUserModel.findOneAndUpdate(
@@ -4039,9 +4051,15 @@ const profileController = {
                     message: "All fields are required",
                 });
             }
+            if (!mongoose.Types.ObjectId.isValid(meetingId)) {
+                return res.status(400).json({
+                    status: 0,
+                    message: "Invalid meetingId format",
+                });
+            }
 
             let checkBooking = await BookMeetingsModel.findOne({
-                _id: meetingId
+                _id: mongoose.Types.ObjectId(meetingId)
             });
 
             if (!checkBooking) {
@@ -4101,13 +4119,13 @@ const profileController = {
 
             if (!profile) return res.json({ status: 0, message: "Invalid cognitoUserId" });
 
-            const filter = { _id: meetingId };
+            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
             const deletedMeeting = await BookMeetingsModel.findByIdAndDelete(meetingId);
             if (!deletedMeeting) {
                 return res.json({ status: 0, message: "Meeting not found!" });
             }
 
-            const filter1 = { requestId: meetingId };
+            const filter1 = { requestId: mongoose.Types.ObjectId(meetingId) };
             const deletedNotification = await NotificationModel.deleteMany(filter1);
 
 
@@ -4204,6 +4222,12 @@ const profileController = {
                     message: "Invalid cognitoUserId",
                 });
             }
+            if (!mongoose.Types.ObjectId.isValid(meetingId)) {
+                return res.status(400).json({
+                    status: 0,
+                    message: "Invalid meetingId format",
+                });
+            }
             if (!cognitoUserId || !meetingId) {
                 return res.status(200).json({
                     status: 0,
@@ -4258,7 +4282,7 @@ const profileController = {
             if (!profile) return res.json({ status: 0, message: "Invalid cognitoUserId" });
 
             let checkBooking = await BookMeetingsModel.findOne({
-                _id: meetingId
+                _id: mongoose.Types.ObjectId(meetingId)
             });
 
             if (!checkBooking) {
@@ -4273,8 +4297,14 @@ const profileController = {
                     message: "Already end meeting",
                 });
             }
-
-            const filter = { _id: meetingId };
+            if (!mongoose.Types.ObjectId.isValid(meetingId)) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Invalid meetingId format",
+                });
+            }
+            
+            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
             let update = {};
             update.status = 2;
             const updateBooking = await BookMeetingsModel.findOneAndUpdate(filter, { $set: update }, { new: true });
@@ -4934,8 +4964,8 @@ const profileController = {
 
             const checkMeetingValid = await BookMeetingsModel.find({
                 $or: [
-                    { cognitoUserId: cognitoUserIdMy, _id: meetingId },
-                    { cognitoUserIdMenter: cognitoUserIdMy, _id: meetingId }
+                    { cognitoUserId: cognitoUserIdMy, _id: mongoose.Types.ObjectId(meetingId) },
+                    { cognitoUserIdMenter: cognitoUserIdMy, _id: mongoose.Types.ObjectId(meetingId) }
                 ]
             })
 
