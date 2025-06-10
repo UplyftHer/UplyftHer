@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
@@ -29,10 +30,11 @@ const IndustryController = {
     addIndustry: async (req, res) => {
         try {
             const { name, status } = req.body;
-    
-            if (!name || !status) {
-                return res.status(200).json({ message: 'Name and status are required' });
+             if (typeof name !== 'string' || typeof status !== 'string' || !name.trim() || !status.trim()) {
+                return res.status(200).json({ message: 'Name and status are required and must be strings' });
             }
+    
+           
     
             // Check if the industry name already exists
             const existingIndustry = await IndustryModel.findOne({ name });
@@ -56,6 +58,9 @@ const IndustryController = {
     getIndustryById : async (req, res) => {
         try {
           const { id } = req.params;
+          if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(200).json({ message: 'Invalid ID' });
+        }
           const industry = await IndustryModel.findById(id);
       
           if (!industry) {
@@ -75,10 +80,13 @@ const IndustryController = {
         try {
             const { id } = req.params;
             const { name, status } = req.body;
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(200).json({ message: 'Invalid ID' });
+            }
 
             // Validate required fields
-            if (!name || !status) {
-                return res.status(200).json({ message: 'Name and status are required' });
+            if (typeof name !== 'string' || typeof status !== 'string' || !name.trim() || !status.trim()) {
+                return res.status(200).json({ message: 'Name and status are required and must be strings' });
             }
 
 
@@ -99,6 +107,9 @@ const IndustryController = {
     deleteIndustry: async (req, res) => {
         try {
             const { id } = req.params; 
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(200).json({ message: 'Invalid ID' });
+            }
             const deletedIndustry = await IndustryModel.findByIdAndDelete(id);
             if (!deletedIndustry) {
                 return res.status(200).json({ message: 'Industry not found' });

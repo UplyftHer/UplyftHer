@@ -220,7 +220,9 @@ const adminProfileController = {
         return res.status(200).json({ errors: [{ msg: 'New password does not meet the required complexity (min 8 chars, 1 number, 1 special character).' }] });
       }
 
-      const admin = await Admin.findOne({ email });
+      const sanitizedEmail = validator.normalizeEmail(email);
+
+      const admin = await Admin.findOne({ email: sanitizedEmail });
       if (!admin) {
         return res.status(200).json({ status: 0, errors: { message: 'Invalid email' } });
       }
@@ -252,7 +254,8 @@ const adminProfileController = {
       if (!validator.isEmail(email)) {
           return res.status(200).json({ status: 0, errors: { message: 'Invalid email format.' } });
       }
-      const admin = await Admin.findOne({ email });
+      const sanitizedEmail = validator.normalizeEmail(email);
+      const admin = await Admin.findOne({ email: sanitizedEmail });
       if (!admin) {
         return res.status(200).json({ status: 0, errors: { email: 'Email not found! Please enter a valid email' } });
       }

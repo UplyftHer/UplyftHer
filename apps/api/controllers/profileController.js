@@ -157,8 +157,10 @@ const profileController = {
                     message: "Invalid email format",
                 });
             }
-            const user = await UsersModel.findOne({ email });
-            console.log("useruser", user);
+            const sanitizedEmail = validator.normalizeEmail(email);
+
+            const user = await UsersModel.findOne({ email: sanitizedEmail });
+            
             if (!user) {
                 return res.json({ status: 0, message: 'User not found' });
             }
@@ -3228,7 +3230,7 @@ const profileController = {
                 });
             }
             // Validate date (YYYY-MM-DD)
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+            if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date.trim())) {
                 return res.status(200).json({ status: 0, message: "Invalid date format (expected YYYY-MM-DD)" });
             }
 
@@ -3474,11 +3476,11 @@ const profileController = {
                     message: "All fields are required",
                 });
             }
-            // Validate date (YYYY-MM-DD)
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-                return res.status(200).json({ status: 0, message: "Invalid date format (expected YYYY-MM-DD)" });
+            if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date.trim())) {
+                return res.status(200).json({ status: 0, message: "Invalid date format" });
             }
-            if (typeof slot !== 'string' || slot.trim() === '') {
+            
+            if (typeof slot !== 'string' || slot.trim() === '' || slot.length > 20) {
                 return res.status(200).json({ status: 0, message: "Invalid slot" });
             }
             const allowedModes = ['videoCall', 'audioCall', 'inPerson'];

@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
@@ -50,17 +51,19 @@ const DomainManagerController = {
         return res.status(400).json({ message: 'Invalid domain name' });
       }
 
+      const sanitizedName = String(name).trim();
+
       if (!status) {
         return res.status(400).json({ message: 'Status is required' });
       }
 
-      const existingDomain = await DomainManagerModel.findOne({ name });
+      const existingDomain = await DomainManagerModel.findOne({ sanitizedName });
       if (existingDomain) {
         return res.status(409).json({ message: 'Domain name already exists' });
       }
 
       const newDomain = new DomainManagerModel({
-        name,
+        name:sanitizedName,
         status,
       });
 
@@ -98,6 +101,9 @@ const DomainManagerController = {
   getDomainById: async (req, res) => {
     try {
       const { id } = req.params;
+       if (!mongoose.Types.ObjectId.isValid(id)) {
+          return res.json({ status: 0, errors: { message: 'Invalid id format' } });
+       }
       const domain = await DomainManagerModel.findById(id);
 
       if (!domain) {
@@ -118,11 +124,15 @@ const DomainManagerController = {
       const { name, status } = req.body;
 
       // Validate input
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+          return res.json({ status: 0, errors: { message: 'Invalid id format' } });
+      }
+      if (typeof name !== 'string' || typeof status !== 'string' || !name.trim() || !status.trim()) {
+          return res.status(200).json({ message: 'Name and status are required and must be strings' });
+      }
 
       
-      if (!name || !status) {
-        return res.status(200).json({ message: 'Name and status are required' });
-      }
+      
 
       const existingDomain = await DomainManagerModel.findById(id);
       if (!existingDomain) {
@@ -164,6 +174,9 @@ const DomainManagerController = {
   deleteDomain: async (req, res) => {
     try {
       const { id } = req.params; 
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+          return res.json({ status: 0, errors: { message: 'Invalid id format' } });
+      }
       const deletedDomain = await DomainManagerModel.findByIdAndDelete(id);
       if (!deletedDomain) {
         return res.status(200).json({ message: 'Domain not found' });

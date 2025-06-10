@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
@@ -86,10 +87,11 @@ async function uploadToS3(fileName) {
     addInterests: async (req, res) => {
         try {
             const { name, status } = req.body;
-            
-            if (!name || !status) {
-                return res.status(200).json({ message: 'Name and status are required' });
+            if (typeof name !== 'string' || typeof status !== 'string' || !name.trim() || !status.trim()) {
+                return res.status(200).json({ message: 'Name and status are required and must be strings' });
             }
+            
+            
     
             const existingInterests = await InterestsModel.findOne({ name });
             if (existingInterests) {
@@ -165,6 +167,9 @@ async function uploadToS3(fileName) {
     getInterestsById : async (req, res) => {
         try {
           const { id } = req.params;
+          if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(200).json({ message: 'Invalid ID' });
+          }
           const interests = await InterestsModel.findById(id);
       
           if (!interests) {
@@ -187,9 +192,11 @@ async function uploadToS3(fileName) {
             const { id } = req.params;
             const { name, status } = req.body;
     
-            
-            if (!name || !status) {
-                return res.status(200).json({ message: 'Name and status are required' });
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(200).json({ message: 'Invalid ID' });
+            }
+            if (typeof name !== 'string' || typeof status !== 'string' || !name.trim() || !status.trim()) {
+                return res.status(200).json({ message: 'Name and status are required and must be strings' });
             }
     
             // Find the interest by ID
@@ -265,6 +272,9 @@ async function uploadToS3(fileName) {
     deleteInterests: async (req, res) => {
         try {
             const { id } = req.params; 
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(200).json({ message: 'Invalid ID' });
+            }
             const deletedInterests = await InterestsModel.findByIdAndDelete(id);
             if (!deletedInterests) {
                 return res.status(200).json({ message: 'Interests not found' });
