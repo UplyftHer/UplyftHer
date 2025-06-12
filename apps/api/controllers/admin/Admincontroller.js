@@ -1,4 +1,5 @@
 
+const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
@@ -17,7 +18,8 @@ const interactedUserModel = require('../../models/interactedUserModel');
 const BlockedUsers = require('../../models/BlockedUsers.js');
 const PrivacyPolicyModel = require('../../models/admin/PrivacyModel');
 const TermsModel = require('../../models/admin/TermsModel');
-const AboutUsModel = require('../../models/admin/AboutUsModel')
+const AboutUsModel = require('../../models/admin/AboutUsModel');
+const validator = require('validator');
 
 AWS.config.update({
     region: process.env.S3_REGION, // Set your AWS region
@@ -41,6 +43,10 @@ function getSecretHash(username) {
         .digest('base64');
 }
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 
 const AdminController = {
    
@@ -48,27 +54,18 @@ const AdminController = {
         signup: async (req, res) => {
             
             const { email , invitationCode, registerusercount} = req.body;
-            // const { email, password, invitationCode,registerBy} = req.body;
-           
-    
-            // Calculate the SECRET_HASH using the getSecretHash function
-            //const secretHash = getSecretHash(email);
-    
-            // const params = {
-            //     ClientId: process.env.COGNITO_CLIENT_ID,
-            //     //SecretHash: secretHash, // Include the calculated SECRET_HASH
-            //     Username: email,
-            //     Password: password,
-            //     UserAttributes: [
-            //         { Name: 'email', Value: email } // Add email as a user attribute
-            //     ]
-            // };
+            
     
             try {
-                    // Check email in both models simultaneously using Promise.all
+                    if (!validator.isEmail(email)) {
+                        return res.status(200).json({ status: 0, errors: { message: 'Invalid email format.' } });
+                    }
+                    const sanitizedEmail = validator.normalizeEmail(email);
+                
+                // Check email in both models simultaneously using Promise.all
                     const [userCheck, adminCheck] = await Promise.all([
-                    UsersModel.findOne({ email: email }, { email: 1 }),
-                    AdminInvitationCode.findOne({ email: email }, { email: 1 })
+                    UsersModel.findOne({ email: sanitizedEmail }, { email: 1 }),
+                    AdminInvitationCode.findOne({ email: sanitizedEmail }, { email: 1 })
                     ]);
 
                     // If either email is found, return the message
@@ -85,7 +82,7 @@ const AdminController = {
                 const userData = new AdminInvitationCode({
                     //cognitoUserId: data.UserSub,
                     //cognitoUserId: "123456789",
-                    email,
+                    email:sanitizedEmail,
                     invitationCode,
                     registerusercount
                 });
@@ -161,10 +158,23 @@ const AdminController = {
 
         try {
             const filter = {};
-            if (status) filter.status = status;
-            if (role) filter.role = role;
+            if (status) {
+                const allowedStatuses = ['0', '1', '2']; // Example statuses
+                if (allowedStatuses.includes(String(status))) {
+                    filter.status = String(status);
+                }
+            }
+            //if (status) filter.status = status;
+            if (role) {
+                const allowedRoles = ['Mentor', 'Mentee']; // Example roles
+                if (allowedRoles.includes(String(role))) {
+                    filter.role = String(role);
+                }
+            }
+            //if (role) filter.role = role;
             if (search) {
-            const regex = new RegExp(search, 'i');
+            const escapedSearch = escapeRegExp(search);
+            const regex = new RegExp(escapedSearch, 'i');
             filter.$or = [
                 { name: { $regex: regex } },
                 { email: { $regex: regex } },
@@ -194,7 +204,20 @@ updateUserStatus: async (req, res) => {
     
    
     try {
-        // Find user and update their status
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.json({
+                status: 0,
+                message: 'Invalid User ID format',
+            });
+        }
+
+        if (!['0', '1', '2'].includes(newStatus)) {
+            return res.json({
+                status: 0,
+                message: 'Invalid status value',
+            });
+        }
+
         const user = await UsersModel.findById(userId);
         if (!user) {
             return res.json({

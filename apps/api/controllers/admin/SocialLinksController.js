@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
 const fs = require("fs");
 const SocialLinksModel = require('../../models/admin/SocialLinksModel'); 
@@ -16,17 +17,20 @@ const s3 = new AWS.S3({
 const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME;
 
 async function getSignedUrl(key) {
-    return new Promise((resolve, reject) => {
-        const params = { Bucket: S3_BUCKET_NAME, Key: key, Expires: 1200 };
-        s3.getSignedUrl('getObject', params, (err, url) => {
-            if (err) reject(err);
-            resolve(url);
-        });
-    });
+    return `${process.env.BASE_URL_IMAGE}/${key}`;
+    // return new Promise((resolve, reject) => {
+    //     const params = { Bucket: S3_BUCKET_NAME, Key: key, Expires: 1200 };
+    //     s3.getSignedUrl('getObject', params, (err, url) => {
+    //         if (err) reject(err);
+    //         resolve(url);
+    //     });
+    // });
 }
 
 async function uploadToS3(fileName) {
-    const fileContent = fs.readFileSync(fileName);
+    const filePath = path.join(__dirname, 'Uploads', 'Images', fileName);
+    // Read the file
+    const fileContent = fs.readFileSync(filePath);
 
     const params = {
         Bucket: S3_BUCKET_NAME,
@@ -80,16 +84,36 @@ const SocialLinksController = {
             if (req.files && req.files.image) {
                 const photoFile = req.files.image;
                 const currentDate = Date.now();
-                const photoFileOrg = photoFile.name;
-                const documentFileName = `${currentDate}-${photoFileOrg}`;
-                filePathEvent = `Uploads/Images/${documentFileName}`;
+
+                // Extract original extension
+                const originalExt = path.extname(photoFile.name);
+
+                 // Generate safe random filename (no user-controlled input in path!)
+                const randomName = crypto.randomBytes(16).toString('hex');
+                const documentFileName = `${currentDate}-${randomName}${originalExt}`;
+
+                 // Safe local path
+                filePathEvent = path.join('Uploads/Images', documentFileName);
+
+                // Ensure directory exists
+                fs.mkdirSync(path.dirname(filePathEvent), { recursive: true });
+
+                // Move file to local folder
                 await photoFile.mv(filePathEvent);
+
+               
+              
 
                 try {
                     imageUrl = await uploadToS3(filePathEvent);
-                    fs.unlinkSync(filePathEvent);
+                   // Delete local file (you said you still want to delete it)
+                    if (fs.existsSync(filePathEvent)) {
+                        fs.unlinkSync(filePathEvent);
+                    }
                 } catch (uploadError) {
-                    fs.unlinkSync(filePathEvent);
+                    if (fs.existsSync(filePathEvent)) {
+                        fs.unlinkSync(filePathEvent);
+                    }
                     return res.json({ status: 0, errors: { message: 'Error uploading image to S3' } });
                 }
             }
@@ -113,6 +137,9 @@ const SocialLinksController = {
     getSocialLinkById: async (req, res) => {
         try {
             const { id } = req.params;
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(200).json({ message: 'Invalid ID' });
+            }
             const socialLink = await SocialLinksModel.findById(id);
 
             if (!socialLink) {
@@ -135,6 +162,9 @@ const SocialLinksController = {
         try {
             const { id } = req.params;
             const { name, url, accountStatus } = req.body;
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(200).json({ message: 'Invalid ID' });
+            }
 
             const socialLink = await SocialLinksModel.findById(id);
             if (!socialLink) {
@@ -142,19 +172,35 @@ const SocialLinksController = {
             }
 
             let imageUrl = socialLink.image;
+            const nameSafe = typeof name === 'string' ? name.trim() : '';
+            const urlSafe = typeof url === 'string' ? url.trim() : '';
+
+            let accountStatusSafe = 1; 
+            if (accountStatus === '0' || accountStatus === 0) {
+            accountStatusSafe = 0;
+            } else if (accountStatus === '1' || accountStatus === 1) {
+            accountStatusSafe = 1;
+            } else if (typeof accountStatus !== 'undefined') {
+            return res.status(200).json({ message: 'Invalid accountStatus value' });
+            }
             //let filePath = "";
             let savedata = {
-                name,
-                 url,
-                accountStatus
+                name:nameSafe,
+                url:urlSafe,
+                accountStatus:accountStatusSafe,
+                image:""
             }
 
             if (req.files && req.files.image) {
                 const imageFile = req.files.image;
-                let filePath = `Uploads/Images/${Date.now()}-${imageFile.name}`;
+                const ext = path.extname(imageFile.name).toLowerCase();
+                const safeFileName = crypto.randomBytes(16).toString('hex') + ext;
+                filePath = path.join('Uploads', 'Images', `${Date.now()}-${safeFileName}`);
                 await imageFile.mv(filePath);
                 imageUrl = await uploadToS3(filePath);
                 savedata.image = filePath;
+
+                
             }
 
             const updatedSocialLink = await SocialLinksModel.findByIdAndUpdate(
@@ -174,6 +220,9 @@ const SocialLinksController = {
     deleteSocialLink: async (req, res) => {
         try {
             const { id } = req.params;
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(200).json({ message: 'Invalid ID' });
+            }
             const socialLink = await SocialLinksModel.findById(id);
             if (!socialLink) {
                 return res.status(200).json({ message: 'Social link not found' });

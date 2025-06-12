@@ -74,6 +74,25 @@ const meetingController = {
                     message: "All fields are required",
                 });
             }
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
+            if (!mongoose.Types.ObjectId.isValid(meetingId)) {
+                return res.status(400).json({
+                    status: 0,
+                    message: "Invalid meetingId format",
+                });
+            }
+            // Validate date (YYYY-MM-DD)
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                return res.status(200).json({ status: 0, message: "Invalid date format (expected YYYY-MM-DD)" });
+            }
+            if (typeof slot !== 'string' || slot.trim() === '') {
+                return res.status(200).json({ status: 0, message: "Invalid slot" });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy }, // Query filter
                 {
@@ -126,8 +145,8 @@ const meetingController = {
 
             const checkMeetingExists = await BookMeetingsModel.findOne({
                 $or: [
-                    { _id: meetingId, date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserId, cognitoUserIdMenter: cognitoUserIdMy },
-                    { _id: meetingId, date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserIdMy, cognitoUserIdMenter: cognitoUserId },
+                    { _id: mongoose.Types.ObjectId(meetingId), date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserId, cognitoUserIdMenter: cognitoUserIdMy },
+                    { _id: mongoose.Types.ObjectId(meetingId), date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserIdMy, cognitoUserIdMenter: cognitoUserId },
                 ]
             })
             if (!checkMeetingExists) {
@@ -326,7 +345,7 @@ const meetingController = {
                 join_url:jsonResponse.join_url,
             }
 
-            const filter = { _id: meetingId };
+            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
             let update = {};
             update.status = 1;
             update.start_url = jsonResponse.start_url;
@@ -375,7 +394,7 @@ const meetingController = {
         const { event, payload } = req.body;
         console.log(`Webhook received: ${event}`);
     
-        // Zoom URL validation check
+        
         if (event === "endpoint.url_validation") {
             console.log("Validating Zoom webhook...");
             console.log("Headers:", req.headers);
@@ -389,7 +408,17 @@ const meetingController = {
     
         else if (event === "meeting.ended") {
             console.log(`Webhook meeting.ended`);
+            
             const meetingId = payload.object.id;
+            if (typeof meetingId !== 'string' && typeof meetingId !== 'number') {
+                console.log("Invalid meetingId type");
+                return res.status(400).send("Invalid meetingId");
+            }
+
+            if (!/^\d+$/.test(meetingId.toString())) {
+                console.log("Invalid meetingId format");
+                return res.status(400).send("Invalid meetingId format");
+            }
             let checkBooking = await BookMeetingsModel.aggregate([
                 { $match: { zoomMeetingId: meetingId } },
                 { $lookup: { from: "users", localField: "cognitoUserId", foreignField: "cognitoUserId", as: "menteeData" } },
@@ -413,11 +442,11 @@ const meetingController = {
     
                 if (meetingstatus.includes(checkBookingSingle.status)) {
                     console.log(`Meeting started`);
-                    const filter = { zoomMeetingId: meetingId };
+                    const filter = { zoomMeetingId: meetingId.toString() };
                     let update = { status: 2 };
                     const updateBooking = await BookMeetingsModel.findOneAndUpdate(filter, { $set: update }, { new: true });
     
-                    // Send notifications (mentor & mentee)
+                    
                     let notifications = [
                         {
                             toUser: checkBookingSingle.mentorData,

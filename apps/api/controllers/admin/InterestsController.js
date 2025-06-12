@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
@@ -13,13 +14,14 @@ AWS.config.update({
 const cognito = new AWS.CognitoIdentityServiceProvider();
 
 async function getSignedUrl(keys) {
-  return new Promise((resolve, reject) => {
-      let params = { Bucket: S3_BUCKET_NAME, Key: keys, Expires: 1200 };
-      s3.getSignedUrl('getObject', params, (err, url) => {
-          if (err) reject(err);  
-          resolve(url);  
-      });
-  });
+    return `${process.env.BASE_URL_IMAGE}/${keys}`;
+//   return new Promise((resolve, reject) => {
+//       let params = { Bucket: S3_BUCKET_NAME, Key: keys, Expires: 1200 };
+//       s3.getSignedUrl('getObject', params, (err, url) => {
+//           if (err) reject(err);  
+//           resolve(url);  
+//       });
+//   });
 }
 
 
@@ -85,49 +87,69 @@ async function uploadToS3(fileName) {
     addInterests: async (req, res) => {
         try {
             const { name, status } = req.body;
-            
-            if (!name || !status) {
-                return res.status(200).json({ message: 'Name and status are required' });
+            if (typeof name !== 'string' || typeof status !== 'string' || !name.trim() || !status.trim()) {
+                return res.status(200).json({ message: 'Name and status are required and must be strings' });
             }
+            
+            
     
             const existingInterests = await InterestsModel.findOne({ name });
             if (existingInterests) {
                 return res.status(200).json({ message: 'Interest name already exists' });
             }
     
-            let filePath = ""; 
-    
+            let filePath = "";
+
             // Check if a file is uploaded
             if (req.files && req.files.image) {
                 const iconFile = req.files.image;
                 const currentDate = Date.now();
-                const iconFileName = `${currentDate}-${iconFile.name}`;
-                filePath = `Uploads/Images/${iconFileName}`;
+
+                // Extract original extension
+                const originalExt = path.extname(iconFile.name);
+
+                // Generate safe random filename
+                const randomName = crypto.randomBytes(16).toString('hex');
+                const iconFileName = `${currentDate}-${randomName}${originalExt}`;
+
+                filePath = path.join('Uploads/Images', iconFileName);
+
+                // Ensure directory exists
+                fs.mkdirSync(path.dirname(filePath), { recursive: true });
+
+                // Move file to local folder
                 await iconFile.mv(filePath);
             }
-    
-            try {
 
-                const imageUrl = await uploadToS3(filePath);
-                fs.unlinkSync(filePath); 
+            try {
+                // Upload to S3
+                const imageUrl = filePath ? await uploadToS3(filePath) : '';
+
+                // Clean up local file if uploaded
+                if (filePath && fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+
+                // Create interest record
                 const newInterest = new InterestsModel({
                     name,
                     status,
-                    icon: filePath, 
+                    icon: imageUrl, // Save S3 URL, NOT local filePath
                 });
-    
+
                 await newInterest.save();
-    
+
                 return res.status(201).json({
                     message: 'Interest added successfully',
                     interest: newInterest,
                 });
-    
+
             } catch (uploadError) {
-               
-                if (filePath) {
-                    fs.unlinkSync(filePath);  
+                // Clean up local file if exists
+                if (filePath && fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
                 }
+
                 return res.status(500).json({
                     status: 0,
                     errors: { message: 'Error uploading image to S3' },
@@ -145,6 +167,9 @@ async function uploadToS3(fileName) {
     getInterestsById : async (req, res) => {
         try {
           const { id } = req.params;
+          if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(200).json({ message: 'Invalid ID' });
+          }
           const interests = await InterestsModel.findById(id);
       
           if (!interests) {
@@ -167,9 +192,11 @@ async function uploadToS3(fileName) {
             const { id } = req.params;
             const { name, status } = req.body;
     
-            
-            if (!name || !status) {
-                return res.status(200).json({ message: 'Name and status are required' });
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(200).json({ message: 'Invalid ID' });
+            }
+            if (typeof name !== 'string' || typeof status !== 'string' || !name.trim() || !status.trim()) {
+                return res.status(200).json({ message: 'Name and status are required and must be strings' });
             }
     
             // Find the interest by ID
@@ -190,11 +217,20 @@ async function uploadToS3(fileName) {
             if (req.files && req.files.image) {
                 const iconFile = req.files.image;
                 const currentDate = Date.now();
-                const iconFileName = `${currentDate}-${iconFile.name}`;
-                let filePath = `Uploads/Images/${iconFileName}`;
-    
+                // Extract original extension
+                const originalExt = path.extname(iconFile.name);
+                // Generate safe random filename
+                const randomName = crypto.randomBytes(16).toString('hex');
+                const iconFileName = `${currentDate}-${randomName}${originalExt}`;
+                const filePath = path.join('Uploads/Images', iconFileName);
+
+                // Ensure directory exists
+                fs.mkdirSync(path.dirname(filePath), { recursive: true });
+
                 // Move the file to the local directory
                 await iconFile.mv(filePath);
+    
+                
     
                 try {
                     iconUrl = await uploadToS3(filePath);
@@ -203,7 +239,7 @@ async function uploadToS3(fileName) {
                     fs.unlinkSync(filePath);
                 } catch (uploadError) {
 
-                    if (filePath) {
+                    if (fs.existsSync(filePath)) {
                         fs.unlinkSync(filePath);
                     }
                     return res.status(500).json({
@@ -236,6 +272,9 @@ async function uploadToS3(fileName) {
     deleteInterests: async (req, res) => {
         try {
             const { id } = req.params; 
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(200).json({ message: 'Invalid ID' });
+            }
             const deletedInterests = await InterestsModel.findByIdAndDelete(id);
             if (!deletedInterests) {
                 return res.status(200).json({ message: 'Interests not found' });

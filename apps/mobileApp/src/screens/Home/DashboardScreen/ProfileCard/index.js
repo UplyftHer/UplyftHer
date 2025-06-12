@@ -5,8 +5,11 @@ import GText from '../../../../components/GText';
 import {styles} from './styles';
 import GImage from '../../../../components/GImage';
 import {colors} from '../../../../../assets/colors';
+import {scaledValue} from '../../../../utils/design.utils';
 
 const ProfileCard = props => {
+  console.log('props?.item', props?.item);
+
   return (
     <View style={[styles.gradientContainer, props?.style]}>
       <ImageBackground
@@ -65,20 +68,45 @@ const ProfileCard = props => {
         </View>
         {/* )} */}
         {props?.item?.mode != 'inPerson' && (
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => {
-              props?.meetingOnPress();
-              console.log('abc');
-            }}
-            style={styles.buttonStyle}>
-            <Image source={Images.VideoIcon} style={styles.iconStyle} />
-            <GText
-              medium
-              text={'Join meeting'}
-              style={styles.buttonTextStyle}
-            />
-          </TouchableOpacity>
+          <View
+            style={{
+              flexDirection: props?.item?.status === 1 ? 'row' : 'column',
+              // justifyContent: 'space-between',
+              width: '100%',
+              gap: scaledValue(10),
+              justifyContent: 'center',
+            }}>
+            {props?.item?.status === 1 && (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => {
+                  props?.endMeetingOnPress();
+                }}
+                style={[
+                  styles.buttonStyle,
+                  {backgroundColor: colors.darkShadeOfPurple, borderWidth: 0},
+                ]}>
+                <GText
+                  medium
+                  text={'End meeting'}
+                  style={styles.buttonTextStyle}
+                />
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                props?.meetingOnPress();
+              }}
+              style={styles.buttonStyle}>
+              <Image source={Images.VideoIcon} style={styles.iconStyle} />
+              <GText
+                medium
+                text={'Join meeting'}
+                style={styles.buttonTextStyle}
+              />
+            </TouchableOpacity>
+          </View>
         )}
       </ImageBackground>
     </View>

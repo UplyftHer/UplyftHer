@@ -81,6 +81,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: scaledValue(10),
     gap: scaledValue(4),
+    paddingHorizontal: scaledValue(18),
   },
   iconStyle: {width: scaledValue(20), height: scaledValue(20)},
   buttonTextStyle: {

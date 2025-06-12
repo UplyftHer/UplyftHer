@@ -114,7 +114,7 @@ function convertTo24hr(time12hr) {
 }
 
 const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(email);
 };
 
@@ -125,7 +125,10 @@ const profileController = {
         const { deviceToken } = req.body;
 
         try {
-
+            if (typeof deviceToken !== 'string' || deviceToken.trim() === '' || deviceToken.length > 512) {
+                return res.status(200).json({ status: 0, message: "Invalid deviceToken" });
+            }
+            
             const update = {
                 $pull: { deviceToken }
             };
@@ -148,8 +151,16 @@ const profileController = {
         const { email } = req.body;
 
         try {
-            const user = await UsersModel.findOne({ email });
-            console.log("useruser", user);
+            if (!isValidEmail(email)) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Invalid email format",
+                });
+            }
+            const sanitizedEmail = validator.normalizeEmail(email);
+
+            const user = await UsersModel.findOne({ email: sanitizedEmail });
+            
             if (!user) {
                 return res.json({ status: 0, message: 'User not found' });
             }
@@ -176,13 +187,19 @@ const profileController = {
     },
 
     deleteUser: async (req, res) => {
-        console.log("process.env.JWT_SECRET", process.env.JWT_SECRET);
+        
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserId = decoded.username;
 
         try {
             const {reason} = req.body;
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const user = await UsersModel.findOne({ cognitoUserId });
             if (!user) {
                 return res.json({ status: 0, message: 'User not found' });
@@ -277,6 +294,13 @@ const profileController = {
 
         try {
             const { cognitoUserId, status, reason} = req.body;
+
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             if (!cognitoUserId || !status) {
                 return res.status(200).json({
                     status: 0,
@@ -327,6 +351,12 @@ const profileController = {
             const token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const cognitoUserIdMy = decoded.username;
+            if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const getBlockedUser = await BlockedUsers.find({ cognitoUserId: cognitoUserIdMy });
             if (!getBlockedUser || getBlockedUser.length === 0) {
                 return res.status(200).json({ status: 1, message: 'No blocked user found',data: getBlockedUser });
@@ -465,6 +495,14 @@ const profileController = {
                 return res.json({ status: 0, message: "Interests array cannot be empty." });
             }
 
+            const sanitizedInterests = Array.isArray(parsedDataInterests)
+            ? parsedDataInterests.map(item => ({
+                interestId: typeof item.interestId === 'string' ? item.interestId.replace(/[$.]/g, '').trim() : '',
+                name: typeof item.name === 'string' ? item.name.replace(/[$.]/g, '').trim() : '',
+                icon: typeof item.icon === 'string' ? item.icon.replace(/[$.]/g, '').trim() : '',
+            }))
+            : [];
+
             // Validation for `preference`
             if (!Array.isArray(parsedDataPreference)) {
                 return res.json({ status: 0, message: "Preference must be an array." });
@@ -473,36 +511,59 @@ const profileController = {
             if (parsedDataPreference.length === 0) {
                 return res.json({ status: 0, message: "Preference array cannot be empty." });
             }
+
+            const sanitizedPreference = Array.isArray(parsedDataPreference)
+            ? parsedDataPreference.map(item => ({
+                preferenceId: typeof item.preferenceId === 'string' ? item.preferenceId.replace(/[$.]/g, '').trim() : '',
+                type: typeof item.type === 'string' ? item.type.replace(/[$.]/g, '').trim() : '',
+            }))
+            : [];
+
+            if (typeof organizationName !== 'string' || organizationName.trim() === '') {
+                return res.json({ status: 0, message: "Invalid organizationName" });
+            }
             const filter = { cognitoUserId: decoded.username };
             const update = {
-                fullName,
-                age,
-                location,
-                userType,
-                occupation,
-                organizationName,
-                industry,
-                interests: parsedDataInterests,
-                bio,
-                country,
-                city,
-                iso2,
-                preference: parsedDataPreference,
+                fullName: typeof fullName === 'string' ? fullName.trim() : '',
+                age: typeof age === 'string' && /^\d+$/.test(age.trim()) ? age.trim() : '', // only allow string with digits
+                location: typeof location === 'string' ? location.trim() : '',
+                userType: userType === 0 || userType === 1 ? userType : 0, // you already checked this earlier
+                occupation: typeof occupation === 'string' ? occupation.trim() : '',
+                organizationName: typeof organizationName === 'string' ? organizationName.trim() : '',
+                industry: typeof industry === 'string' ? industry.trim() : '',
+                interests: sanitizedInterests,
+                bio: typeof bio === 'string' ? bio.trim() : '',
+                country: typeof country === 'string' ? country.trim() : '',
+                city: typeof city === 'string' ? city.trim() : '',
+                iso2: typeof iso2 === 'string' ? iso2.trim() : '',
+                preference: sanitizedPreference,
                 isCreateProfile: 1
             };
             if (req.files && req.files.profilePic) {
-
                 var currentDate = Date.now();
                 let photoFile = req.files.profilePic;
-                let photoFileOrg = photoFile.name;
-                const documentFileName = currentDate + "" + photoFileOrg;
-                var filePathEvent = `Uploads/Images/${documentFileName}`;
 
+                // Sanitize file name: take only basename and strip unsafe characters
+                let originalExt = path.extname(photoFile.name);
+                let randomName = crypto.randomBytes(16).toString('hex'); // 32-char random string
+
+                const documentFileName = `${currentDate}_${randomName}${originalExt}`;
+                const filePathEvent = path.join('Uploads/Images', documentFileName);
+
+                // Ensure the directory exists (optional safety)
+                fs.mkdirSync(path.dirname(filePathEvent), { recursive: true });
+
+               
                 await photoFile.mv(filePathEvent);
-                var imageurl = await uploadToS3(filePathEvent);
-                fs.unlinkSync(filePathEvent);
-                update.profilePic = filePathEvent;
 
+                
+                const imageurl = await uploadToS3(filePathEvent);
+
+                
+                fs.unlinkSync(filePathEvent);
+
+                
+                update.profilePic = filePathEvent;
             }
 
             const profile = await UsersModel.findOneAndUpdate(filter, update, { new: true });
@@ -530,7 +591,7 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1]; 
         const decoded = jwt.verify(token, process.env.JWT_SECRET); 
         const cognitoUserId = decoded.username;
-        //const cognitoUserId = "43346822-5091-700d-a512-b9a39bbb7726";
+       
 
 
 
@@ -610,7 +671,7 @@ const profileController = {
         const decoded = jwt.verify(token, process.env.JWT_SECRET); 
         const cognitoUserId = decoded.username;
         let accessToken = decoded.accessToken;
-        //const cognitoUserId = "43346822-5091-700d-a512-b9a39bbb7726";
+        
 
 
 
@@ -620,6 +681,12 @@ const profileController = {
        
 
         try {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             if (!email || !confirmationCode) {
                 return res.status(200).json({
                     status: 0,
@@ -640,10 +707,10 @@ const profileController = {
 
             // const usercognito = await cognito.adminGetUser({
             //     UserPoolId: process.env.COGNITO_USER_POOL_ID,
-            //     Username: "932448c2-f051-702e-b04e-d514bfcd6fa7", // Get from the database
+            //     Username: "", // Get from the database
             // }).promise();
             
-            // console.log("User Attributes:", usercognito.UserAttributes);
+            
 
             // Confirm email update in Cognito
             // const params = {
@@ -694,13 +761,18 @@ const profileController = {
         //console.log("decoded",decoded);
         const cognitoUserId = decoded.username; // Get user ID from token
 
-        //console.log("cognitoUserId",cognitoUserId);
+        
 
         try {
-
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const profile = await UsersModel.findOne(
                 { cognitoUserId },
-                //{ cognitoUserId: 0 } // Projection to exclude fields
+                
             );
             if (!profile) return res.json({ status: 0, message: "Profile not found" });
 
@@ -720,10 +792,19 @@ const profileController = {
         //console.log("decoded",decoded);
         const cognitoUserId = decoded.username; // Get user ID from token
 
-        //console.log("cognitoUserId",cognitoUserId);
+       
         const { isMatchAvailibilty } = req.body; // Data from request body
         try {
-
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
+            if (typeof isMatchAvailibilty !== 'number' || (isMatchAvailibilty !== 0 && isMatchAvailibilty !== 1)) {
+                return res.status(200).json({ status: 0, message: "Invalid isMatchAvailibilty, must be 0 or 1" });
+            }
+            
             const filter = { cognitoUserId: cognitoUserId };
             const update = {
                 isMatchAvailibilty
@@ -746,6 +827,12 @@ const profileController = {
 
         const { status, type } = req.body;
         try {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const filter = { cognitoUserId: cognitoUserId };
             let update = {};
 
@@ -776,6 +863,12 @@ const profileController = {
 
         const { slots } = req.body;
         try {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserId },
                 // { cognitoUserId: 0 } // Projection to exclude fields
@@ -902,6 +995,12 @@ const profileController = {
 
         try {
 
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const availability = await AvailabilityModel.findOne({ cognitoUserId });
 
             if (!availability) {
@@ -956,7 +1055,12 @@ const profileController = {
         const { name } = req.body;
 
         try {
-            // Fetch the availability for the user
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const availability = await AvailabilityModel.findOne({ cognitoUserId });
 
             if (!availability) {
@@ -1012,7 +1116,13 @@ const profileController = {
 
 
         try {
-
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
+            
             // const availability = await AvailabilityModel.findOne({ cognitoUserId });
             // return res.json({
             //     status: 1,
@@ -1071,14 +1181,19 @@ const profileController = {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserId = decoded.username;
 
-        //const cognitoUserId = "73c478e2-f091-703a-cdf3-d1ed55eafe90";
-        console.log("cognitoUserId", cognitoUserId);
+        
 
 
         const { offset, limit } = req.body;
 
         try {
 
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne({ cognitoUserId });
 
             if (!myProfile) {
@@ -1244,6 +1359,12 @@ const profileController = {
 
         try {
 
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdSave !== 'string' || cognitoUserIdSave.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne({ cognitoUserId });
 
             if (!myProfile) {
@@ -1277,8 +1398,8 @@ const profileController = {
 
             // Check if the profile is already saved
             const existingEntry = await SavedProfilesModel.findOne({
-                cognitoUserId: cognitoUserId,
-                cognitoUserIdSave: cognitoUserIdSave,
+                cognitoUserId: cognitoUserId.trim(),
+                cognitoUserIdSave: cognitoUserIdSave.trim(),
             });
 
             if (status === "1") {
@@ -1308,8 +1429,8 @@ const profileController = {
                 }
                 // Remove profile from the SavedProfiles table
                 await SavedProfilesModel.deleteOne({
-                    cognitoUserId: cognitoUserId,
-                    cognitoUserIdSave: cognitoUserIdSave,
+                    cognitoUserId: cognitoUserId.trim(),
+                    cognitoUserIdSave: cognitoUserIdSave.trim(),
                 });
 
                 return res.status(200).json({
@@ -1338,14 +1459,19 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserId = decoded.username;
-        console.log("cognitoUserId",cognitoUserId);
+        
 
         const { offset } = req.body;
         const limit = parseInt(process.env.PAGINATION_LIMIT) || 10;
         const offsetstart = parseInt(offset) || 0;
 
         try {
-
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne({ cognitoUserId });
 
 
@@ -1459,14 +1585,20 @@ const profileController = {
     getUserProfile: async (req, res) => {
         const token = req.headers.authorization.split(' ')[1]; // Extract token
         const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify token
-        //console.log("decoded",decoded);
+        
         const cognitoUserIdMy = decoded.username; // Get user ID from token
 
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
+        
         const { cognitoUserId } = req.body;
-        //console.log("cognitoUserId",cognitoUserId);
+        
         try {
 
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy },
                 // { cognitoUserId: 0 } // Projection to exclude fields
@@ -1534,11 +1666,17 @@ const profileController = {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
 
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
+        
         const { cognitoUserId } = req.body;
-        //console.log("cognitoUserId",cognitoUserId);
+        
         try {
 
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy },
                 // { cognitoUserId: 0 } // Projection to exclude fields
@@ -1597,11 +1735,16 @@ const profileController = {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
 
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
+        
         const { cognitoUserId } = req.body;
-        //console.log("cognitoUserId",cognitoUserId);
+       
         try {
-
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy },
                 // { cognitoUserId: 0 } // Projection to exclude fields
@@ -1727,13 +1870,19 @@ const profileController = {
         const cognitoUserIdMy = decoded.username;
 
 
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
+        
         const { offset } = req.body;
         const limit = parseInt(process.env.PAGINATION_LIMIT) || 10;
         const offsetstart = parseInt(offset) || 0;
-        //console.log("cognitoUserId",cognitoUserId);
+        
         try {
 
+           if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            } 
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy },
                 // { cognitoUserId: 0 } // Projection to exclude fields
@@ -1805,14 +1954,19 @@ const profileController = {
         const cognitoUserIdMy = decoded.username;
 
 
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
+        
         const { requestId, notificationId, status } = req.body;
 
-        //console.log("cognitoUserId",cognitoUserId);
+        
         try {
-
+            if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             if (!requestId || !status) {
-                return res.status(200).json({
+                return res.json({
                     status: 0,
                     message: "All fields are required",
                 });
@@ -1830,9 +1984,9 @@ const profileController = {
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
 
-            // Check requestId valid
+            
             const checkRequest = await ConnectedUserModel.findOne({
-                _id: requestId,
+                _id: mongoose.Types.ObjectId(requestId),
                 cognitoUserIdSave: cognitoUserIdMy,
                 status: 0,
             });
@@ -1845,13 +1999,13 @@ const profileController = {
             }
 
             if (status == '1' || status == '2') {
-                const filter = { _id: requestId };
+                const filter = { _id: mongoose.Types.ObjectId(requestId) };
                 let update = {};
                 update.status = status;
                 const profile = await ConnectedUserModel.findOneAndUpdate(filter, { $set: update }, { new: true });
 
                 // notification table update
-                const filters = { _id: notificationId };
+                const filters = { _id: mongoose.Types.ObjectId(notificationId) };
                 // let updates = {}; 
                 // updates.isTakeAction = 1;
                 // await NotificationModel.findOneAndUpdate(filters, { $set: updates }, { new: true });
@@ -1950,13 +2104,19 @@ const profileController = {
 
 
 
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
+       
         const { offset } = req.body;
         const limit = parseInt(process.env.PAGINATION_LIMIT) || 10;
         const offsetstart = parseInt(offset) || 0;
-        //console.log("cognitoUserId",cognitoUserId);
+        
         try {
 
+            if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy },
                 // { cognitoUserId: 0 } // Projection to exclude fields
@@ -2095,13 +2255,19 @@ const profileController = {
 
 
 
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
+        
         const { offset } = req.body;
         const limit = parseInt(process.env.PAGINATION_LIMIT) || 10;
         const offsetstart = parseInt(offset) || 0;
-        //console.log("cognitoUserId",cognitoUserId);
+        
         try {
 
+            if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy },
                 // { cognitoUserId: 0 } // Projection to exclude fields
@@ -2210,13 +2376,19 @@ const profileController = {
 
 
 
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
+       
         const { offset } = req.body;
         const limit = parseInt(process.env.PAGINATION_LIMIT) || 10;
         const offsetstart = parseInt(offset) || 0;
-        //console.log("cognitoUserId",cognitoUserId);
+        
         try {
 
+            if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy },
                 // { cognitoUserId: 0 } // Projection to exclude fields
@@ -2331,16 +2503,19 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-        //const cognitoUserIdMy = "73c478e2-f091-703a-cdf3-d1ed55eafe90";
-
-
-        console.log("cognitoUserIdMy", cognitoUserIdMy);
+        
 
 
         const { cognitoUserId, message } = req.body;
-        //console.log("cognitoUserId",cognitoUserId);
+        
         try {
-
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
+            
             if (!cognitoUserId || !message) {
                 return res.status(200).json({
                     status: 0,
@@ -2490,16 +2665,18 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-        //const cognitoUserIdMy = "73c478e2-f091-703a-cdf3-d1ed55eafe90";
-
-
-        console.log("cognitoUserIdMy", cognitoUserIdMy);
+        
 
 
         const { messageId, message } = req.body;
-        //console.log("cognitoUserId",cognitoUserId);
+        
         try {
-
+            if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             if (!messageId || !message) {
                 return res.status(200).json({
                     status: 0,
@@ -2514,9 +2691,15 @@ const profileController = {
             //console.log("myProfile",myProfile);
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
+            if (!mongoose.Types.ObjectId.isValid(messageId)) {
+                return res.status(400).json({
+                    status: 0,
+                    message: "Invalid messageId format",
+                });
+            }
 
             const chatDetail = await ChatModel.findOne(
-                { _id: messageId },
+                { _id: mongoose.Types.ObjectId(messageId) },
             );
             if (!chatDetail) return res.json({ status: 0, message: "Invalid messageId" });
 
@@ -2532,7 +2715,7 @@ const profileController = {
                 message: message,
                 isEdit: 1,
             };
-            const filter = { _id: messageId};
+            const filter = { _id: mongoose.Types.ObjectId(messageId)};
             const connectedUpdated = await ChatModel.findOneAndUpdate(filter, { $set: update }, { new: true });
             
 
@@ -2573,13 +2756,19 @@ const profileController = {
 
 
 
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
+        
 
         const { cognitoUserId, offset } = req.body;
         const limit = parseInt(process.env.PAGINATION_LIMIT) || 10;
         const offsetstart = parseInt(offset) || 0;
-        //console.log("cognitoUserId",cognitoUserId);
+        
         try {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             if (!cognitoUserId) {
                 return res.status(200).json({
                     status: 0,
@@ -2715,12 +2904,18 @@ const profileController = {
 
 
 
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
+        
 
         const { cognitoUserId } = req.body;
 
-        //console.log("cognitoUserId",cognitoUserId);
+      
         try {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             if (!cognitoUserId) {
                 return res.status(200).json({
                     status: 0,
@@ -2868,12 +3063,18 @@ const profileController = {
 
 
 
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
+       
         const { search, filter, offset } = req.body;
 
-        //console.log("cognitoUserId",cognitoUserId);
+       
         try {
 
+            if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy }, // Query filter
                 {
@@ -3029,20 +3230,23 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-        //const cognitoUserIdMy = "73c478e2-f091-703a-cdf3-d1ed55eafe90"; 
-
-
-
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
         const { cognitoUserId, date } = req.body;
-
-        //console.log("cognitoUserId",cognitoUserId);
         try {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             if (!cognitoUserId || !date) {
                 return res.status(200).json({
                     status: 0,
                     message: "All fields are required",
                 });
+            }
+            // Validate date (YYYY-MM-DD)
+            if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date.trim())) {
+                return res.status(200).json({ status: 0, message: "Invalid date format (expected YYYY-MM-DD)" });
             }
 
             // Convert the input date string to a Date object
@@ -3267,20 +3471,42 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-        //const cognitoUserIdMy = "73c478e2-f091-703a-cdf3-d1ed55eafe90"; 
+        
 
 
 
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
         const { cognitoUserId, date, slot, personalNote, mode, meetingTitle } = req.body;
 
-        //console.log("cognitoUserId",cognitoUserId);
+     
         try {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             if (!cognitoUserId || !date || !slot || !mode || !meetingTitle) {
                 return res.status(200).json({
                     status: 0,
                     message: "All fields are required",
                 });
+            }
+            if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date.trim())) {
+                return res.status(200).json({ status: 0, message: "Invalid date format" });
+            }
+            
+            if (typeof slot !== 'string' || slot.trim() === '' || slot.length > 20) {
+                return res.status(200).json({ status: 0, message: "Invalid slot" });
+            }
+            const safeSlot = slot.replace(/[$.]/g, '').trim().substring(0, 100);
+            const allowedModes = ['videoCall', 'audioCall', 'inPerson'];
+            if (!allowedModes.includes(mode)) {
+                return res.status(200).json({ status: 0, message: "Invalid mode" });
+            }
+
+            // Validate meetingTitle (string, reasonable length)
+            if (typeof meetingTitle !== 'string' || meetingTitle.trim() === '' || meetingTitle.length > 200) {
+                return res.status(200).json({ status: 0, message: "Invalid meetingTitle" });
             }
 
             // Convert the input date string to a Date object
@@ -3379,7 +3605,7 @@ const profileController = {
                 cognitoUserIdMenter: cognitoUserId,
                 day: dayOfWeek,
                 date,
-                slot,
+                slot:safeSlot,
             });
 
             if (checkAlreadyBook) {
@@ -3559,24 +3785,64 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-        //const cognitoUserIdMy = "73c478e2-f091-703a-cdf3-d1ed55eafe90"; 
+       
 
 
 
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
+       
         const { meetingId, cognitoUserId, date, slot, personalNote, mode, meetingTitle } = req.body;
 
-        //console.log("cognitoUserId",cognitoUserId);
+        
         try {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             if (!meetingId || !cognitoUserId || !date || !slot || !mode || !meetingTitle) {
                 return res.status(200).json({
                     status: 0,
                     message: "All fields are required",
                 });
             }
+            // Validate date (YYYY-MM-DD)
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                return res.status(200).json({ status: 0, message: "Invalid date format (expected YYYY-MM-DD)" });
+            }
+            if (typeof slot !== 'string' || slot.trim() === '') {
+                return res.status(200).json({ status: 0, message: "Invalid slot" });
+            }
+            const safeSlot = slot.replace(/[$.]/g, '').trim().substring(0, 100);
+            const allowedModes = ['videoCall', 'audioCall', 'inPerson'];
+            if (!allowedModes.includes(mode)) {
+                return res.status(200).json({ status: 0, message: "Invalid mode" });
+            }
+
+            // Validate meetingTitle (string, reasonable length)
+            if (typeof meetingTitle !== 'string' || meetingTitle.trim() === '' || meetingTitle.length > 200) {
+                return res.status(200).json({ status: 0, message: "Invalid meetingTitle" });
+            }
+
+            let safePersonalNote = '';
+            if (typeof personalNote === 'string') {
+                safePersonalNote = personalNote.trim();
+                // Optionally enforce max length
+                if (safePersonalNote.length > 1000) {
+                    safePersonalNote = safePersonalNote.substring(0, 1000);
+                }
+            } else {
+                safePersonalNote = '';
+            }
+            if (!mongoose.Types.ObjectId.isValid(meetingId)) {
+                return res.status(400).json({
+                    status: 0,
+                    message: "Invalid meetingId format",
+                });
+            }
 
             let checkBooking = await BookMeetingsModel.findOne({
-                _id: meetingId
+                _id: mongoose.Types.ObjectId(meetingId)
             });
 
             if (!checkBooking) {
@@ -3679,7 +3945,7 @@ const profileController = {
                 cognitoUserIdMenter: cognitoUserId,
                 day: dayOfWeek,
                 date,
-                slot,
+                slot:safeSlot,
             });
 
             if (checkAlreadyBook) {
@@ -3700,21 +3966,21 @@ const profileController = {
             //     meetingTitle
             // });
             const slot24 = convertTo24hr(slot);
-            const filter = { _id: meetingId };
+            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
             let update = {
                 cognitoUserId: cognitoUserIdMy,
                 cognitoUserIdMenter: cognitoUserId,
                 day: dayOfWeek,
                 date,
-                slot,
-                personalNote,
+                slot:safeSlot,
+                personalNote:safePersonalNote,
                 mode,
                 meetingTitle,
                 slot24
             };
             const bookmeetingslot = await BookMeetingsModel.findOneAndUpdate(filter, { $set: update }, { new: true });
 
-            const filter1 = { requestId: meetingId };
+            const filter1 = { requestId: mongoose.Types.ObjectId(meetingId) };
             const deletedNotification = await NotificationModel.deleteMany(filter1);
 
             const checkAndUpdateInteraction = await interactedUserModel.findOneAndUpdate(
@@ -3853,24 +4119,29 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-        //const cognitoUserIdMy = "73c478e2-f091-703a-cdf3-d1ed55eafe90"; 
-
-
-
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
         const { meetingId, cognitoUserId } = req.body;
-
-        //console.log("cognitoUserId",cognitoUserId);
         try {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             if (!meetingId) {
                 return res.status(200).json({
                     status: 0,
                     message: "All fields are required",
                 });
             }
+            if (!mongoose.Types.ObjectId.isValid(meetingId)) {
+                return res.status(400).json({
+                    status: 0,
+                    message: "Invalid meetingId format",
+                });
+            }
 
             let checkBooking = await BookMeetingsModel.findOne({
-                _id: meetingId
+                _id: mongoose.Types.ObjectId(meetingId)
             });
 
             if (!checkBooking) {
@@ -3930,13 +4201,13 @@ const profileController = {
 
             if (!profile) return res.json({ status: 0, message: "Invalid cognitoUserId" });
 
-            const filter = { _id: meetingId };
+            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
             const deletedMeeting = await BookMeetingsModel.findByIdAndDelete(meetingId);
             if (!deletedMeeting) {
                 return res.json({ status: 0, message: "Meeting not found!" });
             }
 
-            const filter1 = { requestId: meetingId };
+            const filter1 = { requestId: mongoose.Types.ObjectId(meetingId) };
             const deletedNotification = await NotificationModel.deleteMany(filter1);
 
 
@@ -4024,16 +4295,21 @@ const profileController = {
     endMeeting: async (req, res) => {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const cognitoUserIdMy = decoded.username;
-        //const cognitoUserIdMy = "73c478e2-f091-703a-cdf3-d1ed55eafe90"; 
-
-
-
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
+        const cognitoUserIdMy = decoded.username; 
         const { cognitoUserId, meetingId } = req.body;
-
-        //console.log("cognitoUserId",cognitoUserId);
         try {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
+            if (!mongoose.Types.ObjectId.isValid(meetingId)) {
+                return res.status(400).json({
+                    status: 0,
+                    message: "Invalid meetingId format",
+                });
+            }
             if (!cognitoUserId || !meetingId) {
                 return res.status(200).json({
                     status: 0,
@@ -4088,7 +4364,7 @@ const profileController = {
             if (!profile) return res.json({ status: 0, message: "Invalid cognitoUserId" });
 
             let checkBooking = await BookMeetingsModel.findOne({
-                _id: meetingId
+                _id: mongoose.Types.ObjectId(meetingId)
             });
 
             if (!checkBooking) {
@@ -4103,8 +4379,14 @@ const profileController = {
                     message: "Already end meeting",
                 });
             }
-
-            const filter = { _id: meetingId };
+            if (!mongoose.Types.ObjectId.isValid(meetingId)) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Invalid meetingId format",
+                });
+            }
+            
+            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
             let update = {};
             update.status = 2;
             const updateBooking = await BookMeetingsModel.findOneAndUpdate(filter, { $set: update }, { new: true });
@@ -4214,15 +4496,14 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-        //const cognitoUserIdMy = "73c478e2-f091-703a-cdf3-d1ed55eafe90"; 
-
-
-
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
         const { cognitoUserId, meetingId, rating, feedback } = req.body;
-
-        //console.log("cognitoUserId",cognitoUserId);
         try {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             if (!cognitoUserId || !rating) {
                 return res.status(200).json({
                     status: 0,
@@ -4275,9 +4556,15 @@ const profileController = {
             //         message: "Only Mentee can gave feedback",
             //     });
             // }
+            if (!mongoose.Types.ObjectId.isValid(meetingId)) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Invalid meetingId format",
+                });
+            }
 
             let checkMeetingExists = await BookMeetingsModel.findOne({
-                _id: meetingId,
+                _id: mongoose.Types.ObjectId(meetingId),
             });
 
             if (!checkMeetingExists) {
@@ -4339,7 +4626,14 @@ const profileController = {
         
         try {
            
-            const { cognitoUserId, offset = 0, limit = 10 } = req.body; // Default offset = 0, limit = 10
+            const { cognitoUserId, offset = 0, limit = 10 } = req.body; 
+
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const parsedOffset = parseInt(offset);
             const parsedLimit = parseInt(limit);
 
@@ -4393,6 +4687,12 @@ const profileController = {
 
         //console.log("cognitoUserId",cognitoUserId);
         try {
+            if (typeof cognitoUserId1 !== 'string' || cognitoUserId1.trim() === '' || typeof cognitoUserId2 !== 'string' || cognitoUserId2.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             if (!cognitoUserId1 || !cognitoUserId2) {
                 return res.status(200).json({
                     status: 0,
@@ -4439,17 +4739,16 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-
-
-
-
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
         const { offset } = req.body;
         const limit = parseInt(process.env.PAGINATION_LIMIT) || 10;
         const offsetstart = parseInt(offset) || 0;
-
-        //console.log("cognitoUserId",cognitoUserId);
         try {
+            if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
 
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy }, // Query filter
@@ -4562,18 +4861,16 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-
-
-
-
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
         const { offset } = req.body;
         const limit = parseInt(process.env.PAGINATION_LIMIT) || 10;
         const offsetstart = parseInt(offset) || 0;
-
-        //console.log("cognitoUserId",cognitoUserId);
         try {
-
+            if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy }, // Query filter
                 {
@@ -4707,16 +5004,14 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-
-
-
-
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
         const { meetingId } = req.body;
-
-        //console.log("cognitoUserId",cognitoUserId);
         try {
-
+            if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy }, // Query filter
                 {
@@ -4731,8 +5026,15 @@ const profileController = {
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
 
+            if (!mongoose.Types.ObjectId.isValid(meetingId)) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Invalid meetingId format",
+                });
+            }
+
             let checkMeetingExists = await BookMeetingsModel.findOne({
-                _id: meetingId,
+                _id: mongoose.Types.ObjectId(meetingId),
             });
 
             if (!checkMeetingExists) {
@@ -4744,8 +5046,8 @@ const profileController = {
 
             const checkMeetingValid = await BookMeetingsModel.find({
                 $or: [
-                    { cognitoUserId: cognitoUserIdMy, _id: meetingId },
-                    { cognitoUserIdMenter: cognitoUserIdMy, _id: meetingId }
+                    { cognitoUserId: cognitoUserIdMy, _id: mongoose.Types.ObjectId(meetingId) },
+                    { cognitoUserIdMenter: cognitoUserIdMy, _id: mongoose.Types.ObjectId(meetingId) }
                 ]
             })
 
@@ -4783,16 +5085,16 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-        //const cognitoUserIdMy = "a3f458d2-10a1-70cc-d6e3-0550a9c75624";
-
-
-
-
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
         const { type, message } = req.body;
 
 
         try {
+            if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             if (!type) return res.json({ status: 0, message: "Type required" });
             if (!message) return res.json({ status: 0, message: "Message required" });
 
@@ -4891,15 +5193,14 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-
-
-
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
         const { cognitoUserId } = req.body;
-
-        //console.log("cognitoUserId",cognitoUserId);
         try {
-
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy },
                 // { cognitoUserId: 0 } // Projection to exclude fields
@@ -4969,15 +5270,16 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-
-
-
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
         const { cognitoUserId } = req.body;
 
         //console.log("cognitoUserId",cognitoUserId);
         try {
-
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy },
                 // { cognitoUserId: 0 } // Projection to exclude fields
@@ -5032,19 +5334,16 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
-
-
-
-
-        //console.log("cognitoUserIdMy",cognitoUserIdMy);
         const { offset } = req.body;
         const limit = parseInt(process.env.PAGINATION_LIMIT) || 10;
         const offsetstart = parseInt(offset) || 0;
-
-        //console.log("cognitoUserId",cognitoUserId);
         try {
-
+            if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
             const myProfile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserIdMy }, // Query filter
                 {
@@ -5202,8 +5501,6 @@ const profileController = {
         const { offset } = req.body;
         const limit = parseInt(process.env.PAGINATION_LIMIT) || 10;
         const offsetstart = parseInt(offset) || 0;
-
-        //console.log("cognitoUserId",cognitoUserId);
         try {
             const interestsList = await InterestsModel.find({})
                 .sort({ updatedAt: -1, })
@@ -5229,8 +5526,6 @@ const profileController = {
         const { offset } = req.body;
         const limit = parseInt(process.env.PAGINATION_LIMIT) || 10;
         const offsetstart = parseInt(offset) || 0;
-
-        //console.log("cognitoUserId",cognitoUserId);
         try {
             const IndustriesList = await IndustryModel.find({})
                 .sort({ updatedAt: -1, })

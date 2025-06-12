@@ -53,14 +53,12 @@ const ManageAvailability = ({navigation}) => {
   const [showSlotModal, setShowSlotModal] = useState(false);
   const [selectDayToDelete, setSelectDayToDelete] = useState({});
   const [selectDayToDeleteSlot, setSelectDayToDeleteSlot] = useState({});
-  // console.log('selectDayToDeleteSlot', selectDayToDeleteSlot);
   const minuteRef = useRef({});
   const dateRef = useRef({});
   const [date, setDate] = useState('');
   const [selectedDays, setSelectedDays] = useState([]);
   const [isSelectDate, setIsSelectDate] = useState([]);
   const [selectedDates, setSelectedDates] = useState([]);
-  console.log('isSelectDates=>>>>', selectedDates);
 
   const [open, setOpen] = useState(false);
   const [slots, setSlots] = useState(
@@ -717,8 +715,6 @@ const ManageAvailability = ({navigation}) => {
     };
   };
 
-  console.log('myAvailability', JSON.stringify(myAvailability));
-
   const add_availability_hit = () => {
     const daysInput = {
       slots: selectedDays,
@@ -736,50 +732,16 @@ const ManageAvailability = ({navigation}) => {
       })),
     };
 
-    // console.log('cleanedWeekDaysData15', JSON.stringify(cleanedWeekDaysData));
-
     const cleanedDateData = {
       ...datesInput,
       slots: datesInput?.slots?.map(day => ({
         ...day,
-        slot: day.slot.filter(item => item !== null),
+        slot: day?.slot?.filter(item => item !== null),
       })),
     };
-    // console.log('cleanedDateData12', JSON.stringify(cleanedDateData));
 
-    // if (select?.title === 'Days') {
-    //   if (selectedDays?.length > 0) {
-    //     console.log('cleanedWeekDaysDatsas', cleanedWeekDaysData);
-
-    //     dispatch(add_Availability(cleanedWeekDaysData)).then(res => {
-    //       if (add_Availability.fulfilled.match(res)) {
-    //         const modifiedData = cleanedWeekDaysData?.slots.forEach(
-    //           slotItem => {
-    //             slotItem.slot.forEach(timeItem => {
-    //               timeItem._id = 1;
-    //             });
-    //           },
-    //         );
-    //         console.log(
-    //           'cleanedWeekDaysData0',
-    //           JSON.stringify(cleanedWeekDaysData),
-    //         );
-
-    //         console.log('modifiedDatamodifiedData', modifiedData);
-
-    //         const updatedData = mergeData(myAvailability, cleanedWeekDaysData);
-    //         setMyAvailability(updatedData);
-    //         setSelectedDays([]);
-    //       }
-    //     });
-    //   } else {
-    //     showToast(0, 'Fill slots before adding a new availability.');
-    //   }
-    // }
     if (select?.title === 'Days') {
       if (selectedDays?.length > 0) {
-        console.log('cleanedWeekDaysData', cleanedWeekDaysData);
-
         // Check for undefined slots
         const hasUndefinedSlots = cleanedWeekDaysData?.slots?.some(
           day => day.slot === undefined,
@@ -801,11 +763,6 @@ const ManageAvailability = ({navigation}) => {
               });
             });
 
-            console.log(
-              'cleanedWeekDaysData',
-              JSON.stringify(cleanedWeekDaysData),
-            );
-
             const updatedData = mergeData(myAvailability, cleanedWeekDaysData);
             setMyAvailability(updatedData);
             setSelectedDays([]);
@@ -816,6 +773,18 @@ const ManageAvailability = ({navigation}) => {
       }
     } else {
       if (isSelectDate?.length > 0) {
+        const hasUndefinedSlots = cleanedDateData?.slots?.some(
+          day => day.slot === undefined,
+        );
+
+        if (hasUndefinedSlots) {
+          showToast(
+            0,
+            'One or more days have undefined slot data. Please fill all slots.',
+          );
+          return;
+        }
+
         dispatch(add_Availability(cleanedDateData)).then(res => {
           if (add_Availability.fulfilled.match(res)) {
             const modifiedData = cleanedDateData?.slots.forEach(slotItem => {
@@ -823,9 +792,6 @@ const ManageAvailability = ({navigation}) => {
                 timeItem._id = 1;
               });
             });
-            console.log('cleanedDateData0', JSON.stringify(cleanedDateData));
-
-            console.log('modifiedDatamodifiedData', modifiedData);
             const updatedData = mergeData(myAvailability, cleanedDateData);
             setMyAvailability(updatedData);
             setIsSelectDate([]);
@@ -873,16 +839,12 @@ const ManageAvailability = ({navigation}) => {
       name: i?.week,
       slottime: time,
     };
-    // console.log('console0111', i, index, slotIndex);
     const getDate = myAvailability?.slots?.find(slot => slot?.name === i?.name);
-    // console.log('getDategetDate', getDate);
-
     const findDateSlot = getDate ? getDate?.slot[slotIndex]?.time : null;
     const dateInput = {
       name: i?.name,
       slottime: findDateSlot,
     };
-    // console.log('dateInput123', dateInput);
 
     if (select?.title === 'Days') {
       dispatch(delete_Availability_forSlots(input)).then(res => {
@@ -1234,7 +1196,6 @@ const ManageAvailability = ({navigation}) => {
                                     const time = getWeekDay
                                       ? getWeekDay.slot[slotIndex]
                                       : null;
-                                    console.log('123445', time);
 
                                     // Return true or false based on your logic
                                     return time?._id ? true : false; // Replace with your condition
@@ -1269,7 +1230,57 @@ const ManageAvailability = ({navigation}) => {
 
                           <TouchableOpacity
                             onPress={() => {
-                              if (selectedDays?.length > 0) {
+                              const checkTimeSlotExists = (
+                                data,
+                                targetDateOrDay,
+                                targetTime,
+                              ) => {
+                                // Step 1: Validate time fields
+                                if (
+                                  !targetTime.hour ||
+                                  !targetTime.minute ||
+                                  !targetTime.format
+                                ) {
+                                  console.warn(
+                                    '⚠️ Invalid time: Missing hour, minute, or format.',
+                                  );
+                                  return false;
+                                }
+
+                                // Step 2: Create formatted time string like "08:08 AM"
+                                const formattedTime = `${targetTime.hour.padStart(
+                                  2,
+                                  '0',
+                                )}:${targetTime.minute.padStart(
+                                  2,
+                                  '0',
+                                )} ${targetTime.format.toUpperCase()}`;
+
+                                // Step 3: Find the matching slot (could be either date or day)
+                                const slotEntry = data.slots.find(
+                                  slot =>
+                                    (slot.type === 'date' &&
+                                      slot.name === targetDateOrDay) ||
+                                    (slot.type === 'day' &&
+                                      slot.name.toLowerCase() ===
+                                        targetDateOrDay.toLowerCase()),
+                                );
+
+                                if (!slotEntry) return false;
+
+                                // Step 4: Check if time exists
+                                return slotEntry.slot.some(
+                                  s => s.time === formattedTime,
+                                );
+                              };
+
+                              const exists = checkTimeSlotExists(
+                                myAvailability,
+                                i?.week,
+                                slot,
+                              );
+
+                              if (!exists) {
                                 const updatedSelectedDates = [...selectedDays];
 
                                 // Find the corresponding day entry and remove the slot at slotIndex
@@ -1305,36 +1316,6 @@ const ManageAvailability = ({navigation}) => {
                                   setShowSlotModal(true);
                                 }, 300);
                               }
-
-                              // const updatedSelectedDates = [...selectedDays];
-
-                              // // Find the corresponding day entry and remove the slot at slotIndex
-                              // if (
-                              //   updatedSelectedDates[index] &&
-                              //   updatedSelectedDates[index].slot
-                              // ) {
-                              //   updatedSelectedDates[index].slot =
-                              //     updatedSelectedDates[index].slot.filter(
-                              //       (_, idx) => idx !== slotIndex,
-                              //     );
-                              // }
-
-                              // // Update the selectedDates state with the modified array
-                              // setSelectedDays(updatedSelectedDates);
-
-                              // // Optionally, update the slots if you're also modifying the slots state
-                              // const updatedSlots = [...slots];
-                              // if (
-                              //   updatedSlots[index] &&
-                              //   updatedSlots[index].slot
-                              // ) {
-                              //   updatedSlots[index].slot = updatedSlots[
-                              //     index
-                              //   ].slot.filter((_, idx) => idx !== slotIndex);
-                              // }
-                              // updatedSlots[index].splice(slotIndex, 1);
-
-                              // setSlots(updatedSlots);
                             }}
                             style={styles.trashView}>
                             <Image
@@ -1445,15 +1426,6 @@ const ManageAvailability = ({navigation}) => {
                             )
                               ? prevSelectedDays // If it exists, keep the original array
                               : [...prevSelectedDays, item];
-                            // return prevSelectedDays.map(item =>
-                            //   item.name === i?.week
-                            //     ? {name: i?.week, status: 1, type: 'day'}
-                            //     : item,
-                            // );
-
-                            // return prevSelectedDays.filter(
-                            //   item => item.name !== i?.week,
-                            // );
                           } else {
                             // Otherwise, add it to the selected list
                             return [
@@ -1574,7 +1546,6 @@ const ManageAvailability = ({navigation}) => {
                                 const time = getWeekDay
                                   ? getWeekDay.slot[slotIndex]
                                   : null;
-                                console.log('123445', time);
 
                                 // Return true or false based on your logic
                                 return time?._id ? true : false; // Replace with your condition
@@ -1609,7 +1580,57 @@ const ManageAvailability = ({navigation}) => {
 
                       <TouchableOpacity
                         onPress={() => {
-                          if (isSelectDate?.length > 0) {
+                          const checkTimeSlotExists = (
+                            data,
+                            targetDateOrDay,
+                            targetTime,
+                          ) => {
+                            // Step 1: Validate time fields
+                            if (
+                              !targetTime.hour ||
+                              !targetTime.minute ||
+                              !targetTime.format
+                            ) {
+                              console.warn(
+                                '⚠️ Invalid time: Missing hour, minute, or format.',
+                              );
+                              return false;
+                            }
+
+                            // Step 2: Create formatted time string like "08:08 AM"
+                            const formattedTime = `${targetTime.hour.padStart(
+                              2,
+                              '0',
+                            )}:${targetTime.minute.padStart(
+                              2,
+                              '0',
+                            )} ${targetTime.format.toUpperCase()}`;
+
+                            // Step 3: Find the matching slot (could be either date or day)
+                            const slotEntry = data.slots.find(
+                              slot =>
+                                (slot.type === 'date' &&
+                                  slot.name === targetDateOrDay) ||
+                                (slot.type === 'day' &&
+                                  slot.name.toLowerCase() ===
+                                    targetDateOrDay.toLowerCase()),
+                            );
+
+                            if (!slotEntry) return false;
+
+                            // Step 4: Check if time exists
+                            return slotEntry.slot.some(
+                              s => s.time === formattedTime,
+                            );
+                          };
+
+                          const exists = checkTimeSlotExists(
+                            myAvailability,
+                            i?.name,
+                            slot,
+                          );
+
+                          if (!exists) {
                             const updatedSelectedDates = [...selectedDates];
                             // Find the corresponding day entry and remove the slot at slotIndex
                             if (
@@ -1653,29 +1674,6 @@ const ManageAvailability = ({navigation}) => {
                               setShowSlotModal(true);
                             }, 300);
                           }
-
-                          // const updatedSelectedDates = [...selectedDates];
-                          // // Find the corresponding day entry and remove the slot at slotIndex
-                          // if (
-                          //   updatedSelectedDates[index] &&
-                          //   updatedSelectedDates[index].slot
-                          // ) {
-                          //   updatedSelectedDates[index].slot =
-                          //     updatedSelectedDates[index].slot.filter(
-                          //       (_, idx) => idx !== slotIndex,
-                          //     );
-                          // }
-                          // // Update the selectedDates state with the modified array
-                          // setSelectedDates(updatedSelectedDates);
-                          // // Optionally, update the slots if you're also modifying the slots state
-                          // const updatedSlots = [...timeSlots];
-                          // if (updatedSlots[index] && updatedSlots[index].slot) {
-                          //   updatedSlots[index].slot = updatedSlots[
-                          //     index
-                          //   ].slot.filter((_, idx) => idx !== slotIndex);
-                          // }
-                          // updatedSlots[index].splice(slotIndex, 1);
-                          // setTimeSlots(updatedSlots);
                         }}
                         style={styles.trashView}>
                         <Image
@@ -1687,10 +1685,18 @@ const ManageAvailability = ({navigation}) => {
                   ))}
                   <TouchableOpacity
                     onPress={() => {
-                      setSelectDayToDelete(i, index);
-                      setTimeout(() => {
-                        setShowModal(true);
-                      }, 300);
+                      if (i?.status === 1) {
+                        setSelectDayToDelete(i, index);
+                        setTimeout(() => {
+                          setShowModal(true);
+                        }, 300);
+                      } else {
+                        setIsSelectDate([]);
+                        setTimeSlots([]);
+                        setDateArray(
+                          dateArray.filter(item => item?.status !== 0),
+                        );
+                      }
                     }}
                     activeOpacity={0.7}
                     style={{
@@ -1730,14 +1736,7 @@ const ManageAvailability = ({navigation}) => {
           {select?.title === 'Date' && (
             <TouchableOpacity
               disabled={selectedDates?.length < 0}
-              // onPress={add_availability_hit}
               onPress={() => {
-                // setDateArray([
-                //   {
-                //     id: 1,
-                //     name: getCurrentDate(new Date()),
-                //   },
-                // ]);
                 setOpen(true);
               }}
               style={styles.touchableButtonStyle}>
@@ -1916,6 +1915,7 @@ const ManageAvailability = ({navigation}) => {
               {
                 id: prev.length + 1,
                 name: getCurrentDate(date),
+                status: 0,
               },
             ]);
             setSelectedDates(prevSelectedDays => {

@@ -42,10 +42,10 @@ const App = () => {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <SafeAreaProvider>
-          {/* <StatusBar
+          <StatusBar
             backgroundColor={colors.offWhite}
             barStyle="dark-content"
-          /> */}
+          />
           <AppNavigation />
         </SafeAreaProvider>
       </PersistGate>

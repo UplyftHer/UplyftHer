@@ -7,6 +7,7 @@ const DomainModel = require('../models/admin/DomainManagerModel');
 const AdminInvitationCode = require('../models/admin/AdminInvitationCode');
 const CountriesCities= require("../utils/countriescities.json");
 const OrganizationsModel = require('../models/OrganizationsModel.js');
+const validator = require('validator');
 
 AWS.config.update({
     region: process.env.S3_REGION, // Set your AWS region
@@ -69,6 +70,9 @@ async function uploadLinkedInProfilePic(linkedinProfilePicUrl) {
         const fileName = `LinkedIn_${currentDate}.jpg`; // Use LinkedIn as prefix for clarity
         const tempFilePath = path.join(__dirname, '../Uploads/Images', fileName);
 
+        // Ensure the folder exists
+        fs.mkdirSync(path.dirname(tempFilePath), { recursive: true });
+
         // Save the image temporarily
         fs.writeFileSync(tempFilePath, response.data);
 
@@ -76,7 +80,9 @@ async function uploadLinkedInProfilePic(linkedinProfilePicUrl) {
         const imageUrl = await uploadToS3(tempFilePath);
 
         // Step 3: Clean up the temporary file
-        fs.unlinkSync(tempFilePath);
+        if (fs.existsSync(tempFilePath)) {
+            fs.unlinkSync(tempFilePath);
+        }
 
         return imageUrl; // Return the S3 URL
     } catch (error) {
@@ -119,25 +125,29 @@ const generateRandomString = (length = 12) => {
         throw new Error('Password length must be at least 8 characters.');
     }
 
-    // Ensure the password contains at least one of each required character type
-    let result = '';
-    result += upperCase[Math.floor(Math.random() * upperCase.length)];
-    result += lowerCase[Math.floor(Math.random() * lowerCase.length)];
-    result += numbers[Math.floor(Math.random() * numbers.length)];
-    result += specialCharacters[Math.floor(Math.random() * specialCharacters.length)];
+    const getRandomIndex = (max) => crypto.randomInt(0, max);
 
-    // Fill the remaining characters with a mix of all types
+    let result = '';
+    result += upperCase[getRandomIndex(upperCase.length)];
+    result += lowerCase[getRandomIndex(lowerCase.length)];
+    result += numbers[getRandomIndex(numbers.length)];
+    result += specialCharacters[getRandomIndex(specialCharacters.length)];
+
     const allCharacters = upperCase + lowerCase + numbers + specialCharacters;
+
     for (let i = result.length; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * allCharacters.length);
-        result += allCharacters[randomIndex];
+        result += allCharacters[getRandomIndex(allCharacters.length)];
     }
 
-    // Shuffle the result to ensure randomness
-    return result
+    // Secure shuffle
+    result = result
         .split('')
-        .sort(() => Math.random() - 0.5)
+        .map(value => ({ value, sort: crypto.randomInt(0, Number.MAX_SAFE_INTEGER) }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value)
         .join('');
+
+    return result;
 };
 
 
@@ -218,6 +228,18 @@ const authController = {
         email = email.toLowerCase();
         // Calculate the SECRET_HASH using the getSecretHash function
         //const secretHash = getSecretHash(email);
+        // Example validation
+        if (!validator.isEmail(email)) {
+            return res.json(
+                { status: 0, message: "Invalid email format." },
+            );
+        }
+
+        else if (typeof invitationCode !== 'string' || !/^[A-Za-z0-9]{12}$/.test(invitationCode)) {
+            return res.json(
+                { status: 0, message: "Invalid invitation code format." },
+            );
+        }
 
         const params = {
             ClientId: process.env.COGNITO_CLIENT_ID,
@@ -246,9 +268,10 @@ const authController = {
                 await cognito.adminDeleteUser(params).promise();
                 await UsersModel.deleteOne({ cognitoUserId:checkEmail.cognitoUserId });
             }
-            console.log(email,invitationCode);
+            
+           
             let checkAdminInvitationCode = await AdminInvitationCode.findOne({email,invitationCode});
-            console.log("checkAdminInvitationCode",checkAdminInvitationCode);
+           
             let adminInvitationCode = 0;
             if(checkAdminInvitationCode)
             {
@@ -566,7 +589,7 @@ const authController = {
             }
             if(type == "signup")
             {
-                if(!invitationCode)
+                if(typeof invitationCode !== 'string' || !/^[A-Za-z0-9]{12}$/.test(invitationCode))
                 {
                     return res.status(200).json({
                         status: 0,
@@ -637,7 +660,7 @@ const authController = {
                 }
                 else
                 {
-                    if(!invitationCode)
+                    if(typeof invitationCode !== 'string' || !/^[A-Za-z0-9]{12}$/.test(invitationCode))
                     {
                         return res.json({ status: 0, message: "We couldn't find an account associated with your credentials. Please create an account before proceeding." });
                     }

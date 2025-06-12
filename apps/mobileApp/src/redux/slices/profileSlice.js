@@ -344,7 +344,11 @@ export const change_user_password = createAsyncThunk(
         showToast(1, response?.data?.message);
         navigationContainerRef?.goBack();
       } else {
-        showToast(0, response?.data?.message);
+        showToast(
+          0,
+          response?.data?.message ||
+            'Something went wrong, please try again later.',
+        );
       }
       if (response?.data?.status !== 1) {
         return rejectWithValue(response?.data);
