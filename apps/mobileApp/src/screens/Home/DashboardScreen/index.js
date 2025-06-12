@@ -34,6 +34,7 @@ import {
 } from '../../../redux/slices/profileSlice';
 import {
   cancel_meeting,
+  end_meeting,
   get_upComing_meeting_list,
   join_meeting,
   setUpComingMeetingList,
@@ -299,15 +300,49 @@ const DashboardScreen = ({navigation, route}) => {
 
     dispatch(join_meeting(input)).then(res => {
       if (join_meeting.fulfilled.match(res)) {
-        Linking.openURL(
-          userData?.userType === 1
-            ? res?.payload?.start_url
-            : res?.payload?.join_url,
-        );
+        console.log('4564564', res.payload);
+
+        if (res.payload?.status === 1) {
+          const updatedData = upComingMeetingList?.map(item => {
+            if (item._id === i?._id) {
+              return {
+                ...item,
+                status: 1,
+              };
+            }
+            return item;
+          });
+
+          dispatch(setUpComingMeetingList(updatedData));
+          Linking.openURL(
+            userData?.userType === 1
+              ? res?.payload?.data?.start_url
+              : res?.payload?.data?.join_url,
+          );
+        }
       }
     });
   };
 
+  const endMeeting = i => {
+    console.log(i);
+
+    const input = {
+      meetingId: i?._id,
+      cognitoUserId: i?.userdetail?.cognitoUserId,
+    };
+    console.log(input);
+    const filteredData = upComingMeetingList.filter(
+      item => item?._id !== i?._id,
+    );
+    dispatch(end_meeting(input)).then(res => {
+      if (end_meeting.fulfilled.match(res)) {
+        if (res.payload?.status === 1) {
+          dispatch(setUpComingMeetingList(filteredData));
+        }
+      }
+    });
+  };
   const edit_user_profile_hit = () => {
     const api_credential = {
       fullName: userData?.fullName,
@@ -379,6 +414,9 @@ const DashboardScreen = ({navigation, route}) => {
                   <ProfileCard
                     meetingOnPress={() => {
                       joinMeeting(upComingMeetingList[0]);
+                    }}
+                    endMeetingOnPress={() => {
+                      endMeeting(upComingMeetingList[0]);
                     }}
                     firstName={
                       upComingMeetingList[0]?.userdetail?.fullName.split(' ')[0]

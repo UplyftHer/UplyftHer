@@ -16,6 +16,7 @@ import {
 } from '../../../../redux/store/storeUtils';
 import {
   cancel_meeting,
+  end_meeting,
   join_meeting,
   setUpComingMeetingList,
 } from '../../../../redux/slices/bookMeetingSlice';
@@ -128,11 +129,42 @@ const UpComingMeetings = ({navigation}) => {
     dispatch(join_meeting(input)).then(res => {
       if (join_meeting.fulfilled.match(res)) {
         // if(res?.payload?.)
-        Linking.openURL(
-          userData?.userType === 1
-            ? res?.payload?.start_url
-            : res?.payload?.join_url,
-        );
+        if (res.payload?.status === 1) {
+          const updatedData = data?.map(item => {
+            if (item._id === i?._id) {
+              return {
+                ...item,
+                status: 1,
+              };
+            }
+            return item;
+          });
+
+          setData(updatedData);
+          Linking.openURL(
+            userData?.userType === 1
+              ? res?.payload?.data?.start_url
+              : res?.payload?.data?.join_url,
+          );
+        }
+      }
+    });
+  };
+
+  const endMeeting = i => {
+    console.log(i);
+
+    const input = {
+      meetingId: i?._id,
+      cognitoUserId: i?.userdetail?.cognitoUserId,
+    };
+    console.log(input);
+    const filteredData = data.filter(item => item?._id !== i?._id);
+    dispatch(end_meeting(input)).then(res => {
+      if (end_meeting.fulfilled.match(res)) {
+        if (res.payload?.status === 1) {
+          setData(filteredData);
+        }
       }
     });
   };
@@ -166,6 +198,9 @@ const UpComingMeetings = ({navigation}) => {
                 <ProfileCard
                   meetingOnPress={() => {
                     joinMeeting(item);
+                  }}
+                  endMeetingOnPress={() => {
+                    endMeeting(item);
                   }}
                   item={item}
                   firstName={item?.userdetail?.fullName?.split(' ')[0]}

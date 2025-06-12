@@ -113,12 +113,12 @@ export const styles = StyleSheet.create({
   dayView: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: scaledValue(10),
+    marginBottom: scaledValue(8),
   },
   timeView: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: scaledValue(10),
+    marginBottom: scaledValue(8),
   },
   modeView: {
     flexDirection: 'row',

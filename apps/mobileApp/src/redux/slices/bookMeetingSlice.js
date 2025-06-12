@@ -254,7 +254,36 @@ export const join_meeting = createAsyncThunk(
         return rejectWithValue(response?.data);
       }
 
-      return response?.data?.data;
+      return response?.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error);
+    }
+  },
+);
+
+export const end_meeting = createAsyncThunk(
+  '/api/profile/endMeeting',
+  async (credentials, {rejectWithValue, dispatch}) => {
+    try {
+      dispatch(setLoading(true));
+      const response = await API({
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        route: `profile/endMeeting`,
+        body: credentials,
+        method: 'POST',
+      });
+      dispatch(setLoading(false));
+      console.log('endMeeting=>>', JSON.stringify(response?.data));
+      console.log('endMeetings=>>', JSON.stringify(response?.status));
+      showToast(response?.data?.status, response?.data?.message);
+      if (response?.data?.status !== 1) {
+        return rejectWithValue(response?.data);
+      }
+
+      return response?.data;
     } catch (error) {
       console.log(error);
       return rejectWithValue(error);

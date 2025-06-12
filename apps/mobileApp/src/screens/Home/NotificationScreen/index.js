@@ -77,18 +77,46 @@ const NotificationScreen = ({navigation}) => {
 
   const renderItem = ({item}) => (
     <TouchableOpacity
-      disabled={item?.isTakeAction !== 1 || item?.type === 'meeting'}
+      // disabled={item?.isTakeAction !== 1 || item?.type === 'meeting'}
       onPress={() => {
-        if (item?.startConversation?.includes(userData?.cognitoUserId)) {
-          navigation.navigate('Inbox');
-        } else {
-          navigation.navigate('MatchScreen', {
-            itemData: item?.fromUserDetail,
-            screen: 'Notification',
-            requestId: item?.requestId,
-            setData,
-          });
-        }
+        console.log(item);
+        navigation.navigate('StackScreens', {
+          screen: 'ReviewAndFeedback',
+          params: {
+            meetingData: item,
+            pastMeetingData: [],
+            setPastMeetingData: {},
+          },
+        });
+        // navigation?.navigate('StackScreens', {
+        //   screen: 'BookMeeting',
+        //   params: {
+        //     otherUserData: item?.fromUserDetail,
+        //     mentorData: item?.fromUserDetail,
+        //     meetingData: {},
+        //   },
+        // });
+        // if (item?.startConversation?.includes(userData?.cognitoUserId)) {
+        //   navigation.navigate('Inbox');
+        //  } else if (item?.type === 'availability')
+        // {
+        //   navigation?.navigate('StackScreens', {
+        //     screen: 'BookMeeting',
+        //     params: {
+        //       otherUserData: otherUserData,
+        //       mentorData: extraData,
+        //       meetingData: {},
+        //     },
+        //   });
+        // }
+        // else {
+        //   navigation.navigate('MatchScreen', {
+        //     itemData: item?.fromUserDetail,
+        //     screen: 'Notification',
+        //     requestId: item?.requestId,
+        //     setData,
+        //   });
+        // }
       }}
       style={styles.newFlatlist}>
       <View style={styles.ImageView}>
