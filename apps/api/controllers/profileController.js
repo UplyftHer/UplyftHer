@@ -522,7 +522,11 @@ const profileController = {
             if (typeof organizationName !== 'string' || organizationName.trim() === '') {
                 return res.json({ status: 0, message: "Invalid organizationName" });
             }
-            const filter = { cognitoUserId: decoded.username };
+            if (typeof decoded.username !== 'string' || /[$.]/.test(decoded.username)) {
+            return res.json({ status: 0, message: "Invalid user ID" });
+            }
+            const filter = { cognitoUserId: decoded.username.trim() };
+            //const filter = { cognitoUserId: decoded.username };
             const update = {
                 fullName: typeof fullName === 'string' ? fullName.trim() : '',
                 age: typeof age === 'string' && /^\d+$/.test(age.trim()) ? age.trim() : '', // only allow string with digits
@@ -542,6 +546,11 @@ const profileController = {
             if (req.files && req.files.profilePic) {
                 var currentDate = Date.now();
                 let photoFile = req.files.profilePic;
+
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/heif'];
+                if (!allowedTypes.includes(photoFile.mimetype)) {
+                    return res.json({ status: 0, message: "Invalid file type. Only JPG, PNG, or HEIC allowed." });
+                }
 
                 // Sanitize file name: take only basename and strip unsafe characters
                 let originalExt = path.extname(photoFile.name);
