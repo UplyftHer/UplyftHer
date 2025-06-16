@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
 const fs = require("fs");
 const TestimonialsModel = require('../../models/admin/TestimonialsModel');
+const path = require('path');
 
 // Initialize AWS Cognito Identity Provider
 AWS.config.update({

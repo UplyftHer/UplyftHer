@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
 const fs = require("fs");
 const SocialLinksModel = require('../../models/admin/SocialLinksModel'); 
+const path = require('path');
 
 AWS.config.update({
     region: process.env.S3_REGION, // Set your AWS region

@@ -41,6 +41,7 @@ router.post('/startConversation', authMiddleware, profileController.startConvers
 router.post('/getNewCoversations', authMiddleware, profileController.getNewCoversations);
 router.post('/getOldConversations', authMiddleware, profileController.getOldConversations);
 router.post('/sendMessage', authMiddleware, profileController.sendMessage);
+router.post('/readMessage', authMiddleware, profileController.readMessage);
 router.post('/editMessage', authMiddleware, profileController.editMessage);
 
 //meeting apis
