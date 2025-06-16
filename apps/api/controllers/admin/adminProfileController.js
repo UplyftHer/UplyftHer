@@ -7,6 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const AWS = require('aws-sdk');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
+const path = require('path');
 
 // Initialize AWS Cognito Identity Provider
 AWS.config.update({

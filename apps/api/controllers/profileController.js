@@ -22,6 +22,7 @@ const sendEmail = require('../utils/emailSender');
 const { FirebaseData, PushNotification } = require("../utils/firebase.js");
 
 
+const path = require('path');
 const AWS = require('aws-sdk');
 const jwt = require('jsonwebtoken');
 //const moment = require('moment');
@@ -2670,6 +2671,115 @@ const profileController = {
             return res.json({ status: 0, message: error.message });
         }
     },
+
+    readMessage: async (req, res) => {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const cognitoUserIdMy = decoded.username;
+        
+
+
+        const { cognitoUserId, chatId } = req.body;
+        
+        try {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
+            
+            if (!cognitoUserId || !chatId) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "All fields are required",
+                });
+            }
+            const myProfile = await UsersModel.findOne(
+                { cognitoUserId: cognitoUserIdMy },
+                // { cognitoUserId: 0 } // Projection to exclude fields
+            );
+
+            //console.log("myProfile",myProfile);
+
+            if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
+
+            const profile = await UsersModel.findOne(
+                { cognitoUserId: cognitoUserId },
+                // { cognitoUserId: 0 } // Projection to exclude fields
+            );
+            if (!profile) return res.json({ status: 0, message: "Invalid cognitoUserId" });
+
+            if (cognitoUserId === cognitoUserIdMy) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Both users are same",
+                });
+            }
+
+             if (!mongoose.Types.ObjectId.isValid(chatId)) {
+                return res.status(400).json({
+                    status: 0,
+                    message: "Invalid chatId format",
+                });
+            }
+
+            
+
+            
+
+            
+            const checkConnectedUser = await ConnectedUserModel.findOne({
+                $or: [
+                    { cognitoUserId: cognitoUserId, cognitoUserIdSave: cognitoUserIdMy, status: 1 },
+                    { cognitoUserId: cognitoUserIdMy, cognitoUserIdSave: cognitoUserId, status: 1 }
+                ]
+            })
+            if (!checkConnectedUser) return res.json({ status: 0, message: "Both users are not connected" });
+
+
+            const saveChat = await ChatModel.findOne({
+                _id: mongoose.Types.ObjectId(chatId),
+                fromId: cognitoUserId,
+                toId: cognitoUserIdMy,
+            });
+            if (!saveChat) return res.json({ status: 0, message: "Invalid chat" });
+
+
+            let update = {
+                isRead: 1,
+            };
+            const filter = {
+                _id: mongoose.Types.ObjectId(chatId)
+            };
+           
+            const chatUpdated = await ChatModel.findOneAndUpdate(filter, { $set: update }, { new: true });
+
+            // read message using socket
+            io.emit("readMessage", {
+                status: 1,
+                _id: chatId,
+                connectedId: checkConnectedUser._id,
+                sendercognitoUserId: cognitoUserIdMy,
+                receivercognitoUserId: cognitoUserId,
+                profilePic: myProfile.profilePic,
+                message: saveChat.message,
+                isEdit: 0,
+                updatedAt: saveChat.updatedAt
+            });
+
+            return res.status(200).json({
+                status: 1,
+                message: "Message read successfully",
+                data:saveChat
+            });
+
+        } catch (error) {
+            //res.status(500).json({ message: 'Error fetching profile', error });
+            return res.json({ status: 0, message: error.message });
+        }
+    },
+
     editMessage: async (req, res) => {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
