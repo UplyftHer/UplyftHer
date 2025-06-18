@@ -1993,7 +1993,7 @@ const profileController = {
                 });
             }
             // Validate requestId
-            if (!mongoose.Types.ObjectId.isValid(requestId)) {
+            if (!new mongoose.Types.ObjectId.isValid(requestId)) {
                 return res.status(200).json({
                     status: 0,
                     message: "Invalid requestId format",
@@ -2007,7 +2007,7 @@ const profileController = {
 
             
             const checkRequest = await ConnectedUserModel.findOne({
-                _id: mongoose.Types.ObjectId(requestId),
+                _id: new mongoose.Types.ObjectId(requestId),
                 cognitoUserIdSave: cognitoUserIdMy,
                 status: 0,
             });
@@ -2020,13 +2020,13 @@ const profileController = {
             }
 
             if (status == '1' || status == '2') {
-                const filter = { _id: mongoose.Types.ObjectId(requestId) };
+                const filter = { _id: new mongoose.Types.ObjectId(requestId) };
                 let update = {};
                 update.status = status;
                 const profile = await ConnectedUserModel.findOneAndUpdate(filter, { $set: update }, { new: true });
 
                 // notification table update
-                const filters = { _id: mongoose.Types.ObjectId(notificationId) };
+                const filters = { _id: new mongoose.Types.ObjectId(notificationId) };
                 // let updates = {}; 
                 // updates.isTakeAction = 1;
                 // await NotificationModel.findOneAndUpdate(filters, { $set: updates }, { new: true });
@@ -2837,7 +2837,7 @@ const profileController = {
 
 
             const saveChat = await ChatModel.findOne({
-                _id: mongoose.Types.ObjectId(chatId),
+                _id: new mongoose.Types.ObjectId(chatId),
                 fromId: cognitoUserId,
                 toId: cognitoUserIdMy,
             });
@@ -2848,7 +2848,7 @@ const profileController = {
                 isRead: 1,
             };
             const filter = {
-                _id: mongoose.Types.ObjectId(chatId)
+                _id: new mongoose.Types.ObjectId(chatId)
             };
            
             const chatUpdated = await ChatModel.findOneAndUpdate(filter, { $set: update }, { new: true });
@@ -2916,7 +2916,7 @@ const profileController = {
             }
 
             const chatDetail = await ChatModel.findOne(
-                { _id: mongoose.Types.ObjectId(messageId) },
+                { _id: new mongoose.Types.ObjectId(messageId) },
             );
             if (!chatDetail) return res.json({ status: 0, message: "Invalid messageId" });
 
@@ -2932,7 +2932,7 @@ const profileController = {
                 message: message,
                 isEdit: 1,
             };
-            const filter = { _id: mongoose.Types.ObjectId(messageId)};
+            const filter = { _id: new mongoose.Types.ObjectId(messageId)};
             const connectedUpdated = await ChatModel.findOneAndUpdate(filter, { $set: update }, { new: true });
             
 
@@ -4059,7 +4059,7 @@ const profileController = {
             }
 
             let checkBooking = await BookMeetingsModel.findOne({
-                _id: mongoose.Types.ObjectId(meetingId)
+                _id: new mongoose.Types.ObjectId(meetingId)
             });
 
             if (!checkBooking) {
@@ -4183,7 +4183,7 @@ const profileController = {
             //     meetingTitle
             // });
             const slot24 = convertTo24hr(slot);
-            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
+            const filter = { _id: new mongoose.Types.ObjectId(meetingId) };
             let update = {
                 cognitoUserId: cognitoUserIdMy,
                 cognitoUserIdMenter: cognitoUserId,
@@ -4197,7 +4197,7 @@ const profileController = {
             };
             const bookmeetingslot = await BookMeetingsModel.findOneAndUpdate(filter, { $set: update }, { new: true });
 
-            const filter1 = { requestId: mongoose.Types.ObjectId(meetingId) };
+            const filter1 = { requestId: new mongoose.Types.ObjectId(meetingId) };
             const deletedNotification = await NotificationModel.deleteMany(filter1);
 
             const checkAndUpdateInteraction = await interactedUserModel.findOneAndUpdate(
@@ -4358,7 +4358,7 @@ const profileController = {
             }
 
             let checkBooking = await BookMeetingsModel.findOne({
-                _id: mongoose.Types.ObjectId(meetingId)
+                _id: new mongoose.Types.ObjectId(meetingId)
             });
 
             if (!checkBooking) {
@@ -4418,13 +4418,13 @@ const profileController = {
 
             if (!profile) return res.json({ status: 0, message: "Invalid cognitoUserId" });
 
-            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
+            const filter = { _id: new mongoose.Types.ObjectId(meetingId) };
             const deletedMeeting = await BookMeetingsModel.findByIdAndDelete(meetingId);
             if (!deletedMeeting) {
                 return res.json({ status: 0, message: "Meeting not found!" });
             }
 
-            const filter1 = { requestId: mongoose.Types.ObjectId(meetingId) };
+            const filter1 = { requestId: new mongoose.Types.ObjectId(meetingId) };
             const deletedNotification = await NotificationModel.deleteMany(filter1);
 
 
@@ -4581,7 +4581,7 @@ const profileController = {
             if (!profile) return res.json({ status: 0, message: "Invalid cognitoUserId" });
 
             let checkBooking = await BookMeetingsModel.findOne({
-                _id: mongoose.Types.ObjectId(meetingId)
+                _id: new mongoose.Types.ObjectId(meetingId)
             });
 
             if (!checkBooking) {
@@ -4603,7 +4603,7 @@ const profileController = {
                 });
             }
             
-            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
+            const filter = { _id: new mongoose.Types.ObjectId(meetingId) };
             let update = {};
             update.status = 2;
             const updateBooking = await BookMeetingsModel.findOneAndUpdate(filter, { $set: update }, { new: true });
@@ -4781,7 +4781,7 @@ const profileController = {
             }
 
             let checkMeetingExists = await BookMeetingsModel.findOne({
-                _id: mongoose.Types.ObjectId(meetingId),
+                _id: new mongoose.Types.ObjectId(meetingId),
             });
 
             if (!checkMeetingExists) {
@@ -5251,7 +5251,7 @@ const profileController = {
             }
 
             let checkMeetingExists = await BookMeetingsModel.findOne({
-                _id: mongoose.Types.ObjectId(meetingId),
+                _id: new mongoose.Types.ObjectId(meetingId),
             });
 
             if (!checkMeetingExists) {
@@ -5263,8 +5263,8 @@ const profileController = {
 
             const checkMeetingValid = await BookMeetingsModel.find({
                 $or: [
-                    { cognitoUserId: cognitoUserIdMy, _id: mongoose.Types.ObjectId(meetingId) },
-                    { cognitoUserIdMenter: cognitoUserIdMy, _id: mongoose.Types.ObjectId(meetingId) }
+                    { cognitoUserId: cognitoUserIdMy, _id: new mongoose.Types.ObjectId(meetingId) },
+                    { cognitoUserIdMenter: cognitoUserIdMy, _id: new mongoose.Types.ObjectId(meetingId) }
                 ]
             })
 

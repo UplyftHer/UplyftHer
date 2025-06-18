@@ -145,8 +145,8 @@ const meetingController = {
 
             const checkMeetingExists = await BookMeetingsModel.findOne({
                 $or: [
-                    { _id: mongoose.Types.ObjectId(meetingId), date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserId, cognitoUserIdMenter: cognitoUserIdMy },
-                    { _id: mongoose.Types.ObjectId(meetingId), date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserIdMy, cognitoUserIdMenter: cognitoUserId },
+                    { _id: new mongoose.Types.ObjectId(meetingId), date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserId, cognitoUserIdMenter: cognitoUserIdMy },
+                    { _id: new mongoose.Types.ObjectId(meetingId), date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserIdMy, cognitoUserIdMenter: cognitoUserId },
                 ]
             })
             if (!checkMeetingExists) {
@@ -345,7 +345,7 @@ const meetingController = {
                 join_url:jsonResponse.join_url,
             }
 
-            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
+            const filter = { _id: new mongoose.Types.ObjectId(meetingId) };
             let update = {};
             update.status = 1;
             update.start_url = jsonResponse.start_url;
