@@ -139,10 +139,10 @@ const generateRandomString = (length = 12) => {
         result += allCharacters[getRandomIndex(allCharacters.length)];
     }
 
-    // Secure shuffle
+    // Secure shuffle with valid range
     result = result
         .split('')
-        .map(value => ({ value, sort: crypto.randomInt(0, Number.MAX_SAFE_INTEGER) }))
+        .map(value => ({ value, sort: crypto.randomInt(0, 1 << 24) })) // safe shuffle
         .sort((a, b) => a.sort - b.sort)
         .map(({ value }) => value)
         .join('');
