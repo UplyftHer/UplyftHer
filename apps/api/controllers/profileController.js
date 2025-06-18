@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 //const io = require("../server");
 const { io, connectedUsers } = require("../server");
+const crypto = require('crypto');
 const SavedProfilesModel = require('../models/SavedProfiles');
 const ConnectedUserModel = require('../models/ConnectedUserModel');
 const UnConnectedUserModel = require('../models/UnConnectedUserModel');
@@ -447,28 +448,37 @@ const profileController = {
         let interests = req.body.interests;
         let preference = req.body.preference;
 
-        // Remove any leading or trailing single quotes that may exist
-        if (interests.startsWith("'") && interests.endsWith("'")) {
-            interests = interests.slice(1, -1);
+        let parsedDataInterests = [];
+        if (Array.isArray(interests)) {
+            parsedDataInterests = interests;
+        } else if (typeof interests === 'string') {
+            // Remove leading/trailing single quotes if any (mobile sometimes wraps strings like: `'[...]'`)
+            interests = interests.trim();
+            if (interests.startsWith("'") && interests.endsWith("'")) {
+                interests = interests.slice(1, -1);
+            }
+            try {
+                parsedDataInterests = JSON.parse(interests);
+            } catch (e) {
+                console.error("Invalid interests JSON string");
+                parsedDataInterests = [];
+            }
         }
-        if (preference.startsWith("'") && preference.endsWith("'")) {
-            preference = preference.slice(1, -1);
-        }
-        let parsedDataInterests;
-        let parsedDataPreference;
-        try {
-            // Now parse the cleaned JSON string
-            parsedDataInterests = JSON.parse(interests);
-            //console.log("parsedData=>>>", parsedDataInterests);
-        } catch (error) {
-            //console.error("Error parsing interests:", error);
-        }
-        try {
-            // Now parse the cleaned JSON string
-            parsedDataPreference = JSON.parse(preference);
-            //console.log("parsedData=>>>parsedDataPreference", parsedDataPreference);
-        } catch (error) {
-            //console.error("Error parsing parsedDataPreference:", error);
+
+        let parsedDataPreference = [];
+        if (Array.isArray(preference)) {
+            parsedDataPreference = preference;
+        } else if (typeof preference === 'string') {
+            preference = preference.trim();
+            if (preference.startsWith("'") && preference.endsWith("'")) {
+                preference = preference.slice(1, -1);
+            }
+            try {
+                parsedDataPreference = JSON.parse(preference);
+            } catch (e) {
+                console.error("Invalid preference JSON string");
+                parsedDataPreference = [];
+            }
         }
 
         try {
