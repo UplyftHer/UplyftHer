@@ -3,6 +3,7 @@ const AWS = require('aws-sdk');
 const fs = require("fs");
 const TestimonialsModel = require('../../models/admin/TestimonialsModel');
 const path = require('path');
+const crypto = require('crypto');
 
 // Initialize AWS Cognito Identity Provider
 AWS.config.update({

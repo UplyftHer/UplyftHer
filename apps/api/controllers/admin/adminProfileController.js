@@ -8,6 +8,7 @@ const AWS = require('aws-sdk');
 const jwt = require('jsonwebtoken');
 const validator = require('validator');
 const path = require('path');
+const crypto = require('crypto');
 
 // Initialize AWS Cognito Identity Provider
 AWS.config.update({
