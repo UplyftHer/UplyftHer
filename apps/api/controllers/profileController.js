@@ -1993,7 +1993,7 @@ const profileController = {
                 });
             }
             // Validate requestId
-            if (!new mongoose.Types.ObjectId.isValid(requestId)) {
+            if (!mongoose.Types.ObjectId.isValid(requestId)) {
                 return res.status(200).json({
                     status: 0,
                     message: "Invalid requestId format",
