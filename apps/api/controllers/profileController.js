@@ -2739,6 +2739,94 @@ const profileController = {
                 updatedAt: saveChat.createdAt
             });
 
+            const connectedList = await ConnectedUserModel.find({
+                $or: [
+                    { cognitoUserId: cognitoUserIdMy, cognitoUserIdSave: cognitoUserId, status: 1 },
+                    { cognitoUserId: cognitoUserId, cognitoUserIdSave: cognitoUserIdMy, status: 1 }
+                ]
+            })
+            .sort({ updatedAt: -1 })
+            .lean();
+
+          
+
+            const recentMatchesList = await Promise.all(
+                connectedList.map(async (connect) => {
+                    let filters = {};
+                    let secondUser = "";
+                    if (connect.cognitoUserId == cognitoUserIdMy) {
+                        filters.cognitoUserId = connect.cognitoUserIdSave;
+                        secondUser = connect.cognitoUserIdSave;
+                    }
+                    else {
+                        filters.cognitoUserId = connect.cognitoUserId;
+                        secondUser = connect.cognitoUserId;
+                    }
+
+                    // single user detail
+                    const [connectUserDetail] = await UsersModel.aggregate([
+                        {
+                            $match: filters
+                        },
+                        {
+                            $project: {
+                                cognitoUserId: 1,
+                                email: 1,
+                                userType: 1,
+                                emailDomainVerified: 1,
+                                fullName: { $ifNull: ["$fullName", ""] },
+                                profilePic: { $ifNull: ["$profilePic", ""] }
+                            }
+                        }
+                    ]);
+
+                    // Check if user start chat
+
+                    const checkChat = await ChatModel.findOne({
+                        $or: [
+                            { fromId: cognitoUserIdMy, toId: secondUser, messageType: 0 },
+                            { toId: cognitoUserIdMy, fromId: secondUser, messageType: 0 },
+                        ]
+                        // $or: [
+                        //     { fromId: cognitoUserIdMy, toId: secondUser },
+                        //     { toId: cognitoUserIdMy, fromId: secondUser },
+                        // ]
+                    })
+                    .sort({ updatedAt: -1 });
+                    //console.log("checkChat",checkChat);
+
+                    const isChat = checkChat ? 1 : 0;
+                    let firstName = "";
+                    if (connectUserDetail.fullName) {
+                        firstName = connectUserDetail.fullName.split(' ')[0];
+                    }
+
+                    const lastMessage = checkChat ? checkChat.message : `${firstName} has accepted your connection request. Say hello 👋`;
+                    const lastMessagetime = checkChat ? checkChat.createdAt : connect.createdAt;
+                    const unreadCount = await ChatModel.countDocuments({
+                        isRead: 0,
+                        toId: cognitoUserId
+                    });
+
+
+                    return {
+                        ...connect,
+                        connectUserDetail,
+                        isChat,
+                        lastMessage,
+                        lastMessagetime,
+                        unreadCount
+                    };
+                })
+            );
+
+            console.log("recentMatchesList",recentMatchesList);
+            io.emit("acceptRequest", {
+                recentMatchesList
+            });
+
+            
+
             //pushnotification
             // if (Array.isArray(myProfile.deviceToken) && myProfile.deviceToken.length > 0)
             // {
