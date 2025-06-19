@@ -2848,7 +2848,9 @@ const profileController = {
                 isRead: 1,
             };
             const filter = {
-                _id: new mongoose.Types.ObjectId(chatId)
+                //_id: new mongoose.Types.ObjectId(chatId),
+                fromId: cognitoUserId,
+                toId: cognitoUserIdMy,
             };
            
             const chatUpdated = await ChatModel.findOneAndUpdate(filter, { $set: update }, { new: true });
