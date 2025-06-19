@@ -2853,7 +2853,8 @@ const profileController = {
                 toId: cognitoUserIdMy,
             };
            
-            const chatUpdated = await ChatModel.findOneAndUpdate(filter, { $set: update }, { new: true });
+            //const chatUpdated = await ChatModel.findOneAndUpdate(filter, { $set: update }, { new: true });
+            const chatUpdated = await ChatModel.updateMany(filter, { $set: update });
 
             // read message using socket
             io.emit("readMessage", {
