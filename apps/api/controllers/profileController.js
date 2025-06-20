@@ -2102,14 +2102,16 @@ const profileController = {
 
                     const recentMatchesList = await Promise.all(
                         connectedList.map(async (connect) => {
-                            let filters = {};
+                            let filters = {
+                                cognitoUserId:cognitoUserIdMy,
+                            };
                             let secondUser = "";
                             if (connect.cognitoUserId == cognitoUserIdMy) {
-                                filters.cognitoUserId = connect.cognitoUserIdSave;
+                                //filters.cognitoUserId = connect.cognitoUserIdSave;
                                 secondUser = connect.cognitoUserIdSave;
                             }
                             else {
-                                filters.cognitoUserId = connect.cognitoUserId;
+                                //filters.cognitoUserId = connect.cognitoUserId;
                                 secondUser = connect.cognitoUserId;
                             }
 
@@ -2752,14 +2754,16 @@ const profileController = {
 
             const recentMatchesList = await Promise.all(
                 connectedList.map(async (connect) => {
-                    let filters = {};
+                    let filters = {
+                        cognitoUserId:cognitoUserIdMy,
+                    };
                     let secondUser = "";
                     if (connect.cognitoUserId == cognitoUserIdMy) {
-                        filters.cognitoUserId = connect.cognitoUserIdSave;
+                        //filters.cognitoUserId = connect.cognitoUserIdSave;
                         secondUser = connect.cognitoUserIdSave;
                     }
                     else {
-                        filters.cognitoUserId = connect.cognitoUserId;
+                        //filters.cognitoUserId = connect.cognitoUserId;
                         secondUser = connect.cognitoUserId;
                     }
 
