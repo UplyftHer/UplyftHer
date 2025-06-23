@@ -2144,7 +2144,7 @@ const profileController = {
                                 //     { toId: cognitoUserIdMy, fromId: secondUser },
                                 // ]
                             })
-                            .sort({ updatedAt: -1 });
+                            .sort({ createdAt: -1 });
                             //console.log("checkChat",checkChat);
 
                             const isChat = checkChat ? 1 : 0;
@@ -2556,7 +2556,7 @@ const profileController = {
                         //     { toId: cognitoUserIdMy, fromId: secondUser },
                         // ]
                     })
-                        .sort({ updatedAt: -1 });
+                        .sort({ createdAt: -1 });
                     //console.log("checkChat",checkChat);
 
                     const isChat = checkChat ? 1 : 0;
@@ -2796,7 +2796,7 @@ const profileController = {
                         //     { toId: cognitoUserIdMy, fromId: secondUser },
                         // ]
                     })
-                    .sort({ updatedAt: -1 });
+                    .sort({ createdAt: -1 });
                     //console.log("checkChat",checkChat);
 
                     const isChat = checkChat ? 1 : 0;
