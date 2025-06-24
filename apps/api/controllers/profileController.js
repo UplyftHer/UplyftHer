@@ -283,7 +283,8 @@ const profileController = {
             return res.json({ status: 1, message: 'User deleted successfully' });
         } catch (error) {
             console.error('Delete user error:', error);
-            return res.json({ status: 0, message: error.message });
+            //return res.json({ status: 0, message: error.message });
+            return res.json({ status: 0, message: error.message || 'Something went wrong. Please try again later.' });
         }
     },
 
@@ -427,7 +428,7 @@ const profileController = {
             }
             else
             {
-                return res.json({ status: 0, message: errormessage });
+                return res.json({ status: 0, message: errormessage || 'Something went wrong. Please try again later.' });
             }
             
         }
