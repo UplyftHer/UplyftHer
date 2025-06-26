@@ -1203,6 +1203,8 @@ const profileController = {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserId = decoded.username;
 
+        console.log("cognitoUserId", cognitoUserId);
+
         
 
 
@@ -1227,7 +1229,7 @@ const profileController = {
 
 
             const myInterestNames = myProfile.interests.map((interest) => interest.name);
-            //console.log("myInterestNames", myInterestNames);
+            console.log("myInterestNames", myInterestNames);
 
             let ignoreCognitoUserId = [cognitoUserId];
 
@@ -1912,6 +1914,8 @@ const profileController = {
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
 
+            const myInterestNames = myProfile.interests.map((interest) => interest.name);
+
             const notificationList = await NotificationModel.find({ toCognitoId: cognitoUserIdMy })
                 .sort({ updatedAt: -1 })
                 .skip(offsetstart)
@@ -1926,15 +1930,15 @@ const profileController = {
                         {
                             $match: { cognitoUserId: notify.fromCognitoId }
                         },
-                        {
-                            $project: {
-                                cognitoUserId: 1,
-                                email: 1,
-                                userType: 1,
-                                fullName: { $ifNull: ["$fullName", ""] },
-                                profilePic: { $ifNull: ["$profilePic", ""] }
-                            }
-                        }
+                        // {
+                        //     $project: {
+                        //         cognitoUserId: 1,
+                        //         email: 1,
+                        //         userType: 1,
+                        //         fullName: { $ifNull: ["$fullName", ""] },
+                        //         profilePic: { $ifNull: ["$profilePic", ""] }
+                        //     }
+                        // }
                     ]);
 
                     const connectedData = await ConnectedUserModel.findOne({
@@ -1945,13 +1949,25 @@ const profileController = {
                     });
                     const startConversation = connectedData ? connectedData.startConversation : [];
 
+                    const matchingInterests = fromUserDetail.interests.filter((interest) =>
+                        myInterestNames.includes(interest.name)
+                    );
+
+                    // Calculate match percentage, handle empty myInterestNames
+                    const matchPercentage = myInterestNames.length > 0
+                        ? Math.round((matchingInterests.length / myInterestNames.length) * 100)
+                        : 0;
+
 
 
 
                     return {
                         ...notify,
                         startConversation,
-                        fromUserDetail
+                        connectUserDetail: {
+                            ...fromUserDetail,
+                            matchPercentage
+                        },
                     };
                 })
             );
