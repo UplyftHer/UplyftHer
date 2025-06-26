@@ -24,14 +24,14 @@ jobs:
         include:
           - language: actions
             build-mode: none
-          - language: java-kotlin
-            build-mode: none     # Changed from 'manual' to skip Android build
+          # - language: java-kotlin
+          #   build-mode: manual  
           - language: javascript-typescript
             build-mode: none
           - language: ruby
             build-mode: none
-          - language: swift
-            build-mode: none     # Changed from 'manual' to skip iOS build
+          # - language: swift
+          #   build-mode: manual   
  
     steps:
       - name: Checkout repository
