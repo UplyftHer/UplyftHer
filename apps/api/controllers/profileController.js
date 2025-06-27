@@ -926,7 +926,7 @@ const profileController = {
                 } else {
 
                     availability.slots.push(newSlot);
-                }
+                } 
             });
 
 
@@ -3805,9 +3805,14 @@ const profileController = {
 
 
         const { cognitoUserId, date, slot, personalNote, mode, meetingTitle } = req.body;
+        const timezone = req.headers['timezone'];
 
      
         try {
+            if (!timezone || !moment.tz.zone(timezone)) {
+                //return res.status(200).json({ status: 0, message: "Invalid or missing timezone" });
+                timezone = "UTC";
+            }
             if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
@@ -3987,8 +3992,17 @@ const profileController = {
                 firstname2 = profile.fullName.split(' ')[0]
             }
 
+            // Combine slot and date as UTC
+            const utcDateTime = moment.tz(`${date} ${slot}`, "YYYY-MM-DD hh:mm A", "UTC");
+
+            // Convert to the requested timezone
+            const localTime = utcDateTime.clone().tz(timezone).format("hh:mm A");
+
             // send notification
-            let message = `Your session with ${firstname} is scheduled for ${date} at ${slot}`;
+            //let message = `Your session with ${firstname} is scheduled for ${date} at ${slot}`;
+            //let message = `Your session with ${firstname} is scheduled for ${date} at ${localTime} (${timezone})`;
+            let message = `Your session with ${firstname} is scheduled for ${date} at ${localTime} IST`;
+           
             let type = `meeting`;
             let tableName = `book_meetings`;
             let notificationSave = await NotificationModel.create({
