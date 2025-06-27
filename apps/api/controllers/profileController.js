@@ -4141,6 +4141,7 @@ const profileController = {
             if (!timezone || !moment.tz.zone(timezone)) {
                 timezone = "Asia/Kolkata"; // fallback to IST
             }
+            
             if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
@@ -4355,7 +4356,7 @@ const profileController = {
             const utcDateTime = moment.tz(`${date} ${slot}`, "YYYY-MM-DD hh:mm A", "UTC");
 
             // Convert to the requested timezone
-            const localTimeBook = utcDateTime.clone().tz(timezone).format("hh:mm A");
+            const localTimeBook = utcDateTimeBook.clone().tz(timezone).format("hh:mm A");
             const localTime = utcDateTime.clone().tz(timezone).format("hh:mm A");
 
             // send notification
@@ -4477,7 +4478,11 @@ const profileController = {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
         const { meetingId, cognitoUserId } = req.body;
+        let timezone = req.headers['timezone'];
         try {
+            if (!timezone || !moment.tz.zone(timezone)) {
+                timezone = "Asia/Kolkata"; // fallback to IST
+            }
             if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
@@ -4572,9 +4577,15 @@ const profileController = {
             //     cognitoUserId: cognitoUserIdMy,
             // }; 
             // const bookmeetingslot = await BookMeetingsModel.findOneAndUpdate(filter, { $set: update }, { new: true });
+            // Combine slot and date as UTC
+            const utcDateTime = moment.tz(`${checkBooking.date} ${checkBooking.slot}`, "YYYY-MM-DD hh:mm A", "UTC");
+
+            // Convert to the requested timezone
+            const localTime = utcDateTime.clone().tz(timezone).format("hh:mm A");
 
             // send notification
-            let message = `Your session with ${myProfile.fullName} is cancelled for ${checkBooking.date} at ${checkBooking.slot}`;
+            //let message = `Your session with ${myProfile.fullName} is cancelled for ${checkBooking.date} at ${checkBooking.slot}`;
+            let message = `Your session with ${myProfile.fullName} is cancelled for ${checkBooking.date} at ${localTime}`;
             let type = `meeting`;
             let tableName = `book_meetings`;
             let notificationSave = await NotificationModel.create({
@@ -4654,7 +4665,12 @@ const profileController = {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username; 
         const { cognitoUserId, meetingId } = req.body;
+        let timezone = req.headers['timezone'];
         try {
+            if (!timezone || !moment.tz.zone(timezone)) {
+                timezone = "Asia/Kolkata"; // fallback to IST
+            }
+       
             if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
