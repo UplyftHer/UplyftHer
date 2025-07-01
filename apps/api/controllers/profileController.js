@@ -1227,8 +1227,7 @@ const profileController = {
                 });
             }
 
-
-            const myInterestNames = myProfile.interests.map((interest) => interest.name);
+            const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
             console.log("myInterestNames", myInterestNames);
 
             let ignoreCognitoUserId = [cognitoUserId];
@@ -1312,10 +1311,13 @@ const profileController = {
                         myInterestNames.includes(interest.name)
                     );
 
+                    const baseCount = Math.max(myInterestNames.length, matchingInterests.length);
+
                     // Calculate match percentage, handle empty myInterestNames
                     const matchPercentage = myInterestNames.length > 0
-                        ? Math.round((matchingInterests.length / myInterestNames.length) * 100)
+                        ? Math.round((matchingInterests.length / baseCount) * 100)
                         : 0;
+                    
 
                     // Check if user is saved
                     const checkSaved = await SavedProfilesModel.findOne({
@@ -1505,7 +1507,8 @@ const profileController = {
                     message: "User not found.",
                 });
             }
-            const myInterestNames = myProfile.interests.map((interest) => interest.name);
+            
+            const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
             // console.log("myInterestNames",myInterestNames);
 
             let ignoreCognitoUserId = [cognitoUserId];
@@ -1556,10 +1559,11 @@ const profileController = {
                 const matchingInterests = saveProfile.interests.filter((interest) =>
                     myInterestNames.includes(interest.name)
                 );
+                const baseCount = Math.max(myInterestNames.length, matchingInterests.length);
 
                 // Calculate match percentage, handle empty myInterestNames
                 const matchPercentage = myInterestNames.length > 0
-                    ? Math.round((matchingInterests.length / myInterestNames.length) * 100)
+                    ? Math.round((matchingInterests.length / baseCount) * 100)
                     : 0;
 
                 saveProfile.matchPercentage = matchPercentage;
@@ -1636,7 +1640,8 @@ const profileController = {
                 });
             }
             //console.log("myProfile",myProfile);
-            const myInterestNames = myProfile.interests.map((interest) => interest.name);
+            
+            const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
             //console.log("myInterestNames",myInterestNames);
 
             const users = await UsersModel.find({
@@ -1651,10 +1656,11 @@ const profileController = {
                     const matchingInterests = user.interests.filter((interest) =>
                         myInterestNames.includes(interest.name)
                     );
+                    const baseCount = Math.max(myInterestNames.length, matchingInterests.length);
 
                     // Calculate match percentage, handle empty myInterestNames
                     const matchPercentage = myInterestNames.length > 0
-                        ? Math.round((matchingInterests.length / myInterestNames.length) * 100)
+                        ? Math.round((matchingInterests.length / baseCount) * 100)
                         : 0;
 
                     // Check if user is saved
@@ -1914,7 +1920,8 @@ const profileController = {
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
 
-            const myInterestNames = myProfile.interests.map((interest) => interest.name);
+           
+            const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
 
             const notificationList = await NotificationModel.find({ toCognitoId: cognitoUserIdMy })
                 .sort({ updatedAt: -1 })
@@ -1952,10 +1959,11 @@ const profileController = {
                     const matchingInterests = fromUserDetail.interests.filter((interest) =>
                         myInterestNames.includes(interest.name)
                     );
+                    const baseCount = Math.max(myInterestNames.length, matchingInterests.length);
 
                     // Calculate match percentage, handle empty myInterestNames
                     const matchPercentage = myInterestNames.length > 0
-                        ? Math.round((matchingInterests.length / myInterestNames.length) * 100)
+                        ? Math.round((matchingInterests.length / baseCount) * 100)
                         : 0;
 
 
@@ -2245,7 +2253,8 @@ const profileController = {
             );
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
-            const myInterestNames = myProfile.interests.map((interest) => interest.name);
+           
+            const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
             const ignoreCognitoUserId = [cognitoUserIdMy];
             const blockedUsersList = await BlockedUsers.find({
                 cognitoUserId: cognitoUserIdMy,
@@ -2312,10 +2321,11 @@ const profileController = {
                     const matchingInterests = connectUserDetail.interests.filter((interest) =>
                         myInterestNames.includes(interest.name)
                     );
+                    const baseCount = Math.max(myInterestNames.length, matchingInterests.length);
 
                     // Calculate match percentage, handle empty myInterestNames
                     const matchPercentage = myInterestNames.length > 0
-                        ? Math.round((matchingInterests.length / myInterestNames.length) * 100)
+                        ? Math.round((matchingInterests.length / baseCount) * 100)
                         : 0;
 
                     // Check if user start chat
@@ -3418,7 +3428,8 @@ const profileController = {
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
 
-            const myInterestNames = myProfile.interests.map((interest) => interest.name);
+            
+            const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
 
             const ignoreCognitoUserId = [cognitoUserIdMy];
             const blockedUsersList = await BlockedUsers.find({
@@ -3497,10 +3508,11 @@ const profileController = {
                     const matchingInterests = user.interests.filter((interest) =>
                         myInterestNames.includes(interest.name)
                     );
+                    const baseCount = Math.max(myInterestNames.length, matchingInterests.length);
 
                     // Calculate match percentage, handle empty myInterestNames
                     const matchPercentage = myInterestNames.length > 0
-                        ? Math.round((matchingInterests.length / myInterestNames.length) * 100)
+                        ? Math.round((matchingInterests.length / baseCount) * 100)
                         : 0;
 
                     // Check if user is saved
@@ -3811,8 +3823,9 @@ const profileController = {
         try {
             if (!timezone || !moment.tz.zone(timezone)) {
                 //return res.status(200).json({ status: 0, message: "Invalid or missing timezone" });
-                timezone = "UTC";
+                timezone = "Asia/Kolkata";
             }
+            const abbreviation = moment().tz(timezone).format('z');
             if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
@@ -4001,7 +4014,7 @@ const profileController = {
             // send notification
             //let message = `Your session with ${firstname} is scheduled for ${date} at ${slot}`;
             //let message = `Your session with ${firstname} is scheduled for ${date} at ${localTime} (${timezone})`;
-            let message = `Your session with ${firstname} is scheduled for ${date} at ${localTime}`;
+            let message = `Your session with ${firstname} is scheduled for ${date} at ${localTime} (${abbreviation})`;
            
             let type = `meeting`;
             let tableName = `book_meetings`;
@@ -4141,6 +4154,7 @@ const profileController = {
             if (!timezone || !moment.tz.zone(timezone)) {
                 timezone = "Asia/Kolkata"; // fallback to IST
             }
+            const abbreviation = moment().tz(timezone).format('z');
             
             if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
@@ -4362,7 +4376,7 @@ const profileController = {
             // send notification
             //let message = `Your session with ${myProfile.fullName} is rescheduled for ${date} at ${slot}`;
             //let message = `Your session with ${myProfile.fullName} has been rescheduled from ${checkBooking.date} at ${checkBooking.slot} to ${date} at ${slot}.`;
-            let message = `Your session with ${myProfile.fullName} has been rescheduled from ${checkBooking.date} at ${localTimeBook} to ${date} at ${localTime}.`;
+            let message = `Your session with ${myProfile.fullName} has been rescheduled from ${checkBooking.date} at ${localTimeBook} (${abbreviation}) to ${date} at ${localTime} (${abbreviation}).`;
             let type = `meeting`;
             let tableName = `book_meetings`;
             let notificationSave = await NotificationModel.create({
@@ -4483,6 +4497,7 @@ const profileController = {
             if (!timezone || !moment.tz.zone(timezone)) {
                 timezone = "Asia/Kolkata"; // fallback to IST
             }
+            const abbreviation = moment().tz(timezone).format('z');
             if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
@@ -4585,7 +4600,7 @@ const profileController = {
 
             // send notification
             //let message = `Your session with ${myProfile.fullName} is cancelled for ${checkBooking.date} at ${checkBooking.slot}`;
-            let message = `Your session with ${myProfile.fullName} is cancelled for ${checkBooking.date} at ${localTime}`;
+            let message = `Your session with ${myProfile.fullName} is cancelled for ${checkBooking.date} at ${localTime} (${abbreviation})`;
             let type = `meeting`;
             let tableName = `book_meetings`;
             let notificationSave = await NotificationModel.create({
@@ -4670,6 +4685,7 @@ const profileController = {
             if (!timezone || !moment.tz.zone(timezone)) {
                 timezone = "Asia/Kolkata"; // fallback to IST
             }
+            const abbreviation = moment().tz(timezone).format('z');
        
             if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
@@ -5730,7 +5746,8 @@ const profileController = {
             );
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
-            const myInterestNames = myProfile.interests.map((interest) => interest.name);
+           
+            const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
             //console.log("myInterestNames",myInterestNames);
 
             const ignoreCognitoUserId = [];
@@ -5822,10 +5839,11 @@ const profileController = {
                     const matchingInterests = userdetail.interests.filter((interest) =>
                         myInterestNames.includes(interest.name)
                     );
+                    const baseCount = Math.max(myInterestNames.length, matchingInterests.length);
 
                     // Calculate match percentage, handle empty myInterestNames
                     const matchPercentage = myInterestNames.length > 0
-                        ? Math.round((matchingInterests.length / myInterestNames.length) * 100)
+                        ? Math.round((matchingInterests.length / baseCount) * 100)
                         : 0;
 
                     //console.log("matchPercentage",matchPercentage);
