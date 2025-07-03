@@ -101,7 +101,7 @@ function ProfesSlider() {
           ))}
         </Slider>
       ) : (
-        <p>No testimonials available.</p>
+        <></>
       )}
     </div>
     );

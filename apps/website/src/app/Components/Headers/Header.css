@@ -17,8 +17,7 @@
     padding: 0px;
 }
 .header .logo img {
-    width: 100%;
-    max-width: 130px;
+    width: 100%;object-fit: cover;
 }
 .fixed-top {
     position: fixed;

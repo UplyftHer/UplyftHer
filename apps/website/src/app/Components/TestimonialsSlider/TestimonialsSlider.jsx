@@ -97,7 +97,7 @@ function TestimonialsSlider() {
           ))}
         </Slider>
       ) : (
-        <p>No testimonials available.</p>
+        <></>
       )}
     </div>
   );
