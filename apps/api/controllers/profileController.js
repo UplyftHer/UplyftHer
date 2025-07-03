@@ -938,6 +938,7 @@ const profileController = {
                     { cognitoUserIdSave: cognitoUserId, isChat: 1 }
                 ]
             })
+            console.log("connectedList", connectedList);
             let notificationCognitoUserId = [];
             connectedList.forEach(connect => {
                 let ignoreid;
@@ -951,6 +952,8 @@ const profileController = {
                     notificationCognitoUserId.push(ignoreid);
                 }
             });
+
+            console.log("notificationCognitoUserId", notificationCognitoUserId);
 
             if (notificationCognitoUserId.length > 0) {
                 for (let i = 0; i < notificationCognitoUserId.length; i++) {
@@ -978,6 +981,7 @@ const profileController = {
                     const userToNotification = await UsersModel.findOne(
                         { cognitoUserId: notificationCognitoUserId[i] }
                     );
+                    console.log("userToNotification", userToNotification);
 
                     if (userToNotification) {
                         if (Array.isArray(userToNotification.deviceToken) && userToNotification.deviceToken.length > 0) {
@@ -4989,6 +4993,35 @@ const profileController = {
                 feedback: feedback,
                 rating,
             });
+
+            //pushnotification
+
+            const userToNotification = await UsersModel.findOne(
+                { cognitoUserId: cognitoUserId }
+            );
+            let firstname1 = "";
+            if (myProfile.fullName) {
+                firstname1 = myProfile.fullName.split(' ')[0]
+            }
+            let notificationmessage = `${firstname1} has sent you feedback for your meeting.`;
+
+            if (userToNotification) {
+                if (Array.isArray(userToNotification.deviceToken) && userToNotification.deviceToken.length > 0) {
+                    let payload = {
+                        notification: {
+                            title: "Feedback",
+                            body: notificationmessage,
+                            //data:notificationSave,
+                            content_available: "true",
+                            //image:"https://i.ytimg.com/vi/iosNuIdQoy8/maxresdefault.jpg"
+                        },
+                        data: {
+                            "data": JSON.stringify(sendFeedbackData),
+                        }
+                    }
+                    await PushNotification({ registrationToken: userToNotification.deviceToken, payload });
+                }
+            }
 
 
 
