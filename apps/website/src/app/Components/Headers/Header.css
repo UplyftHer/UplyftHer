@@ -1,6 +1,6 @@
 .header {
     position: relative;
-    padding: 30px 16px 30px 40px;
+    padding: 0px 16px 0px 40px;
     transition: all 0.5s;
     z-index: 997; 
     height: 80px;
@@ -336,9 +336,7 @@
         padding: 10px 10px;
         height: 57px;
     }
-    .header .logo img {
-        max-width: 80px;
-    }
+
     .mobile-nav-toggle {
         font-size: 21px;
     }
@@ -348,7 +346,6 @@
 @media (max-width: 480px) {
 
     .header .logo img {
-        max-width: 72px;
         height: 40px;
     }
     
