@@ -160,7 +160,7 @@ const DomainManagerController = {
     // }
     await UsersModel.updateMany(
       { email: { $regex: `@${domainWithoutAt}$`, $options: 'i' } },
-      { $set: { emailDomainVerified: status } }
+      { $set: { emailDomainVerified: parseInt(status) } }
     );
 
       return res.status(200).json({ message: 'Domain updated successfully', domain: updatedDomain });

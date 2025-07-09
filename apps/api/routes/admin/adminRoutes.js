@@ -26,6 +26,7 @@ router.delete('/deleteUser/:cognitoUserId', AdminController.deleteUser);
 // industriesrouter
 router.get('/industries', IndustryController.getAllIndustries);
 router.post('/industries', IndustryController.addIndustry);
+router.get('/industries/:id', IndustryController.getIndustryById);
 router.put('/industries/:id', IndustryController.updateIndustry);
 router.delete('/industries/:id', IndustryController.deleteIndustry);
 // interests
