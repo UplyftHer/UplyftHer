@@ -33,9 +33,10 @@ async function getSignedUrl(key) {
 
 
 async function uploadToS3(fileName) {
-    const filePath = path.join(__dirname, 'Uploads', 'Images', fileName);
-    // Read the file
-    const fileContent = fs.readFileSync(filePath);
+   // const filePath = path.join(__dirname, 'Uploads', 'Images', fileName);
+    // // Read the file
+    // const fileContent = fs.readFileSync(filePath);
+    const fileContent = fs.readFileSync(fileName);
     
 
     const params = {
