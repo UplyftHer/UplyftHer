@@ -4996,32 +4996,32 @@ const profileController = {
 
             //pushnotification
 
-            const userToNotification = await UsersModel.findOne(
-                { cognitoUserId: cognitoUserId }
-            );
-            let firstname1 = "";
-            if (myProfile.fullName) {
-                firstname1 = myProfile.fullName.split(' ')[0]
-            }
-            let notificationmessage = `${firstname1} has sent you feedback for your meeting.`;
+            // const userToNotification = await UsersModel.findOne(
+            //     { cognitoUserId: cognitoUserId }
+            // );
+            // let firstname1 = "";
+            // if (myProfile.fullName) {
+            //     firstname1 = myProfile.fullName.split(' ')[0]
+            // }
+            // let notificationmessage = `${firstname1} has sent you feedback for your meeting.`;
 
-            if (userToNotification) {
-                if (Array.isArray(userToNotification.deviceToken) && userToNotification.deviceToken.length > 0) {
-                    let payload = {
-                        notification: {
-                            title: "Feedback",
-                            body: notificationmessage,
-                            //data:notificationSave,
-                            content_available: "true",
-                            //image:"https://i.ytimg.com/vi/iosNuIdQoy8/maxresdefault.jpg"
-                        },
-                        data: {
-                            "data": JSON.stringify(sendFeedbackData),
-                        }
-                    }
-                    await PushNotification({ registrationToken: userToNotification.deviceToken, payload });
-                }
-            }
+            // if (userToNotification) {
+            //     if (Array.isArray(userToNotification.deviceToken) && userToNotification.deviceToken.length > 0) {
+            //         let payload = {
+            //             notification: {
+            //                 title: "Feedback",
+            //                 body: notificationmessage,
+            //                 //data:notificationSave,
+            //                 content_available: "true",
+            //                 //image:"https://i.ytimg.com/vi/iosNuIdQoy8/maxresdefault.jpg"
+            //             },
+            //             data: {
+            //                 "data": JSON.stringify(sendFeedbackData),
+            //             }
+            //         }
+            //         await PushNotification({ registrationToken: userToNotification.deviceToken, payload });
+            //     }
+            // }
 
 
 
