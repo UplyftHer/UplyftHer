@@ -3,6 +3,7 @@ const AWS = require('aws-sdk');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const InterestsModel = require('../../models/admin/InterestsModel'); // Import the Interests Model
+const path = require('path');
 
 // Initialize AWS Cognito Identity Provider
 AWS.config.update({
@@ -134,7 +135,7 @@ async function uploadToS3(fileName) {
                 const newInterest = new InterestsModel({
                     name,
                     status,
-                    icon: imageUrl, // Save S3 URL, NOT local filePath
+                    icon: filePath, // Save S3 URL, NOT local filePath
                 });
 
                 await newInterest.save();

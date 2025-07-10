@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 //const io = require("../server");
 const { io, connectedUsers } = require("../server");
+const crypto = require('crypto');
 const SavedProfilesModel = require('../models/SavedProfiles');
 const ConnectedUserModel = require('../models/ConnectedUserModel');
 const UnConnectedUserModel = require('../models/UnConnectedUserModel');
@@ -22,6 +23,7 @@ const sendEmail = require('../utils/emailSender');
 const { FirebaseData, PushNotification } = require("../utils/firebase.js");
 
 
+const path = require('path');
 const AWS = require('aws-sdk');
 const jwt = require('jsonwebtoken');
 //const moment = require('moment');
@@ -281,7 +283,8 @@ const profileController = {
             return res.json({ status: 1, message: 'User deleted successfully' });
         } catch (error) {
             console.error('Delete user error:', error);
-            return res.json({ status: 0, message: error.message });
+            //return res.json({ status: 0, message: error.message });
+            return res.json({ status: 0, message: error.message || 'Something went wrong. Please try again later.' });
         }
     },
 
@@ -425,7 +428,7 @@ const profileController = {
             }
             else
             {
-                return res.json({ status: 0, message: errormessage });
+                return res.json({ status: 0, message: errormessage || 'Something went wrong. Please try again later.' });
             }
             
         }
@@ -446,28 +449,37 @@ const profileController = {
         let interests = req.body.interests;
         let preference = req.body.preference;
 
-        // Remove any leading or trailing single quotes that may exist
-        if (interests.startsWith("'") && interests.endsWith("'")) {
-            interests = interests.slice(1, -1);
+        let parsedDataInterests = [];
+        if (Array.isArray(interests)) {
+            parsedDataInterests = interests;
+        } else if (typeof interests === 'string') {
+            // Remove leading/trailing single quotes if any (mobile sometimes wraps strings like: `'[...]'`)
+            interests = interests.trim();
+            if (interests.startsWith("'") && interests.endsWith("'")) {
+                interests = interests.slice(1, -1);
+            }
+            try {
+                parsedDataInterests = JSON.parse(interests);
+            } catch (e) {
+                console.error("Invalid interests JSON string");
+                parsedDataInterests = [];
+            }
         }
-        if (preference.startsWith("'") && preference.endsWith("'")) {
-            preference = preference.slice(1, -1);
-        }
-        let parsedDataInterests;
-        let parsedDataPreference;
-        try {
-            // Now parse the cleaned JSON string
-            parsedDataInterests = JSON.parse(interests);
-            //console.log("parsedData=>>>", parsedDataInterests);
-        } catch (error) {
-            //console.error("Error parsing interests:", error);
-        }
-        try {
-            // Now parse the cleaned JSON string
-            parsedDataPreference = JSON.parse(preference);
-            //console.log("parsedData=>>>parsedDataPreference", parsedDataPreference);
-        } catch (error) {
-            //console.error("Error parsing parsedDataPreference:", error);
+
+        let parsedDataPreference = [];
+        if (Array.isArray(preference)) {
+            parsedDataPreference = preference;
+        } else if (typeof preference === 'string') {
+            preference = preference.trim();
+            if (preference.startsWith("'") && preference.endsWith("'")) {
+                preference = preference.slice(1, -1);
+            }
+            try {
+                parsedDataPreference = JSON.parse(preference);
+            } catch (e) {
+                console.error("Invalid preference JSON string");
+                parsedDataPreference = [];
+            }
         }
 
         try {
@@ -522,12 +534,17 @@ const profileController = {
             if (typeof organizationName !== 'string' || organizationName.trim() === '') {
                 return res.json({ status: 0, message: "Invalid organizationName" });
             }
-            const filter = { cognitoUserId: decoded.username };
+            if (typeof decoded.username !== 'string' || /[$.]/.test(decoded.username)) {
+            return res.json({ status: 0, message: "Invalid user ID" });
+            }
+            const filter = { cognitoUserId: decoded.username.trim() };
+            //const filter = { cognitoUserId: decoded.username };
+            const parsedUserType = parseInt(userType, 10);
             const update = {
                 fullName: typeof fullName === 'string' ? fullName.trim() : '',
                 age: typeof age === 'string' && /^\d+$/.test(age.trim()) ? age.trim() : '', // only allow string with digits
                 location: typeof location === 'string' ? location.trim() : '',
-                userType: userType === 0 || userType === 1 ? userType : 0, // you already checked this earlier
+                userType: parsedUserType === 0 || parsedUserType === 1 ? parsedUserType : 0, // you already checked this earlier
                 occupation: typeof occupation === 'string' ? occupation.trim() : '',
                 organizationName: typeof organizationName === 'string' ? organizationName.trim() : '',
                 industry: typeof industry === 'string' ? industry.trim() : '',
@@ -542,6 +559,11 @@ const profileController = {
             if (req.files && req.files.profilePic) {
                 var currentDate = Date.now();
                 let photoFile = req.files.profilePic;
+
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/heif'];
+                if (!allowedTypes.includes(photoFile.mimetype)) {
+                    return res.json({ status: 0, message: "Invalid file type. Only JPG, PNG, or HEIC allowed." });
+                }
 
                 // Sanitize file name: take only basename and strip unsafe characters
                 let originalExt = path.extname(photoFile.name);
@@ -904,7 +926,7 @@ const profileController = {
                 } else {
 
                     availability.slots.push(newSlot);
-                }
+                } 
             });
 
 
@@ -916,6 +938,7 @@ const profileController = {
                     { cognitoUserIdSave: cognitoUserId, isChat: 1 }
                 ]
             })
+            console.log("connectedList", connectedList);
             let notificationCognitoUserId = [];
             connectedList.forEach(connect => {
                 let ignoreid;
@@ -929,6 +952,8 @@ const profileController = {
                     notificationCognitoUserId.push(ignoreid);
                 }
             });
+
+            console.log("notificationCognitoUserId", notificationCognitoUserId);
 
             if (notificationCognitoUserId.length > 0) {
                 for (let i = 0; i < notificationCognitoUserId.length; i++) {
@@ -956,6 +981,7 @@ const profileController = {
                     const userToNotification = await UsersModel.findOne(
                         { cognitoUserId: notificationCognitoUserId[i] }
                     );
+                    console.log("userToNotification", userToNotification);
 
                     if (userToNotification) {
                         if (Array.isArray(userToNotification.deviceToken) && userToNotification.deviceToken.length > 0) {
@@ -1181,6 +1207,8 @@ const profileController = {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserId = decoded.username;
 
+        console.log("cognitoUserId", cognitoUserId);
+
         
 
 
@@ -1203,9 +1231,8 @@ const profileController = {
                 });
             }
 
-
-            const myInterestNames = myProfile.interests.map((interest) => interest.name);
-            //console.log("myInterestNames", myInterestNames);
+            const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
+            console.log("myInterestNames", myInterestNames);
 
             let ignoreCognitoUserId = [cognitoUserId];
 
@@ -1288,10 +1315,13 @@ const profileController = {
                         myInterestNames.includes(interest.name)
                     );
 
+                    const baseCount = Math.max(myInterestNames.length, matchingInterests.length);
+
                     // Calculate match percentage, handle empty myInterestNames
                     const matchPercentage = myInterestNames.length > 0
-                        ? Math.round((matchingInterests.length / myInterestNames.length) * 100)
+                        ? Math.round((matchingInterests.length / baseCount) * 100)
                         : 0;
+                    
 
                     // Check if user is saved
                     const checkSaved = await SavedProfilesModel.findOne({
@@ -1481,7 +1511,8 @@ const profileController = {
                     message: "User not found.",
                 });
             }
-            const myInterestNames = myProfile.interests.map((interest) => interest.name);
+            
+            const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
             // console.log("myInterestNames",myInterestNames);
 
             let ignoreCognitoUserId = [cognitoUserId];
@@ -1532,10 +1563,11 @@ const profileController = {
                 const matchingInterests = saveProfile.interests.filter((interest) =>
                     myInterestNames.includes(interest.name)
                 );
+                const baseCount = Math.max(myInterestNames.length, matchingInterests.length);
 
                 // Calculate match percentage, handle empty myInterestNames
                 const matchPercentage = myInterestNames.length > 0
-                    ? Math.round((matchingInterests.length / myInterestNames.length) * 100)
+                    ? Math.round((matchingInterests.length / baseCount) * 100)
                     : 0;
 
                 saveProfile.matchPercentage = matchPercentage;
@@ -1612,7 +1644,8 @@ const profileController = {
                 });
             }
             //console.log("myProfile",myProfile);
-            const myInterestNames = myProfile.interests.map((interest) => interest.name);
+            
+            const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
             //console.log("myInterestNames",myInterestNames);
 
             const users = await UsersModel.find({
@@ -1627,10 +1660,11 @@ const profileController = {
                     const matchingInterests = user.interests.filter((interest) =>
                         myInterestNames.includes(interest.name)
                     );
+                    const baseCount = Math.max(myInterestNames.length, matchingInterests.length);
 
                     // Calculate match percentage, handle empty myInterestNames
                     const matchPercentage = myInterestNames.length > 0
-                        ? Math.round((matchingInterests.length / myInterestNames.length) * 100)
+                        ? Math.round((matchingInterests.length / baseCount) * 100)
                         : 0;
 
                     // Check if user is saved
@@ -1890,6 +1924,9 @@ const profileController = {
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
 
+           
+            const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
+
             const notificationList = await NotificationModel.find({ toCognitoId: cognitoUserIdMy })
                 .sort({ updatedAt: -1 })
                 .skip(offsetstart)
@@ -1904,15 +1941,15 @@ const profileController = {
                         {
                             $match: { cognitoUserId: notify.fromCognitoId }
                         },
-                        {
-                            $project: {
-                                cognitoUserId: 1,
-                                email: 1,
-                                userType: 1,
-                                fullName: { $ifNull: ["$fullName", ""] },
-                                profilePic: { $ifNull: ["$profilePic", ""] }
-                            }
-                        }
+                        // {
+                        //     $project: {
+                        //         cognitoUserId: 1,
+                        //         email: 1,
+                        //         userType: 1,
+                        //         fullName: { $ifNull: ["$fullName", ""] },
+                        //         profilePic: { $ifNull: ["$profilePic", ""] }
+                        //     }
+                        // }
                     ]);
 
                     const connectedData = await ConnectedUserModel.findOne({
@@ -1923,13 +1960,26 @@ const profileController = {
                     });
                     const startConversation = connectedData ? connectedData.startConversation : [];
 
+                    const matchingInterests = fromUserDetail.interests.filter((interest) =>
+                        myInterestNames.includes(interest.name)
+                    );
+                    const baseCount = Math.max(myInterestNames.length, matchingInterests.length);
+
+                    // Calculate match percentage, handle empty myInterestNames
+                    const matchPercentage = myInterestNames.length > 0
+                        ? Math.round((matchingInterests.length / baseCount) * 100)
+                        : 0;
+
 
 
 
                     return {
                         ...notify,
                         startConversation,
-                        fromUserDetail
+                        connectUserDetail: {
+                            ...fromUserDetail,
+                            matchPercentage
+                        },
                     };
                 })
             );
@@ -1986,7 +2036,7 @@ const profileController = {
 
             
             const checkRequest = await ConnectedUserModel.findOne({
-                _id: mongoose.Types.ObjectId(requestId),
+                _id: new mongoose.Types.ObjectId(requestId),
                 cognitoUserIdSave: cognitoUserIdMy,
                 status: 0,
             });
@@ -1999,13 +2049,13 @@ const profileController = {
             }
 
             if (status == '1' || status == '2') {
-                const filter = { _id: mongoose.Types.ObjectId(requestId) };
+                const filter = { _id: new mongoose.Types.ObjectId(requestId) };
                 let update = {};
                 update.status = status;
                 const profile = await ConnectedUserModel.findOneAndUpdate(filter, { $set: update }, { new: true });
 
                 // notification table update
-                const filters = { _id: mongoose.Types.ObjectId(notificationId) };
+                const filters = { _id: new mongoose.Types.ObjectId(notificationId) };
                 // let updates = {}; 
                 // updates.isTakeAction = 1;
                 // await NotificationModel.findOneAndUpdate(filters, { $set: updates }, { new: true });
@@ -2070,6 +2120,90 @@ const profileController = {
                         }
                     }
 
+                    const connectedList = await ConnectedUserModel.find({
+                        $or: [
+                            { cognitoUserId: cognitoUserIdMy, cognitoUserIdSave:checkRequest.cognitoUserId,status: 1 },
+                            { cognitoUserId: checkRequest.cognitoUserId, cognitoUserIdSave: cognitoUserIdMy, status: 1 }
+                        ]
+                    })
+                    .sort({ updatedAt: -1 })
+                    .lean();
+
+                    const recentMatchesList = await Promise.all(
+                        connectedList.map(async (connect) => {
+                            let filters = {
+                                cognitoUserId:cognitoUserIdMy,
+                            };
+                            let secondUser = "";
+                            if (connect.cognitoUserId == cognitoUserIdMy) {
+                                //filters.cognitoUserId = connect.cognitoUserIdSave;
+                                secondUser = connect.cognitoUserIdSave;
+                            }
+                            else {
+                                //filters.cognitoUserId = connect.cognitoUserId;
+                                secondUser = connect.cognitoUserId;
+                            }
+
+                            // single user detail
+                            const [connectUserDetail] = await UsersModel.aggregate([
+                                {
+                                    $match: filters
+                                },
+                                {
+                                    $project: {
+                                        cognitoUserId: 1,
+                                        email: 1,
+                                        userType: 1,
+                                        emailDomainVerified: 1,
+                                        fullName: { $ifNull: ["$fullName", ""] },
+                                        profilePic: { $ifNull: ["$profilePic", ""] }
+                                    }
+                                }
+                            ]);
+
+                            // Check if user start chat
+
+                            const checkChat = await ChatModel.findOne({
+                                $or: [
+                                    { fromId: cognitoUserIdMy, toId: secondUser, messageType: 0 },
+                                    { toId: cognitoUserIdMy, fromId: secondUser, messageType: 0 },
+                                ]
+                                // $or: [
+                                //     { fromId: cognitoUserIdMy, toId: secondUser },
+                                //     { toId: cognitoUserIdMy, fromId: secondUser },
+                                // ]
+                            })
+                            .sort({ createdAt: -1 });
+                            //console.log("checkChat",checkChat);
+
+                            const isChat = checkChat ? 1 : 0;
+                            let firstName = "";
+                            if (connectUserDetail.fullName) {
+                                firstName = connectUserDetail.fullName.split(' ')[0];
+                            }
+
+                            const lastMessage = checkChat ? checkChat.message : `${firstName} has accepted your connection request. Say hello 👋`;
+                            const lastMessagetime = checkChat ? checkChat.createdAt : connect.createdAt;
+                            const unreadCount = await ChatModel.countDocuments({
+                                isRead: 0,
+                                toId: cognitoUserIdMy
+                            });
+
+
+                            return {
+                                ...connect,
+                                connectUserDetail,
+                                isChat,
+                                lastMessage,
+                                lastMessagetime,
+                                unreadCount
+                            };
+                        })
+                    );
+                    io.emit("acceptRequest", {
+                       recentMatchesList
+                    });
+
                 }
 
 
@@ -2123,7 +2257,8 @@ const profileController = {
             );
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
-            const myInterestNames = myProfile.interests.map((interest) => interest.name);
+           
+            const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
             const ignoreCognitoUserId = [cognitoUserIdMy];
             const blockedUsersList = await BlockedUsers.find({
                 cognitoUserId: cognitoUserIdMy,
@@ -2190,10 +2325,11 @@ const profileController = {
                     const matchingInterests = connectUserDetail.interests.filter((interest) =>
                         myInterestNames.includes(interest.name)
                     );
+                    const baseCount = Math.max(myInterestNames.length, matchingInterests.length);
 
                     // Calculate match percentage, handle empty myInterestNames
                     const matchPercentage = myInterestNames.length > 0
-                        ? Math.round((matchingInterests.length / myInterestNames.length) * 100)
+                        ? Math.round((matchingInterests.length / baseCount) * 100)
                         : 0;
 
                     // Check if user start chat
@@ -2451,7 +2587,7 @@ const profileController = {
                         //     { toId: cognitoUserIdMy, fromId: secondUser },
                         // ]
                     })
-                        .sort({ updatedAt: -1 });
+                        .sort({ createdAt: -1 });
                     //console.log("checkChat",checkChat);
 
                     const isChat = checkChat ? 1 : 0;
@@ -2462,6 +2598,10 @@ const profileController = {
 
                     const lastMessage = checkChat ? checkChat.message : `${firstName} has accepted your connection request. Say hello 👋`;
                     const lastMessagetime = checkChat ? checkChat.createdAt : connect.createdAt;
+                    const unreadCount = await ChatModel.countDocuments({
+                        isRead: 0,
+                        toId: cognitoUserIdMy
+                    });
 
 
                     return {
@@ -2469,7 +2609,8 @@ const profileController = {
                         connectUserDetail,
                         isChat,
                         lastMessage,
-                        lastMessagetime
+                        lastMessagetime,
+                        unreadCount
                     };
                 })
             );
@@ -2631,6 +2772,96 @@ const profileController = {
                 updatedAt: saveChat.createdAt
             });
 
+            const connectedList = await ConnectedUserModel.find({
+                $or: [
+                    { cognitoUserId: cognitoUserIdMy, cognitoUserIdSave: cognitoUserId, status: 1 },
+                    { cognitoUserId: cognitoUserId, cognitoUserIdSave: cognitoUserIdMy, status: 1 }
+                ]
+            })
+            .sort({ updatedAt: -1 })
+            .lean();
+
+          
+
+            const recentMatchesList = await Promise.all(
+                connectedList.map(async (connect) => {
+                    let filters = {
+                        cognitoUserId:cognitoUserIdMy,
+                    };
+                    let secondUser = "";
+                    if (connect.cognitoUserId == cognitoUserIdMy) {
+                        //filters.cognitoUserId = connect.cognitoUserIdSave;
+                        secondUser = connect.cognitoUserIdSave;
+                    }
+                    else {
+                        //filters.cognitoUserId = connect.cognitoUserId;
+                        secondUser = connect.cognitoUserId;
+                    }
+
+                    // single user detail
+                    const [connectUserDetail] = await UsersModel.aggregate([
+                        {
+                            $match: filters
+                        },
+                        {
+                            $project: {
+                                cognitoUserId: 1,
+                                email: 1,
+                                userType: 1,
+                                emailDomainVerified: 1,
+                                fullName: { $ifNull: ["$fullName", ""] },
+                                profilePic: { $ifNull: ["$profilePic", ""] }
+                            }
+                        }
+                    ]);
+
+                    // Check if user start chat
+
+                    const checkChat = await ChatModel.findOne({
+                        $or: [
+                            { fromId: cognitoUserIdMy, toId: secondUser, messageType: 0 },
+                            { toId: cognitoUserIdMy, fromId: secondUser, messageType: 0 },
+                        ]
+                        // $or: [
+                        //     { fromId: cognitoUserIdMy, toId: secondUser },
+                        //     { toId: cognitoUserIdMy, fromId: secondUser },
+                        // ]
+                    })
+                    .sort({ createdAt: -1 });
+                    //console.log("checkChat",checkChat);
+
+                    const isChat = checkChat ? 1 : 0;
+                    let firstName = "";
+                    if (connectUserDetail.fullName) {
+                        firstName = connectUserDetail.fullName.split(' ')[0];
+                    }
+
+                    const lastMessage = checkChat ? checkChat.message : `${firstName} has accepted your connection request. Say hello 👋`;
+                    const lastMessagetime = checkChat ? checkChat.createdAt : connect.createdAt;
+                    const unreadCount = await ChatModel.countDocuments({
+                        isRead: 0,
+                        toId: cognitoUserId
+                    });
+
+
+                    return {
+                        ...connect,
+                        connectUserDetail,
+                        isChat,
+                        lastMessage,
+                        lastMessagetime,
+                        unreadCount
+                    };
+                })
+            );
+
+            console.log("recentMatchesList",recentMatchesList);
+            io.emit("acceptRequest", {
+                recentMatchesList
+            });
+
+            
+
             //pushnotification
             // if (Array.isArray(myProfile.deviceToken) && myProfile.deviceToken.length > 0)
             // {
@@ -2661,6 +2892,118 @@ const profileController = {
             return res.json({ status: 0, message: error.message });
         }
     },
+
+    readMessage: async (req, res) => {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const cognitoUserIdMy = decoded.username;
+        
+
+
+        const { cognitoUserId, chatId } = req.body;
+        
+        try {
+            if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
+            
+            if (!cognitoUserId || !chatId) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "All fields are required",
+                });
+            }
+            const myProfile = await UsersModel.findOne(
+                { cognitoUserId: cognitoUserIdMy },
+                // { cognitoUserId: 0 } // Projection to exclude fields
+            );
+
+            //console.log("myProfile",myProfile);
+
+            if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
+
+            const profile = await UsersModel.findOne(
+                { cognitoUserId: cognitoUserId },
+                // { cognitoUserId: 0 } // Projection to exclude fields
+            );
+            if (!profile) return res.json({ status: 0, message: "Invalid cognitoUserId" });
+
+            if (cognitoUserId === cognitoUserIdMy) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Both users are same",
+                });
+            }
+
+             if (!mongoose.Types.ObjectId.isValid(chatId)) {
+                return res.status(400).json({
+                    status: 0,
+                    message: "Invalid chatId format",
+                });
+            }
+
+            
+
+            
+
+            
+            const checkConnectedUser = await ConnectedUserModel.findOne({
+                $or: [
+                    { cognitoUserId: cognitoUserId, cognitoUserIdSave: cognitoUserIdMy, status: 1 },
+                    { cognitoUserId: cognitoUserIdMy, cognitoUserIdSave: cognitoUserId, status: 1 }
+                ]
+            })
+            if (!checkConnectedUser) return res.json({ status: 0, message: "Both users are not connected" });
+
+
+            const saveChat = await ChatModel.findOne({
+                _id: new mongoose.Types.ObjectId(chatId),
+                fromId: cognitoUserId,
+                toId: cognitoUserIdMy,
+            });
+            if (!saveChat) return res.json({ status: 0, message: "Invalid chat" });
+
+
+            let update = {
+                isRead: 1,
+            };
+            const filter = {
+                //_id: new mongoose.Types.ObjectId(chatId),
+                fromId: cognitoUserId,
+                toId: cognitoUserIdMy,
+            };
+           
+            //const chatUpdated = await ChatModel.findOneAndUpdate(filter, { $set: update }, { new: true });
+            const chatUpdated = await ChatModel.updateMany(filter, { $set: update });
+
+            // read message using socket
+            io.emit("readMessage", {
+                status: 1,
+                _id: chatId,
+                connectedId: checkConnectedUser._id,
+                sendercognitoUserId: cognitoUserIdMy,
+                receivercognitoUserId: cognitoUserId,
+                profilePic: myProfile.profilePic,
+                message: saveChat.message,
+                isEdit: 0,
+                updatedAt: saveChat.updatedAt
+            });
+
+            return res.status(200).json({
+                status: 1,
+                message: "Message read successfully",
+                data:saveChat
+            });
+
+        } catch (error) {
+            //res.status(500).json({ message: 'Error fetching profile', error });
+            return res.json({ status: 0, message: error.message });
+        }
+    },
+
     editMessage: async (req, res) => {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -2699,7 +3042,7 @@ const profileController = {
             }
 
             const chatDetail = await ChatModel.findOne(
-                { _id: mongoose.Types.ObjectId(messageId) },
+                { _id: new mongoose.Types.ObjectId(messageId) },
             );
             if (!chatDetail) return res.json({ status: 0, message: "Invalid messageId" });
 
@@ -2715,7 +3058,7 @@ const profileController = {
                 message: message,
                 isEdit: 1,
             };
-            const filter = { _id: mongoose.Types.ObjectId(messageId)};
+            const filter = { _id: new mongoose.Types.ObjectId(messageId)};
             const connectedUpdated = await ChatModel.findOneAndUpdate(filter, { $set: update }, { new: true });
             
 
@@ -3089,7 +3432,8 @@ const profileController = {
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
 
-            const myInterestNames = myProfile.interests.map((interest) => interest.name);
+            
+            const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
 
             const ignoreCognitoUserId = [cognitoUserIdMy];
             const blockedUsersList = await BlockedUsers.find({
@@ -3168,10 +3512,11 @@ const profileController = {
                     const matchingInterests = user.interests.filter((interest) =>
                         myInterestNames.includes(interest.name)
                     );
+                    const baseCount = Math.max(myInterestNames.length, matchingInterests.length);
 
                     // Calculate match percentage, handle empty myInterestNames
                     const matchPercentage = myInterestNames.length > 0
-                        ? Math.round((matchingInterests.length / myInterestNames.length) * 100)
+                        ? Math.round((matchingInterests.length / baseCount) * 100)
                         : 0;
 
                     // Check if user is saved
@@ -3476,9 +3821,15 @@ const profileController = {
 
 
         const { cognitoUserId, date, slot, personalNote, mode, meetingTitle } = req.body;
+        let timezone = req.headers['timezone'];
 
      
         try {
+            if (!timezone || !moment.tz.zone(timezone)) {
+                //return res.status(200).json({ status: 0, message: "Invalid or missing timezone" });
+                timezone = "Asia/Kolkata";
+            }
+            const abbreviation = moment().tz(timezone).format('z');
             if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
@@ -3658,8 +4009,17 @@ const profileController = {
                 firstname2 = profile.fullName.split(' ')[0]
             }
 
+            // Combine slot and date as UTC
+            const utcDateTime = moment.tz(`${date} ${slot}`, "YYYY-MM-DD hh:mm A", "UTC");
+
+            // Convert to the requested timezone
+            const localTime = utcDateTime.clone().tz(timezone).format("hh:mm A");
+
             // send notification
-            let message = `Your session with ${firstname} is scheduled for ${date} at ${slot}`;
+            //let message = `Your session with ${firstname} is scheduled for ${date} at ${slot}`;
+            //let message = `Your session with ${firstname} is scheduled for ${date} at ${localTime} (${timezone})`;
+            let message = `Your session with ${firstname} is scheduled for ${date} at ${localTime} (${abbreviation})`;
+           
             let type = `meeting`;
             let tableName = `book_meetings`;
             let notificationSave = await NotificationModel.create({
@@ -3785,6 +4145,7 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
+        let timezone = req.headers['timezone'];
        
 
 
@@ -3794,6 +4155,11 @@ const profileController = {
 
         
         try {
+            if (!timezone || !moment.tz.zone(timezone)) {
+                timezone = "Asia/Kolkata"; // fallback to IST
+            }
+            const abbreviation = moment().tz(timezone).format('z');
+            
             if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
@@ -3842,7 +4208,7 @@ const profileController = {
             }
 
             let checkBooking = await BookMeetingsModel.findOne({
-                _id: mongoose.Types.ObjectId(meetingId)
+                _id: new mongoose.Types.ObjectId(meetingId)
             });
 
             if (!checkBooking) {
@@ -3966,7 +4332,7 @@ const profileController = {
             //     meetingTitle
             // });
             const slot24 = convertTo24hr(slot);
-            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
+            const filter = { _id: new mongoose.Types.ObjectId(meetingId) };
             let update = {
                 cognitoUserId: cognitoUserIdMy,
                 cognitoUserIdMenter: cognitoUserId,
@@ -3980,7 +4346,7 @@ const profileController = {
             };
             const bookmeetingslot = await BookMeetingsModel.findOneAndUpdate(filter, { $set: update }, { new: true });
 
-            const filter1 = { requestId: mongoose.Types.ObjectId(meetingId) };
+            const filter1 = { requestId: new mongoose.Types.ObjectId(meetingId) };
             const deletedNotification = await NotificationModel.deleteMany(filter1);
 
             const checkAndUpdateInteraction = await interactedUserModel.findOneAndUpdate(
@@ -4003,9 +4369,18 @@ const profileController = {
                 }
             );
 
+             // Combine slot and date as UTC
+            const utcDateTimeBook = moment.tz(`${checkBooking.date} ${checkBooking.slot}`, "YYYY-MM-DD hh:mm A", "UTC");
+            const utcDateTime = moment.tz(`${date} ${slot}`, "YYYY-MM-DD hh:mm A", "UTC");
+
+            // Convert to the requested timezone
+            const localTimeBook = utcDateTimeBook.clone().tz(timezone).format("hh:mm A");
+            const localTime = utcDateTime.clone().tz(timezone).format("hh:mm A");
+
             // send notification
             //let message = `Your session with ${myProfile.fullName} is rescheduled for ${date} at ${slot}`;
-            let message = `Your session with ${myProfile.fullName} has been rescheduled from ${checkBooking.date} at ${checkBooking.slot} to ${date} at ${slot}.`;
+            //let message = `Your session with ${myProfile.fullName} has been rescheduled from ${checkBooking.date} at ${checkBooking.slot} to ${date} at ${slot}.`;
+            let message = `Your session with ${myProfile.fullName} has been rescheduled from ${checkBooking.date} at ${localTimeBook} (${abbreviation}) to ${date} at ${localTime} (${abbreviation}).`;
             let type = `meeting`;
             let tableName = `book_meetings`;
             let notificationSave = await NotificationModel.create({
@@ -4018,7 +4393,8 @@ const profileController = {
                 isTakeAction: 1,
             });
 
-            let message1 = `Your session with ${profile.fullName} has been rescheduled from ${checkBooking.date} at ${checkBooking.slot} to ${date} at ${slot}.`;
+            //let message1 = `Your session with ${profile.fullName} has been rescheduled from ${checkBooking.date} at ${checkBooking.slot} to ${date} at ${slot}.`;
+            let message1 = `Your session with ${profile.fullName} has been rescheduled from ${checkBooking.date} at ${localTimeBook} to ${date} at ${localTime}.`;
 
             let notificationSave1 = await NotificationModel.create({
                 fromCognitoId: cognitoUserId,
@@ -4120,7 +4496,12 @@ const profileController = {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
         const { meetingId, cognitoUserId } = req.body;
+        let timezone = req.headers['timezone'];
         try {
+            if (!timezone || !moment.tz.zone(timezone)) {
+                timezone = "Asia/Kolkata"; // fallback to IST
+            }
+            const abbreviation = moment().tz(timezone).format('z');
             if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
@@ -4141,7 +4522,7 @@ const profileController = {
             }
 
             let checkBooking = await BookMeetingsModel.findOne({
-                _id: mongoose.Types.ObjectId(meetingId)
+                _id: new mongoose.Types.ObjectId(meetingId)
             });
 
             if (!checkBooking) {
@@ -4201,13 +4582,13 @@ const profileController = {
 
             if (!profile) return res.json({ status: 0, message: "Invalid cognitoUserId" });
 
-            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
+            const filter = { _id: new mongoose.Types.ObjectId(meetingId) };
             const deletedMeeting = await BookMeetingsModel.findByIdAndDelete(meetingId);
             if (!deletedMeeting) {
                 return res.json({ status: 0, message: "Meeting not found!" });
             }
 
-            const filter1 = { requestId: mongoose.Types.ObjectId(meetingId) };
+            const filter1 = { requestId: new mongoose.Types.ObjectId(meetingId) };
             const deletedNotification = await NotificationModel.deleteMany(filter1);
 
 
@@ -4215,9 +4596,15 @@ const profileController = {
             //     cognitoUserId: cognitoUserIdMy,
             // }; 
             // const bookmeetingslot = await BookMeetingsModel.findOneAndUpdate(filter, { $set: update }, { new: true });
+            // Combine slot and date as UTC
+            const utcDateTime = moment.tz(`${checkBooking.date} ${checkBooking.slot}`, "YYYY-MM-DD hh:mm A", "UTC");
+
+            // Convert to the requested timezone
+            const localTime = utcDateTime.clone().tz(timezone).format("hh:mm A");
 
             // send notification
-            let message = `Your session with ${myProfile.fullName} is cancelled for ${checkBooking.date} at ${checkBooking.slot}`;
+            //let message = `Your session with ${myProfile.fullName} is cancelled for ${checkBooking.date} at ${checkBooking.slot}`;
+            let message = `Your session with ${myProfile.fullName} is cancelled for ${checkBooking.date} at ${localTime} (${abbreviation})`;
             let type = `meeting`;
             let tableName = `book_meetings`;
             let notificationSave = await NotificationModel.create({
@@ -4297,7 +4684,13 @@ const profileController = {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username; 
         const { cognitoUserId, meetingId } = req.body;
+        let timezone = req.headers['timezone'];
         try {
+            if (!timezone || !moment.tz.zone(timezone)) {
+                timezone = "Asia/Kolkata"; // fallback to IST
+            }
+            const abbreviation = moment().tz(timezone).format('z');
+       
             if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
                 return res.json({
                     status: 0,
@@ -4364,7 +4757,7 @@ const profileController = {
             if (!profile) return res.json({ status: 0, message: "Invalid cognitoUserId" });
 
             let checkBooking = await BookMeetingsModel.findOne({
-                _id: mongoose.Types.ObjectId(meetingId)
+                _id: new mongoose.Types.ObjectId(meetingId)
             });
 
             if (!checkBooking) {
@@ -4386,7 +4779,7 @@ const profileController = {
                 });
             }
             
-            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
+            const filter = { _id: new mongoose.Types.ObjectId(meetingId) };
             let update = {};
             update.status = 2;
             const updateBooking = await BookMeetingsModel.findOneAndUpdate(filter, { $set: update }, { new: true });
@@ -4564,7 +4957,7 @@ const profileController = {
             }
 
             let checkMeetingExists = await BookMeetingsModel.findOne({
-                _id: mongoose.Types.ObjectId(meetingId),
+                _id: new mongoose.Types.ObjectId(meetingId),
             });
 
             if (!checkMeetingExists) {
@@ -4600,6 +4993,35 @@ const profileController = {
                 feedback: feedback,
                 rating,
             });
+
+            //pushnotification
+
+            const userToNotification = await UsersModel.findOne(
+                { cognitoUserId: cognitoUserId }
+            );
+            let firstname1 = "";
+            if (myProfile.fullName) {
+                firstname1 = myProfile.fullName.split(' ')[0]
+            }
+            let notificationmessage = `${firstname1} has sent you feedback for your meeting.`;
+
+            if (userToNotification) {
+                if (Array.isArray(userToNotification.deviceToken) && userToNotification.deviceToken.length > 0) {
+                    let payload = {
+                        notification: {
+                            title: "Feedback",
+                            body: notificationmessage,
+                            //data:notificationSave,
+                            content_available: "true",
+                            //image:"https://i.ytimg.com/vi/iosNuIdQoy8/maxresdefault.jpg"
+                        },
+                        data: {
+                            "data": JSON.stringify(sendFeedbackData),
+                        }
+                    }
+                    await PushNotification({ registrationToken: userToNotification.deviceToken, payload });
+                }
+            }
 
 
 
@@ -5034,7 +5456,7 @@ const profileController = {
             }
 
             let checkMeetingExists = await BookMeetingsModel.findOne({
-                _id: mongoose.Types.ObjectId(meetingId),
+                _id: new mongoose.Types.ObjectId(meetingId),
             });
 
             if (!checkMeetingExists) {
@@ -5046,8 +5468,8 @@ const profileController = {
 
             const checkMeetingValid = await BookMeetingsModel.find({
                 $or: [
-                    { cognitoUserId: cognitoUserIdMy, _id: mongoose.Types.ObjectId(meetingId) },
-                    { cognitoUserIdMenter: cognitoUserIdMy, _id: mongoose.Types.ObjectId(meetingId) }
+                    { cognitoUserId: cognitoUserIdMy, _id: new mongoose.Types.ObjectId(meetingId) },
+                    { cognitoUserIdMenter: cognitoUserIdMy, _id: new mongoose.Types.ObjectId(meetingId) }
                 ]
             })
 
@@ -5357,7 +5779,8 @@ const profileController = {
             );
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
-            const myInterestNames = myProfile.interests.map((interest) => interest.name);
+           
+            const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
             //console.log("myInterestNames",myInterestNames);
 
             const ignoreCognitoUserId = [];
@@ -5449,10 +5872,11 @@ const profileController = {
                     const matchingInterests = userdetail.interests.filter((interest) =>
                         myInterestNames.includes(interest.name)
                     );
+                    const baseCount = Math.max(myInterestNames.length, matchingInterests.length);
 
                     // Calculate match percentage, handle empty myInterestNames
                     const matchPercentage = myInterestNames.length > 0
-                        ? Math.round((matchingInterests.length / myInterestNames.length) * 100)
+                        ? Math.round((matchingInterests.length / baseCount) * 100)
                         : 0;
 
                     //console.log("matchPercentage",matchPercentage);

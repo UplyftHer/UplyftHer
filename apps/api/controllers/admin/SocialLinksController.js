@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
 const fs = require("fs");
 const SocialLinksModel = require('../../models/admin/SocialLinksModel'); 
+const path = require('path');
+const crypto = require('crypto');
 
 AWS.config.update({
     region: process.env.S3_REGION, // Set your AWS region
@@ -28,9 +30,10 @@ async function getSignedUrl(key) {
 }
 
 async function uploadToS3(fileName) {
-    const filePath = path.join(__dirname, 'Uploads', 'Images', fileName);
-    // Read the file
-    const fileContent = fs.readFileSync(filePath);
+    // const filePath = path.join(__dirname, 'Uploads', 'Images', fileName);
+    // // Read the file
+    // const fileContent = fs.readFileSync(filePath);
+    const fileContent = fs.readFileSync(fileName);
 
     const params = {
         Bucket: S3_BUCKET_NAME,

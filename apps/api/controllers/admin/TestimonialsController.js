@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const AWS = require('aws-sdk');
 const fs = require("fs");
 const TestimonialsModel = require('../../models/admin/TestimonialsModel');
+const path = require('path');
+const crypto = require('crypto');
 
 // Initialize AWS Cognito Identity Provider
 AWS.config.update({
@@ -31,9 +33,10 @@ async function getSignedUrl(key) {
 
 
 async function uploadToS3(fileName) {
-    const filePath = path.join(__dirname, 'Uploads', 'Images', fileName);
-    // Read the file
-    const fileContent = fs.readFileSync(filePath);
+   // const filePath = path.join(__dirname, 'Uploads', 'Images', fileName);
+    // // Read the file
+    // const fileContent = fs.readFileSync(filePath);
+    const fileContent = fs.readFileSync(fileName);
     
 
     const params = {

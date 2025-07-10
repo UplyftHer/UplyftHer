@@ -18,12 +18,13 @@ const UsersModel = require('../models/UsersModel');
 const BookMeetingsModel = require('../models/BookMeetingsModel');
 
 const getAuthHeaders = () => {
-    return {
-        Authorization: `Basic ${base64.encode(
-            `${zoomClientId}:${zoomClientSecret}`
-        )}`,
-        "Content-Type": "application/json",
-    };
+  const authString = `${zoomClientId}:${zoomClientSecret}`;
+  const encoded = base64.encode(authString);
+
+  return {
+    "Content-Type": "application/x-www-form-urlencoded", // ✅ Required content-type
+    Authorization: `Basic ${encoded}`,
+  };
 };
 
 const generateRandomString = (length = 12) => {
@@ -36,24 +37,47 @@ const generateRandomString = (length = 12) => {
     return result;
   };
 
+// const generateZoomAccessToken = async () => {
+//     try {
+//         const response = await fetch(
+//             `https://zoom.us/oauth/token?grant_type=account_credentials&account_id=${zoomAccountId}`,
+//             {
+//                 method: "POST",
+//                 headers: getAuthHeaders(),
+//             }
+//         );
+
+//         const jsonResponse = await response.json();
+//         //console.log("generateZoomAccessToken jsonResponse----->", jsonResponse);
+
+//         return jsonResponse?.access_token;
+//     } catch (error) {
+//         console.log("generateZoomAccessToken Error --> ", error);
+//         throw error;
+//     }
+// };
 const generateZoomAccessToken = async () => {
-    try {
-        const response = await fetch(
-            `https://zoom.us/oauth/token?grant_type=account_credentials&account_id=${zoomAccountId}`,
-            {
-                method: "POST",
-                headers: getAuthHeaders(),
-            }
-        );
+  try {
+    const response = await fetch(
+      `https://zoom.us/oauth/token?grant_type=account_credentials&account_id=${zoomAccountId}`,
+      {
+        method: "POST",
+        headers: getAuthHeaders(),
+      }
+    );
 
-        const jsonResponse = await response.json();
-        //console.log("generateZoomAccessToken jsonResponse----->", jsonResponse);
+    const jsonResponse = await response.json();
 
-        return jsonResponse?.access_token;
-    } catch (error) {
-        console.log("generateZoomAccessToken Error --> ", error);
-        throw error;
+    if (!response.ok) {
+      console.error("Zoom Token Error:", jsonResponse);
+      throw new Error(jsonResponse.message || "Failed to get Zoom token");
     }
+
+    return jsonResponse.access_token;
+  } catch (error) {
+    console.error("generateZoomAccessToken Error -->", error.message);
+    throw error;
+  }
 };
 
 
@@ -65,8 +89,14 @@ const meetingController = {
          const decoded = jwt.verify(token, process.env.JWT_SECRET); 
          const cognitoUserIdMy = decoded.username; 
         //const cognitoUserIdMy = "a3f458d2-10a1-70cc-d6e3-0550a9c75624"; 
+        let timezone = req.headers['timezone'];
 
         try {
+            if (!timezone || !moment.tz.zone(timezone)) {
+                timezone = "Asia/Kolkata"; // fallback to IST
+            }
+            console.log("timezone", timezone);
+            const abbreviation = moment().tz(timezone).format('z');
             const { meetingId, cognitoUserId, date, slot } = req.body;
             if (!meetingId || !cognitoUserId || !date || !slot) {
                 return res.status(200).json({
@@ -145,8 +175,8 @@ const meetingController = {
 
             const checkMeetingExists = await BookMeetingsModel.findOne({
                 $or: [
-                    { _id: mongoose.Types.ObjectId(meetingId), date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserId, cognitoUserIdMenter: cognitoUserIdMy },
-                    { _id: mongoose.Types.ObjectId(meetingId), date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserIdMy, cognitoUserIdMenter: cognitoUserId },
+                    { _id: new mongoose.Types.ObjectId(meetingId), date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserId, cognitoUserIdMenter: cognitoUserIdMy },
+                    { _id: new mongoose.Types.ObjectId(meetingId), date:date, slot24: { $gte: slotStart, $lte: slotEnd}, cognitoUserId:cognitoUserIdMy, cognitoUserIdMenter: cognitoUserId },
                 ]
             })
             if (!checkMeetingExists) {
@@ -168,7 +198,7 @@ const meetingController = {
             
 
             
-            const currentTime = moment().tz(process.env.ZOOM_TIMEZONE).format("HH:mm");
+            const currentTime = moment().tz(timezone).format("HH:mm");
            
             //console.log("futureTime",futureTime);
             const currentDate = new Date().toISOString().split('T')[0];
@@ -177,6 +207,8 @@ const meetingController = {
             //console.log(slot ,"<" ,timeMeeting, "&&" ,slot, ">", futureTime);
             const current = new Date(currentDate);
             const meeting = new Date(dateMeeting);
+            console.log("current",current);
+            console.log("meeting",meeting);
             const timeDifference = meeting.getTime() - current.getTime();
             const daysUntilMeeting = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
 
@@ -191,9 +223,12 @@ const meetingController = {
                 message = "The meeting date has already passed.";
             }
 
-            const currentDateTime = moment().tz(process.env.ZOOM_TIMEZONE);
-            const meetingStart = moment.tz(`${dateMeeting} ${timeMeeting}`, 'YYYY-MM-DD HH:mm', process.env.ZOOM_TIMEZONE);
+            const currentDateTime = moment().tz("UTC");
+            console.log("currentDateTime", currentDateTime.format('YYYY-MM-DD HH:mm:ss'));
+            const meetingStart = moment.tz(`${dateMeeting} ${timeMeeting}`, 'YYYY-MM-DD HH:mm', "UTC");
+            console.log("meetingStart", meetingStart.format('YYYY-MM-DD HH:mm:ss'));
             const meetingEnd = meetingStart.clone().add(slotDuration, 'minutes');
+            console.log("meetingEnd", meetingEnd.format('YYYY-MM-DD HH:mm:ss'));
             // Calculate the difference in milliseconds
             const timeDifference1 = meetingStart.diff(currentDateTime);
 
@@ -219,6 +254,8 @@ const meetingController = {
 
             if(dateMeeting != date || currentDate != date)
             {
+                console.log("dateMeeting",dateMeeting, "date",date);
+                console.log("currentDate",currentDate, "date",date)
                 return res.status(200).json({
                     status: 0,
                     message: message,
@@ -226,6 +263,9 @@ const meetingController = {
             }
             else if (currentDateTime.isBefore(meetingStart) || currentDateTime.isAfter(meetingEnd))
             {
+                console.log("currentDateTime", currentDateTime.format('YYYY-MM-DD HH:mm:ss'));
+                console.log("meetingStart", meetingStart.format('YYYY-MM-DD HH:mm:ss'));
+                console.log("meetingEnd", meetingEnd.format('YYYY-MM-DD HH:mm:ss'));
                 return res.status(200).json({
                     status: 0,
                     message: messageTime,
@@ -280,14 +320,15 @@ const meetingController = {
             console.log("videoenabled",videoenabled);
 
             const localDateTimeString = `${dateMeeting}T${timeMeeting}:00`;
-            const localDateTime = new Date(
-                new Date(localDateTimeString).toLocaleString("en-US", { timeZone: process.env.ZOOM_TIMEZONE })
-            );
+            console.log("localDateTimeString", localDateTimeString);
+            // const localDateTime = new Date(
+            //     new Date(localDateTimeString).toLocaleString("en-US", { timeZone: timezone })
+            // );
 
-            const utcDateTime = localDateTime.toISOString();
+            // const utcDateTime = localDateTime.toISOString();
 
-            console.log("localDateTime (IST):", localDateTime); // Indian Standard Time
-            console.log("utcDateTime (UTC):", utcDateTime); // Convert to UTC for Zoom API
+            // console.log("localDateTime (IST):", localDateTime); // Indian Standard Time
+            // console.log("utcDateTime (UTC):", utcDateTime); // Convert to UTC for Zoom API
 
             
             
@@ -296,7 +337,7 @@ const meetingController = {
             const meetingPayload = {
                 topic: checkMeetingExists.meetingTitle,
                 type: 2,
-                start_time: utcDateTime, // Ensure UTC time here
+                start_time: localDateTimeString, // Ensure UTC time here
                 duration: slotDuration, // Duration in minutes //default 30
                 timezone: "UTC",
                 settings: {
@@ -323,11 +364,15 @@ const meetingController = {
             );
     
             const jsonResponse = await response.json();
+            console.log("Zoom API Status:", response.status);
+            //console.log("Zoom API Response:", jsonResponse);
             const zoomMeetingId = jsonResponse.id;
             const registrants = [
                 { email: myProfile.email, first_name: myProfile.fullName, last_name: "" },
                 { email: profile.email, first_name: profile.fullName, last_name: "" }
             ];
+
+           
             
             for (const registrant of registrants) {
                 await fetch(`https://api.zoom.us/v2/meetings/${zoomMeetingId}/registrants`, {
@@ -345,7 +390,7 @@ const meetingController = {
                 join_url:jsonResponse.join_url,
             }
 
-            const filter = { _id: mongoose.Types.ObjectId(meetingId) };
+            const filter = { _id: new mongoose.Types.ObjectId(meetingId) };
             let update = {};
             update.status = 1;
             update.start_url = jsonResponse.start_url;

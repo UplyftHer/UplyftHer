@@ -291,6 +291,7 @@ function Landingpage() {
             <Link href="tel:+49 152 277 63275"> +49 152 277 63275</Link>
             <Link href="mailto:hello@uplyfther.com"> hello@uplyfther.com</Link>
           </div>
+          {Array.isArray(socials) && socials.filter(item => item.accountStatus === 1 && item.url).length > 1 && (
           <div className="FollowusDiv" data-aos="fade-up"data-aos-anchor-placement="top-bottom">
             <span>Follow us</span>
             <div className="social">
@@ -311,6 +312,8 @@ function Landingpage() {
               <Link target='_blank' href="https://web.telegram.org/"><FaTelegramPlane /></Link> */}
             </div>
           </div>
+          )}
+
         </div>
         <div className="BottomFt" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
           <Link target='_blank' href="/TermsConditions">TERMS AND CONDITIONS</Link>
