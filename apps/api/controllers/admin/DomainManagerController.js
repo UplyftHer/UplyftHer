@@ -29,9 +29,6 @@ const DomainManagerController = {
     try {
       const domains = await DomainManagerModel.find();
 
-      if (domains.length === 0) {
-        return res.status(404).json({ message: 'No domains found' });
-      }
 
       return res.status(200).json({ domains });
     } catch (error) {
@@ -70,8 +67,8 @@ const DomainManagerController = {
       await newDomain.save();
 
      // Ensure exact domain match and update user emailDomainVerified status
-     const domainWithoutAt = name.replace(/^@/, '');
-     //console.log('hello',domainWithoutAt);
+    //  const domainWithoutAt = name.replace(/^@/, '');
+    //  //console.log('hello',domainWithoutAt);
     // if (status === 1) {
     //   await UsersModel.updateMany(
     //     { email: { $regex: `@${domainWithoutAt}$`, $options: 'i' } },
@@ -79,12 +76,22 @@ const DomainManagerController = {
     //   );
     // }
     
-    await UsersModel.updateMany(
-      { email: { $regex: `@${domainWithoutAt}$`, $options: 'i' } },
-      { $set: { emailDomainVerified: status } }
-    );
+    // await UsersModel.updateMany(
+    //   { email: { $regex: `@${domainWithoutAt}$`, $options: 'i' } },
+    //   { $set: { emailDomainVerified: status } }
+    // );
     
-   
+    const verifiedDomains = await DomainManagerModel.find({ status: 1 }).select('name');
+    const verifiedDomainList = verifiedDomains.map(d => d.name.replace(/^@/, '').toLowerCase());
+
+    await UsersModel.updateMany({}, { $set: { emailDomainVerified: 0 } });
+
+    for (const domain of verifiedDomainList) {
+      await UsersModel.updateMany(
+        { email: { $regex: `@${domain}$`, $options: 'i' } },
+        { $set: { emailDomainVerified: 1 } }
+      );
+    }
 
       return res.status(201).json({ message: 'Domain added successfully', domain: newDomain });
     } catch (error) {
@@ -145,19 +152,18 @@ const DomainManagerController = {
         { new: true }
       );
       const domainWithoutAt = name.replace(/^@/, '');
-     //console.log('hello',domainWithoutAt);
-    //  if (status == 1) {
-    //   // console.log('hello',status);
-    //   await UsersModel.updateMany(
-    //     { email: { $regex: `@${domainWithoutAt}$`, $options: 'i' } },
-    //     { $set: { emailDomainVerified: 1 } }
-    //   );
-    // } else {
-    //   await UsersModel.updateMany(
-    //     { email: { $regex: `@${domainWithoutAt}$`, $options: 'i' } },
-    //     { $set: { emailDomainVerified: 0 } }
-    //   );
-    // }
+
+      if (status == 1) {
+      await UsersModel.updateMany(
+        { email: { $regex: `@${domainWithoutAt}$`, $options: 'i' } },
+        { $set: { emailDomainVerified: 1 } }
+      );
+    } else {
+      await UsersModel.updateMany(
+        { email: { $regex: `@${domainWithoutAt}$`, $options: 'i' } },
+        { $set: { emailDomainVerified: 0 } }
+      );
+    }
     await UsersModel.updateMany(
       { email: { $regex: `@${domainWithoutAt}$`, $options: 'i' } },
       { $set: { emailDomainVerified: parseInt(status) } }
@@ -173,21 +179,35 @@ const DomainManagerController = {
   // Delete domain
   deleteDomain: async (req, res) => {
     try {
-      const { id } = req.params; 
+      const { id } = req.params;
+
       if (!mongoose.Types.ObjectId.isValid(id)) {
-          return res.json({ status: 0, errors: { message: 'Invalid id format' } });
+        return res.json({ status: 0, errors: { message: 'Invalid id format' } });
       }
+
       const deletedDomain = await DomainManagerModel.findByIdAndDelete(id);
       if (!deletedDomain) {
         return res.status(200).json({ message: 'Domain not found' });
       }
-
-      return res.status(200).json({ message: 'Domain deleted successfully' });
+  
+      const verifiedDomains = await DomainManagerModel.find({ status: 1 }).select('name');
+      const domainList = verifiedDomains.map(d => d.name.replace(/^@/, '').toLowerCase());
+  
+      await UsersModel.updateMany({}, { $set: { emailDomainVerified: 0 } });
+  
+      for (const domain of domainList) {
+        await UsersModel.updateMany(
+          { email: { $regex: `@${domain}$`, $options: 'i' } },
+          { $set: { emailDomainVerified: 1 } }
+        );
+      }
+  
+      return res.status(200).json({ message: 'Domain deleted successfully and users updated' });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: 'Error deleting domain', error: error.message });
     }
-  }
+  },  
 };
 
 module.exports = DomainManagerController;
