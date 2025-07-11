@@ -444,7 +444,7 @@ const profileController = {
 
 
         const { fullName, age, location, userType, occupation, organizationName, industry, bio, country, city, iso2} = req.body; // Data from request body
-        console.log("reqbody", req.body);
+        //console.log("reqbody", req.body);
         //console.log("reqbodyJson=>>>", JSON.stringify(req.body));
         let interests = req.body.interests;
         let preference = req.body.preference;
@@ -511,7 +511,7 @@ const profileController = {
             ? parsedDataInterests.map(item => ({
                 interestId: typeof item.interestId === 'string' ? item.interestId.replace(/[$.]/g, '').trim() : '',
                 name: typeof item.name === 'string' ? item.name.replace(/[$.]/g, '').trim() : '',
-                icon: typeof item.icon === 'string' ? item.icon.replace(/[$.]/g, '').trim() : '',
+                icon: typeof item.icon === 'string' ? item.icon.replace(/[$]/g, '').trim() : '',
             }))
             : [];
 
@@ -938,7 +938,7 @@ const profileController = {
                     { cognitoUserIdSave: cognitoUserId, isChat: 1 }
                 ]
             })
-            console.log("connectedList", connectedList);
+            //console.log("connectedList", connectedList);
             let notificationCognitoUserId = [];
             connectedList.forEach(connect => {
                 let ignoreid;
@@ -953,7 +953,7 @@ const profileController = {
                 }
             });
 
-            console.log("notificationCognitoUserId", notificationCognitoUserId);
+            //console.log("notificationCognitoUserId", notificationCognitoUserId);
 
             if (notificationCognitoUserId.length > 0) {
                 for (let i = 0; i < notificationCognitoUserId.length; i++) {
@@ -981,7 +981,7 @@ const profileController = {
                     const userToNotification = await UsersModel.findOne(
                         { cognitoUserId: notificationCognitoUserId[i] }
                     );
-                    console.log("userToNotification", userToNotification);
+                    //console.log("userToNotification", userToNotification);
 
                     if (userToNotification) {
                         if (Array.isArray(userToNotification.deviceToken) && userToNotification.deviceToken.length > 0) {
@@ -1207,7 +1207,7 @@ const profileController = {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserId = decoded.username;
 
-        console.log("cognitoUserId", cognitoUserId);
+        //console.log("cognitoUserId", cognitoUserId);
 
         
 
@@ -1232,7 +1232,7 @@ const profileController = {
             }
 
             const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
-            console.log("myInterestNames", myInterestNames);
+            //console.log("myInterestNames", myInterestNames);
 
             let ignoreCognitoUserId = [cognitoUserId];
 
@@ -1514,11 +1514,23 @@ const profileController = {
             
             const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
             // console.log("myInterestNames",myInterestNames);
+          
+          
+
+
 
             let ignoreCognitoUserId = [cognitoUserId];
             const blockedUsersList = await BlockedUsers.find({
-                cognitoUserId: cognitoUserId,
-                status:1
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserId,
+                    status: 1
+                    }
+                ]
             })
             blockedUsersList.forEach(block => {
                 let ignoreid = block.blockedUserId;
@@ -1547,7 +1559,7 @@ const profileController = {
                 }
             });
 
-            console.log("ignoreCognitoUserId",ignoreCognitoUserId);
+            //console.log("ignoreCognitoUserId",ignoreCognitoUserId);
 
 
             // Get the saved profiles with offset and limit
@@ -2100,7 +2112,7 @@ const profileController = {
                         { cognitoUserId: checkRequest.cognitoUserId }
                     );
 
-                    console.log("userToNotification", userToNotification);
+                    //console.log("userToNotification", userToNotification);
 
                     if (userToNotification) {
                         if (Array.isArray(userToNotification.deviceToken) && userToNotification.deviceToken.length > 0) {
@@ -2506,6 +2518,7 @@ const profileController = {
     },
 
     getOldConversations: async (req, res) => {
+        
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
@@ -2531,19 +2544,63 @@ const profileController = {
             );
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
+            const ignoreCognitoUserId = [];
+            const blockedUsersList = await BlockedUsers.find({
+                $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    status: 1
+                    }
+                ]
+            })
+            //console.log("blockedUsersList",blockedUsersList);
+            blockedUsersList.forEach(block => {
+                let ignoreid = block.blockedUserId;
+                if (!ignoreCognitoUserId.includes(ignoreid)) {
+                    ignoreCognitoUserId.push(ignoreid);
+                }
+            });
+            const InactiveUsersList = await UsersModel.find(
+                { isActive: 0 }, 
+                { cognitoUserId: 1, _id: 0 }
+            );
+            InactiveUsersList.forEach(block => {
+                let ignoreid = block.cognitoUserId;
+                if (!ignoreCognitoUserId.includes(ignoreid)) {
+                    ignoreCognitoUserId.push(ignoreid);
+                }
+            });
+            //console.log("ignoreCognitoUserId-oldconversations",ignoreCognitoUserId);
 
             const connectedList = await ConnectedUserModel.find({
-                $or: [
-                    // { cognitoUserId: cognitoUserIdMy, status: 1, isChat: 1 },
-                    // { cognitoUserIdSave: cognitoUserIdMy, status: 1, isChat: 1 }
-                    { cognitoUserId: cognitoUserIdMy, status: 1 },
-                    { cognitoUserIdSave: cognitoUserIdMy, status: 1 }
-                ]
+                $and: [
+                    {
+                        $or: [
+                            // { cognitoUserId: cognitoUserIdMy, status: 1, isChat: 1 },
+                            // { cognitoUserIdSave: cognitoUserIdMy, status: 1, isChat: 1 }
+                            { cognitoUserId: cognitoUserIdMy, status: 1 },
+                            { cognitoUserIdSave: cognitoUserIdMy, status: 1 }
+                        ]
+                    }
+                ],
+                cognitoUserId: { $nin: ignoreCognitoUserId },
+                cognitoUserIdSave: { $nin: ignoreCognitoUserId }
+               
             })
                 .sort({ updatedAt: -1 })
                 .skip(offsetstart)
                 .limit(limit)
                 .lean();
+
+
+
+                
+
+
 
             const recentMatchesList = await Promise.all(
                 connectedList.map(async (connect) => {
@@ -2746,9 +2803,9 @@ const profileController = {
 
 
             // Send message privately to the receiver
-            console.log("connectedUsers", connectedUsers);
+            //console.log("connectedUsers", connectedUsers);
             const receiverSocketId = connectedUsers[cognitoUserId];
-            console.log("receiverSocketId", receiverSocketId);
+            //console.log("receiverSocketId", receiverSocketId);
             // if (receiverSocketId) {
             //     io.to(receiverSocketId).emit("sendMessage", {
             //         status: 1,
@@ -2855,7 +2912,7 @@ const profileController = {
                 })
             );
 
-            console.log("recentMatchesList",recentMatchesList);
+            //console.log("recentMatchesList",recentMatchesList);
             io.emit("acceptRequest", {
                 recentMatchesList
             });
@@ -3500,7 +3557,7 @@ const profileController = {
                 };
             }
 
-            console.log("finddata",finddata);
+            //console.log("finddata",finddata);
 
             const users = await UsersModel.find(finddata).lean();
 
@@ -3635,7 +3692,7 @@ const profileController = {
 
 
             let slotNames = [dayOfWeek, date];
-            console.log("slotNames", slotNames);
+            //console.log("slotNames", slotNames);
             let availabilityData = await AvailabilityModel.aggregate([
                 {
                     $match: {
@@ -3911,7 +3968,7 @@ const profileController = {
                 return res.json({ status: 0, message: 'Availability not found for this user.' });
             }
 
-            console.log("availability", availability);
+            //console.log("availability", availability);
 
             // Loop through the first item in the availability array (assuming there's only one document for the user)
             const slotIndex = availability[0].slots.findIndex((slotname) => {
@@ -4270,7 +4327,7 @@ const profileController = {
                 if (!availability || availability.length === 0) {
                     return res.json({ status: 0, message: 'Availability not found for this user.' });
                 }
-                console.log("availability", availability);
+               // console.log("availability", availability);
 
                 // Loop through the first item in the availability array (assuming there's only one document for the user)
                 const slotIndex = availability[0].slots.findIndex((slotname) => {
@@ -5070,7 +5127,7 @@ const profileController = {
 
             // Apply pagination
             const paginatedFeedback = filteredFeedback.slice(parsedOffset, parsedOffset + parsedLimit);
-            console.log("paginatedFeedback",paginatedFeedback);
+            //console.log("paginatedFeedback",paginatedFeedback);
 
             const feedbackWithUserDetails = await Promise.all(
                 paginatedFeedback.map(async (item) => {
@@ -5756,6 +5813,7 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
+        //console.log("cognitoUserIdMy-interect",cognitoUserIdMy);
         const { offset } = req.body;
         const limit = parseInt(process.env.PAGINATION_LIMIT) || 10;
         const offsetstart = parseInt(offset) || 0;
@@ -5785,9 +5843,18 @@ const profileController = {
 
             const ignoreCognitoUserId = [];
             const blockedUsersList = await BlockedUsers.find({
-                cognitoUserId: cognitoUserIdMy,
-                status:1
+                $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    status: 1
+                    }
+                ]
             })
+            //console.log("blockedUsersList",blockedUsersList);
             blockedUsersList.forEach(block => {
                 let ignoreid = block.blockedUserId;
                 if (!ignoreCognitoUserId.includes(ignoreid)) {
@@ -5804,7 +5871,7 @@ const profileController = {
                     ignoreCognitoUserId.push(ignoreid);
                 }
             });
-            //console.log("ignoreCognitoUserId",ignoreCognitoUserId);
+            //console.log("ignoreCognitoUserId-interected",ignoreCognitoUserId);
             //console.log("myProfile.userType",myProfile.userType);
             let wheredata = [];
             if (myProfile.userType == 1) {
