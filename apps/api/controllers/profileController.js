@@ -1278,8 +1278,17 @@ const profileController = {
             });
 
             const blockedUsersList = await BlockedUsers.find({
-                cognitoUserId: cognitoUserId,
-                status:1
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserId,
+                    status: 1
+                    }
+                ]
+               
             })
             blockedUsersList.forEach(block => {
                 let ignoreid = block.blockedUserId;
@@ -2272,9 +2281,19 @@ const profileController = {
            
             const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
             const ignoreCognitoUserId = [cognitoUserIdMy];
+           
             const blockedUsersList = await BlockedUsers.find({
-                cognitoUserId: cognitoUserIdMy,
-                status:1
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    status: 1
+                    }
+                ]
+               
             })
             blockedUsersList.forEach(block => {
                 let ignoreid = block.blockedUserId;
@@ -3215,6 +3234,26 @@ const profileController = {
                 });
             }
 
+            //console.log("cognitoUserIdMy",cognitoUserIdMy,"cognitoUserId",cognitoUserId);
+
+            const blockedUsersList = await BlockedUsers.find({
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    blockedUserId: cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    cognitoUserId: cognitoUserId,
+                    status: 1
+                    }
+                ]
+               
+            })
+            //console.log("blockedUsersList",blockedUsersList);
+            if (blockedUsersList.length > 0) return res.json({ status: 0, message: "User not found" });
+
             const messageTypeCondition = myProfile.userType === 0 ? { messageType: { $ne: 1 } } : {};
 
             const ChatData = await ChatModel.find({
@@ -3494,8 +3533,17 @@ const profileController = {
 
             const ignoreCognitoUserId = [cognitoUserIdMy];
             const blockedUsersList = await BlockedUsers.find({
-                cognitoUserId: cognitoUserIdMy,
-                status:1
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    status: 1
+                    }
+                ]
+               
             })
             blockedUsersList.forEach(block => {
                 let ignoreid = block.blockedUserId;
@@ -3672,6 +3720,24 @@ const profileController = {
             );
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
+
+            const blockedUsersList = await BlockedUsers.find({
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    blockedUserId: cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    cognitoUserId: cognitoUserId,
+                    status: 1
+                    }
+                ]
+               
+            })
+
+            if (blockedUsersList.length > 0) return res.json({ status: 0, message: "User not found" });
 
             const profile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserId },
@@ -3951,6 +4017,23 @@ const profileController = {
                     message: "Both users are same",
                 });
             }
+            const blockedUsersList = await BlockedUsers.find({
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    blockedUserId: cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    cognitoUserId: cognitoUserId,
+                    status: 1
+                    }
+                ]
+               
+            })
+
+            if (blockedUsersList.length > 0) return res.json({ status: 0, message: "User not found" });
 
 
             let slotNames = [dayOfWeek, date];
@@ -4008,13 +4091,20 @@ const profileController = {
             })
             if (!checkConnectedUser) return res.json({ status: 0, message: "Both users are not connected" });
 
+            console.log("cognitoUserIdMy",cognitoUserIdMy);
+            console.log("cognitoUserId",cognitoUserId);
+            console.log("dayOfWeek",dayOfWeek);
+            console.log("date",date);
+            console.log("safeSlot",safeSlot);
             let checkAlreadyBook = await BookMeetingsModel.findOne({
-                cognitoUserId: cognitoUserIdMy,
+                //cognitoUserId: cognitoUserIdMy,
                 cognitoUserIdMenter: cognitoUserId,
                 day: dayOfWeek,
                 date,
                 slot:safeSlot,
             });
+
+            console.log("checkAlreadyBook",checkAlreadyBook);
 
             if (checkAlreadyBook) {
                 return res.status(200).json({
