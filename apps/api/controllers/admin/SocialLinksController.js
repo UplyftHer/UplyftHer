@@ -111,11 +111,11 @@ const SocialLinksController = {
                     imageUrl = await uploadToS3(filePathEvent);
                    // Delete local file (you said you still want to delete it)
                     if (fs.existsSync(filePathEvent)) {
-                        fs.unlinkSync(filePathEvent);
+                        // fs.unlinkSync(filePathEvent);
                     }
                 } catch (uploadError) {
                     if (fs.existsSync(filePathEvent)) {
-                        fs.unlinkSync(filePathEvent);
+                        // fs.unlinkSync(filePathEvent);
                     }
                     return res.json({ status: 0, errors: { message: 'Error uploading image to S3' } });
                 }
@@ -191,7 +191,7 @@ const SocialLinksController = {
                 name:nameSafe,
                 url:urlSafe,
                 accountStatus:accountStatusSafe,
-                image:""
+                
             }
 
             if (req.files && req.files.image) {
