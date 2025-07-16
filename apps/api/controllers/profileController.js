@@ -1292,6 +1292,10 @@ const profileController = {
             })
             blockedUsersList.forEach(block => {
                 let ignoreid = block.blockedUserId;
+                if(cognitoUserId === block.blockedUserId)
+                {
+                    ignoreid = block.cognitoUserId;
+                }
                 if (!ignoreCognitoUserId.includes(ignoreid)) {
                     ignoreCognitoUserId.push(ignoreid);
                 }
@@ -1542,7 +1546,13 @@ const profileController = {
                 ]
             })
             blockedUsersList.forEach(block => {
+                
                 let ignoreid = block.blockedUserId;
+                if(cognitoUserId === block.blockedUserId)
+                {
+                    ignoreid = block.cognitoUserId;
+                }
+                
                 if (!ignoreCognitoUserId.includes(ignoreid)) {
                     ignoreCognitoUserId.push(ignoreid);
                 }
@@ -1792,6 +1802,9 @@ const profileController = {
 
         
         const { cognitoUserId } = req.body;
+
+        //console.log("cognitoUserIdMy",cognitoUserIdMy);
+        //console.log("cognitoUserId",cognitoUserId);
        
         try {
             if (typeof cognitoUserId !== 'string' || cognitoUserId.trim() === '' || typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
@@ -1871,7 +1884,7 @@ const profileController = {
 
             //save and sent notification
             let message = `${myProfile.fullName} wants to connect with you`;
-            let type = `connect`;
+            let type = `connectrequest`;
             let tableName = `connected_users`;
             let isTakeAction = 0;
             let notificationSave = await NotificationModel.create({
@@ -1883,6 +1896,8 @@ const profileController = {
                 type: type,
                 isTakeAction: isTakeAction,
             });
+
+            //console.log("cognitoUserIdProfile",cognitoUserIdProfile);
 
             //pushnotification
             if (Array.isArray(cognitoUserIdProfile.deviceToken) && cognitoUserIdProfile.deviceToken.length > 0) {
@@ -2101,7 +2116,7 @@ const profileController = {
                     }
 
                     let message = `You and ${firstname} just connected—start chatting and set up your first session!`;
-                    let type = `connect`;
+                    let type = `connectacceptdecline`;
                     let tableName = `connected_users`;
                     let notificationSave = await NotificationModel.create({
                         fromCognitoId: cognitoUserIdMy,
@@ -2296,7 +2311,12 @@ const profileController = {
                
             })
             blockedUsersList.forEach(block => {
+                
                 let ignoreid = block.blockedUserId;
+                if(cognitoUserIdMy === block.blockedUserId)
+                {
+                    ignoreid = block.cognitoUserId;
+                }
                 if (!ignoreCognitoUserId.includes(ignoreid)) {
                     ignoreCognitoUserId.push(ignoreid);
                 }
@@ -2579,6 +2599,10 @@ const profileController = {
             //console.log("blockedUsersList",blockedUsersList);
             blockedUsersList.forEach(block => {
                 let ignoreid = block.blockedUserId;
+                if(cognitoUserIdMy === block.blockedUserId)
+                {
+                    ignoreid = block.cognitoUserId;
+                }
                 if (!ignoreCognitoUserId.includes(ignoreid)) {
                     ignoreCognitoUserId.push(ignoreid);
                 }
@@ -3429,7 +3453,7 @@ const profileController = {
             //save Notification
 
             let message = `${myProfile.fullName} has enabled meeting request`;
-            let type = `connect`;
+            let type = `enablemeeting`;
             let tableName = `connected_users`;
             let notificationSave = await NotificationModel.create({
                 fromCognitoId: cognitoUserIdMy,
@@ -3547,6 +3571,10 @@ const profileController = {
             })
             blockedUsersList.forEach(block => {
                 let ignoreid = block.blockedUserId;
+                if(cognitoUserIdMy === block.blockedUserId)
+                {
+                    ignoreid = block.cognitoUserId;
+                }
                 if (!ignoreCognitoUserId.includes(ignoreid)) {
                     ignoreCognitoUserId.push(ignoreid);
                 }
@@ -4167,7 +4195,7 @@ const profileController = {
             //let message = `Your session with ${firstname} is scheduled for ${date} at ${localTime} (${timezone})`;
             let message = `Your session with ${firstname} is scheduled for ${date} at ${localTime} (${abbreviation})`;
            
-            let type = `meeting`;
+            let type = `bookmeeting`;
             let tableName = `book_meetings`;
             let notificationSave = await NotificationModel.create({
                 fromCognitoId: cognitoUserIdMy,
@@ -4528,7 +4556,7 @@ const profileController = {
             //let message = `Your session with ${myProfile.fullName} is rescheduled for ${date} at ${slot}`;
             //let message = `Your session with ${myProfile.fullName} has been rescheduled from ${checkBooking.date} at ${checkBooking.slot} to ${date} at ${slot}.`;
             let message = `Your session with ${myProfile.fullName} has been rescheduled from ${checkBooking.date} at ${localTimeBook} (${abbreviation}) to ${date} at ${localTime} (${abbreviation}).`;
-            let type = `meeting`;
+            let type = `editmeeting`;
             let tableName = `book_meetings`;
             let notificationSave = await NotificationModel.create({
                 fromCognitoId: cognitoUserIdMy,
@@ -4752,7 +4780,7 @@ const profileController = {
             // send notification
             //let message = `Your session with ${myProfile.fullName} is cancelled for ${checkBooking.date} at ${checkBooking.slot}`;
             let message = `Your session with ${myProfile.fullName} is cancelled for ${checkBooking.date} at ${localTime} (${abbreviation})`;
-            let type = `meeting`;
+            let type = `cancelmeeting`;
             let tableName = `book_meetings`;
             let notificationSave = await NotificationModel.create({
                 fromCognitoId: cognitoUserIdMy,
@@ -4939,7 +4967,7 @@ const profileController = {
                 firstname = myProfile.fullName.split(' ')[0]
             }
             let message = `How was your recent session with ${firstname}? Share your feedback!`;
-            let type = `meeting`;
+            let type = `endmeeting`;
             let tableName = `book_meetings`;
             let notificationSave = await NotificationModel.create({
                 fromCognitoId: cognitoUserIdMy,
@@ -5903,7 +5931,7 @@ const profileController = {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const cognitoUserIdMy = decoded.username;
-        //console.log("cognitoUserIdMy-interect",cognitoUserIdMy);
+        console.log("cognitoUserIdMy-interect",cognitoUserIdMy);
         const { offset } = req.body;
         const limit = parseInt(process.env.PAGINATION_LIMIT) || 10;
         const offsetstart = parseInt(offset) || 0;
@@ -5947,6 +5975,11 @@ const profileController = {
             //console.log("blockedUsersList",blockedUsersList);
             blockedUsersList.forEach(block => {
                 let ignoreid = block.blockedUserId;
+                if(cognitoUserIdMy === block.blockedUserId)
+                {
+                    ignoreid = block.cognitoUserId;
+                }
+                
                 if (!ignoreCognitoUserId.includes(ignoreid)) {
                     ignoreCognitoUserId.push(ignoreid);
                 }
@@ -5981,6 +6014,8 @@ const profileController = {
                     //{tocognitoUserId: { $nin: ignoreCognitoUserId }},
                 ]
             }
+            //console.log("wheredata",wheredata);
+            //console.log("ignoreCognitoUserId",ignoreCognitoUserId);
             const interactedList = await interactedUserModel.find({
                 $and: [
                     {

@@ -729,6 +729,12 @@ const authController = {
             
                     //Save user in the database
                     let invitationCodeUser = generateRandomString(12);
+                    let emailDomainVerified = 0;
+                    const emailDomain = email.substring(email.indexOf("@"));
+                    const domainExists = await DomainModel.findOne({ name: emailDomain, status:1 });
+                    if (domainExists) {
+                        emailDomainVerified = 1;
+                    }
                     const userData = new UsersModel({
                         cognitoUserId: data.User.Username,
                         email,
@@ -737,9 +743,11 @@ const authController = {
                         myInvitationCode: invitationCodeUser,
                         deviceToken,
                         registerWith:1,
-                        emailDomainVerified: 1, // Mark domain as verified since it's from LinkedIn
+                        isVerified: 1, // Mark verified since it's from LinkedIn
+                        emailDomainVerified,
                         profilePic:profilePicUrl
                     });
+                    
             
                     await userData.save();
 
