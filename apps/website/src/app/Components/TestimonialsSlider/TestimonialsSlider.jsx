@@ -6,6 +6,11 @@ import Image from 'next/image';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import './TestimonialsSlider.css';
 
+
+// Import css files
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
 function TestimonialsSlider() {
   const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +39,8 @@ function TestimonialsSlider() {
     return null; // Ensuring no mismatch between SSR and CSR
   }
 
+  
+
   // Custom Previous Arrow Component
   function CustomPrevArrow(props) {
     const { onClick } = props;
@@ -56,11 +63,14 @@ function TestimonialsSlider() {
 
   const sliderSettings = {
     dots: false,
-    infinite: true,
+    //infinite: true,
+    infinite: testimonials.length > 1,
     speed: 500,
-    slidesToShow: 2,
+    //slidesToShow: 2,
+    slidesToShow: testimonials.length < 2 ? 1 : 2,
     slidesToScroll: 1,
-    autoplay: true, 
+    //autoplay: true, 
+    autoplay: testimonials.length > 1,
     autoplaySpeed: 3000, 
     prevArrow: <CustomPrevArrow />,
     nextArrow: <CustomNextArrow />,

@@ -6,6 +6,10 @@ import Image from 'next/image';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import "./ProfesSlider.css";
 
+// Import css files
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
 function ProfesSlider() {
     const [testimonials, setTestimonials] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -56,9 +60,11 @@ function ProfesSlider() {
   
     const ProfsliderSetting = {
         dots: false,
-        infinite: true,
+        //infinite: true,
+        infinite: testimonials.length > 5,
         speed: 500,
-        slidesToShow: 5,
+        //slidesToShow: 5,
+        slidesToShow: testimonials.length < 5 ? testimonials.length : 5,
         slidesToScroll: 1,
         // autoplay: true,
         // autoplaySpeed: 3000,

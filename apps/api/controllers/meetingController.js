@@ -407,7 +407,10 @@ const meetingController = {
             );
 
             if (userToNotification) {
-                let notificationSave = {};
+                let notificationSave = {
+                    type: "meetingstart",
+                    toCognitoId:cognitoUserId
+                };
                 if (Array.isArray(userToNotification.deviceToken) && userToNotification.deviceToken.length > 0) {
                     let payload = {
                         notification: {
