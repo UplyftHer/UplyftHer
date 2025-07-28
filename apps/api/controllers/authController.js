@@ -511,13 +511,13 @@ const authController = {
         const checkEmail = await UsersModel.findOne({ email: email }, { email: 1, registerWith:1 });
         if (!checkEmail) {
             //return res.json({ status: 0, message: "Email not exists!" });
-            return res.json({ status: 1, message: "If the email you entered is associated with an account, you’ll receive a one-time password (OTP) shortly." });
+            return res.json({ status: 1, message: "If the email you entered is associated with an account, you’ll receive a one-time password (OTP) shortly.",data:{email} });
         }
 
         if(checkEmail.registerWith == 1)
         {
             //return res.json({ status: 0, message: "This email registered with Linkedin!" });
-            return res.json({ status: 1, message: "If the email you entered is associated with an account, you’ll receive a one-time password (OTP) shortly." });
+            return res.json({ status: 1, message: "If the email you entered is associated with an account, you’ll receive a one-time password (OTP) shortly." ,data:{email}});
         }
 
         
@@ -534,7 +534,7 @@ const authController = {
             // Trigger the forgot password flow
             await cognito.forgotPassword(params).promise();
             //res.status(200).json({ message: 'Password reset code sent to your email' });
-            return res.json({ status: 1, message: 'Password reset code sent to your email',data:{email}});
+            return res.json({ status: 1, message: 'If the email you entered is associated with an account, you’ll receive a one-time password (OTP) shortly.',data:{email}});
         } catch (error) {
             console.error('Forgot password error:', error);
             //res.status(500).json({ message: 'Error during password reset process', error: error.message });
