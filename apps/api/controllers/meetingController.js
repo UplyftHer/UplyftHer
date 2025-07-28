@@ -7,6 +7,7 @@ const AWS = require('aws-sdk');
 const jwt = require('jsonwebtoken');
 const { FirebaseData, PushNotification } = require("../utils/firebase.js");
 const NotificationModel = require('../models/NotificationModel');
+const BlockedUsers = require('../models/BlockedUsers.js');
 
 const zoomAccountId = process.env.ZOOM_ACCOUNT_ID;
 const zoomClientId = process.env.ZOOM_CLIENT_ID;
@@ -142,6 +143,24 @@ const meetingController = {
                     message: "Both users are same",
                 });
             }
+
+            const blockedUsersList = await BlockedUsers.find({
+                    $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    blockedUserId: cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    cognitoUserId: cognitoUserId,
+                    status: 1
+                    }
+                ]
+                
+            })
+
+            if (blockedUsersList.length > 0) return res.json({ status: 0, message: "User not found" });
 
             const profile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserId },

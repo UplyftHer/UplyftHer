@@ -1876,6 +1876,24 @@ const profileController = {
                 });
             }
 
+            const blockedUsersList = await BlockedUsers.find({
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    blockedUserId: cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    cognitoUserId: cognitoUserId,
+                    status: 1
+                    }
+                ]
+               
+            })
+            //console.log("blockedUsersList",blockedUsersList);
+            if (blockedUsersList.length > 0) return res.json({ status: 0, message: "User not found" });
+
 
             const requestUser = await ConnectedUserModel.create({
                 cognitoUserId: cognitoUserIdMy,
@@ -1963,7 +1981,36 @@ const profileController = {
            
             const myInterestNames = [...new Set(myProfile.interests.map(interest => interest.name))];
 
-            const notificationList = await NotificationModel.find({ toCognitoId: cognitoUserIdMy })
+             const ignoreCognitoUserId = [];
+            const blockedUsersList = await BlockedUsers.find({
+                $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    status: 1
+                    }
+                ]
+            })
+            //console.log("blockedUsersList",blockedUsersList);
+            blockedUsersList.forEach(block => {
+                let ignoreid = block.blockedUserId;
+                if(cognitoUserIdMy === block.blockedUserId)
+                {
+                    ignoreid = block.cognitoUserId;
+                }
+                
+                if (!ignoreCognitoUserId.includes(ignoreid)) {
+                    ignoreCognitoUserId.push(ignoreid);
+                }
+            });
+
+            const notificationList = await NotificationModel.find(
+                { 
+                    toCognitoId: cognitoUserIdMy ,toCognitoId: { $nin: ignoreCognitoUserId }
+                })
                 .sort({ updatedAt: -1 })
                 .skip(offsetstart)
                 .limit(limit)
@@ -2071,6 +2118,8 @@ const profileController = {
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
 
             
+
+            
             const checkRequest = await ConnectedUserModel.findOne({
                 _id: new mongoose.Types.ObjectId(requestId),
                 cognitoUserIdSave: cognitoUserIdMy,
@@ -2083,6 +2132,24 @@ const profileController = {
                     message: "Invalid request",
                 });
             }
+
+            const blockedUsersList = await BlockedUsers.find({
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    blockedUserId: checkRequest.cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    cognitoUserId: checkRequest.cognitoUserId,
+                    status: 1
+                    }
+                ]
+               
+            })
+            //console.log("blockedUsersList",blockedUsersList);
+            if (blockedUsersList.length > 0) return res.json({ status: 0, message: "User not found" });
 
             if (status == '1' || status == '2') {
                 const filter = { _id: new mongoose.Types.ObjectId(requestId) };
@@ -2462,10 +2529,37 @@ const profileController = {
 
             if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
 
+           
+            const ignoreCognitoUserId = [];
+            const blockedUsersList = await BlockedUsers.find({
+                $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    status: 1
+                    }
+                ]
+            })
+            //console.log("blockedUsersList",blockedUsersList);
+            blockedUsersList.forEach(block => {
+                let ignoreid = block.blockedUserId;
+                if(cognitoUserIdMy === block.blockedUserId)
+                {
+                    ignoreid = block.cognitoUserId;
+                }
+                
+                if (!ignoreCognitoUserId.includes(ignoreid)) {
+                    ignoreCognitoUserId.push(ignoreid);
+                }
+            });
+           
             const connectedList = await ConnectedUserModel.find({
                 $or: [
-                    { cognitoUserId: cognitoUserIdMy, status: 1, isChat: 0 },
-                    { cognitoUserIdSave: cognitoUserIdMy, status: 1, isChat: 0 }
+                    { cognitoUserId: cognitoUserIdMy, status: 1, isChat: 0,cognitoUserId: { $nin: ignoreCognitoUserId } },
+                    { cognitoUserIdSave: cognitoUserIdMy, status: 1, isChat: 0, cognitoUserIdSave: { $nin: ignoreCognitoUserId }}
                 ]
             })
                 .sort({ updatedAt: -1 })
@@ -4429,6 +4523,24 @@ const profileController = {
                 });
             }
 
+            const blockedUsersList = await BlockedUsers.find({
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    blockedUserId: cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    cognitoUserId: cognitoUserId,
+                    status: 1
+                    }
+                ]
+               
+            })
+
+            if (blockedUsersList.length > 0) return res.json({ status: 0, message: "User not found" });
+
 
             let slotNames = [dayOfWeek, date];
             if (myProfile.userType == 0) {
@@ -4739,6 +4851,24 @@ const profileController = {
                 });
             }
 
+            const blockedUsersList = await BlockedUsers.find({
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    blockedUserId: cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    cognitoUserId: cognitoUserId,
+                    status: 1
+                    }
+                ]
+               
+            })
+
+            if (blockedUsersList.length > 0) return res.json({ status: 0, message: "User not found" });
+
             const profile = await UsersModel.findOne(
                 { cognitoUserId: cognitoUserId },
                 {
@@ -4910,6 +5040,24 @@ const profileController = {
                     message: "Both users are same",
                 });
             }
+
+            const blockedUsersList = await BlockedUsers.find({
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    blockedUserId: cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    cognitoUserId: cognitoUserId,
+                    status: 1
+                    }
+                ]
+               
+            })
+
+            if (blockedUsersList.length > 0) return res.json({ status: 0, message: "User not found" });
 
 
 
@@ -5159,6 +5307,24 @@ const profileController = {
                 });
             }
 
+            const blockedUsersList = await BlockedUsers.find({
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    blockedUserId: cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    cognitoUserId: cognitoUserId,
+                    status: 1
+                    }
+                ]
+               
+            })
+
+            if (blockedUsersList.length > 0) return res.json({ status: 0, message: "User not found" });
+
 
 
             let sendFeedbackData = await feedbackModel.create({
@@ -5241,6 +5407,24 @@ const profileController = {
             //const totalRating = filteredFeedback.reduce((sum, item) => sum + item.rating, 0);
             //const averageRating = filteredFeedback.length > 0 ? (totalRating / filteredFeedback.length).toFixed(2) : 0;
             const averageRating = await getUserRating({ cognitoUserIdMy: cognitoUserId });
+
+            const blockedUsersList = await BlockedUsers.find({
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    blockedUserId: cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    cognitoUserId: cognitoUserId,
+                    status: 1
+                    }
+                ]
+               
+            })
+
+            if (blockedUsersList.length > 0) return res.json({ status: 0, message: "User not found" });
             
 
             // Apply pagination
@@ -5376,6 +5560,32 @@ const profileController = {
             //console.log("currentTime", currentTime);
             //console.log("withDurationTime", withDurationTime);
 
+            const ignoreCognitoUserId = [];
+            const blockedUsersList = await BlockedUsers.find({
+                $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    status: 1
+                    }
+                ]
+            })
+            //console.log("blockedUsersList",blockedUsersList);
+            blockedUsersList.forEach(block => {
+                let ignoreid = block.blockedUserId;
+                if(cognitoUserIdMy === block.blockedUserId)
+                {
+                    ignoreid = block.cognitoUserId;
+                }
+                
+                if (!ignoreCognitoUserId.includes(ignoreid)) {
+                    ignoreCognitoUserId.push(ignoreid);
+                }
+            });
+
             const meetingsList = await BookMeetingsModel.find({
                 $and: [
                     {
@@ -5395,7 +5605,9 @@ const profileController = {
                                 slot24: { $gt: withDurationTime }
                             }
                         ]
-                    }
+                    },
+                    { cognitoUserId: { $nin: ignoreCognitoUserId } },
+                    { cognitoUserIdMenter: { $nin: ignoreCognitoUserId } }
                 ]
             })
                 .sort({ date: 1, slot24: 1 }) // Sort by date and time
@@ -5509,7 +5721,31 @@ const profileController = {
 
 
 
-
+            const ignoreCognitoUserId = [];
+            const blockedUsersList = await BlockedUsers.find({
+                $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    status: 1
+                    }
+                ]
+            })
+            //console.log("blockedUsersList",blockedUsersList);
+            blockedUsersList.forEach(block => {
+                let ignoreid = block.blockedUserId;
+                if(cognitoUserIdMy === block.blockedUserId)
+                {
+                    ignoreid = block.cognitoUserId;
+                }
+                
+                if (!ignoreCognitoUserId.includes(ignoreid)) {
+                    ignoreCognitoUserId.push(ignoreid);
+                }
+            });
 
             const meetingsList = await BookMeetingsModel.find({
                 $and: [
@@ -5527,7 +5763,9 @@ const profileController = {
                                 slot24: { $lt: withDurationTime }
                             }
                         ]
-                    }
+                    },
+                    { cognitoUserId: { $nin: ignoreCognitoUserId } },
+                    { cognitoUserIdMenter: { $nin: ignoreCognitoUserId } }
                 ]
             })
                 .sort({ date: -1, slot24: -1 }) // Sort by date and time
@@ -5837,6 +6075,24 @@ const profileController = {
                 }
             });
 
+            const blockedUsersList = await BlockedUsers.find({
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    blockedUserId: cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    cognitoUserId: cognitoUserId,
+                    status: 1
+                    }
+                ]
+               
+            })
+
+            if (blockedUsersList.length > 0) return res.json({ status: 0, message: "User not found" });
+
 
 
             const filter = {
@@ -5897,6 +6153,24 @@ const profileController = {
                 ]
             })
             if (!checkConnectedUser) return res.json({ status: 0, message: "Both users are not connected" });
+
+            const blockedUsersList = await BlockedUsers.find({
+                 $or: [
+                    {
+                    cognitoUserId: cognitoUserIdMy,
+                    blockedUserId: cognitoUserId,
+                    status: 1
+                    },
+                    {
+                    blockedUserId: cognitoUserIdMy,
+                    cognitoUserId: cognitoUserId,
+                    status: 1
+                    }
+                ]
+               
+            })
+
+            if (blockedUsersList.length > 0) return res.json({ status: 0, message: "User not found" });
 
             let update = {
                 isBookFirstSession: 1
@@ -6154,6 +6428,112 @@ const profileController = {
                 data: IndustriesList,
 
 
+            });
+
+        } catch (error) {
+            //res.status(500).json({ message: 'Error fetching profile', error });
+            return res.json({ status: 0, message: error.message });
+        }
+    },
+
+    checkNotification: async (req, res) => {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const cognitoUserIdMy = decoded.username;
+        
+
+
+       
+        
+        try {
+            if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
+            
+            
+            const myProfile = await UsersModel.findOne(
+                { cognitoUserId: cognitoUserIdMy },
+                // { cognitoUserId: 0 } // Projection to exclude fields
+            );
+
+            //console.log("myProfile",myProfile);
+
+            if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
+
+             const notificationList = await NotificationModel.find({
+                toCognitoId: cognitoUserIdMy,
+                isRead: 0
+                }).lean();
+
+                const latestNotification = notificationList.length > 0;
+
+                return res.status(200).json({
+                status: 1,
+                message: "Notification fetched successfully",
+                data: latestNotification,
+                });
+
+                
+
+          
+
+        } catch (error) {
+            //res.status(500).json({ message: 'Error fetching profile', error });
+            return res.json({ status: 0, message: error.message });
+        }
+    },
+    readNotification: async (req, res) => {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const cognitoUserIdMy = decoded.username;
+        
+
+
+       
+        
+        try {
+            if (typeof cognitoUserIdMy !== 'string' || cognitoUserIdMy.trim() === '') {
+                return res.json({
+                    status: 0,
+                    message: "Invalid cognitoUserId",
+                });
+            }
+            
+            
+            const myProfile = await UsersModel.findOne(
+                { cognitoUserId: cognitoUserIdMy },
+                // { cognitoUserId: 0 } // Projection to exclude fields
+            );
+
+            //console.log("myProfile",myProfile);
+
+            if (!myProfile) return res.json({ status: 0, message: "Invalid user" });
+
+           
+
+            
+           
+
+
+            let update = {
+                isRead: 1,
+            };
+            const filter = {
+                toCognitoId: cognitoUserIdMy,
+            };
+           
+            
+            const notificationUpdated = await NotificationModel.updateMany(filter, { $set: update });
+
+            
+
+            return res.status(200).json({
+                status: 1,
+                message: "Notification read successfully",
+                data:notificationUpdated
             });
 
         } catch (error) {
