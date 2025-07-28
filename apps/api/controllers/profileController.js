@@ -2007,14 +2007,20 @@ const profileController = {
                 }
             });
 
-            const notificationList = await NotificationModel.find(
-                { 
-                    toCognitoId: cognitoUserIdMy ,toCognitoId: { $nin: ignoreCognitoUserId }
+            console.log("cognitoUserIdMy",cognitoUserIdMy, "ignoreCognitoUserId",ignoreCognitoUserId)
+
+            const notificationList = await NotificationModel.find({
+                $and: [
+                    { toCognitoId: cognitoUserIdMy },
+                    { toCognitoId: { $nin: ignoreCognitoUserId } }
+                ]
                 })
                 .sort({ updatedAt: -1 })
                 .skip(offsetstart)
                 .limit(limit)
                 .lean();
+
+                console.log("notificationList",notificationList);
 
             const notifications = await Promise.all(
                 notificationList.map(async (notify) => {
