@@ -64,6 +64,8 @@ router.post('/getPreviouslyInteracted', authMiddleware, profileController.getPre
 //contact us apis
 
 router.post('/contactUs', authMiddleware, profileController.contactUs);
+router.post('/readNotification', authMiddleware, profileController.readNotification);
+router.post('/checkNotification', authMiddleware, profileController.checkNotification);
 
 
 module.exports = router;

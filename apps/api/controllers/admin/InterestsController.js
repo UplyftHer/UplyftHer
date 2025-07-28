@@ -133,7 +133,7 @@ async function uploadToS3(fileName) {
 
                 // Create interest record
                 const newInterest = new InterestsModel({
-                    name,
+                    name:name.trim(),
                     status,
                     icon: filePath, // Save S3 URL, NOT local filePath
                 });
@@ -209,7 +209,7 @@ async function uploadToS3(fileName) {
             let iconUrl = existingInterests.icon;  
             // let filePath = ""; 
             let savedata = {
-                name,
+                name:name.trim(),
                 status
             }
 
