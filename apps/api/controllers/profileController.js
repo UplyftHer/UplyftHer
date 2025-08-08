@@ -1319,6 +1319,7 @@ const profileController = {
                 "interests.name": { $in: myInterestNames },
                 cognitoUserId: { $nin: ignoreCognitoUserId },
                 userType: { $ne: myProfile.userType },
+                isMatchAvailibilty: 1,
             }).lean();
 
 
@@ -1933,6 +1934,10 @@ const profileController = {
                 }
                 await PushNotification({ registrationToken: cognitoUserIdProfile.deviceToken, payload });
             }
+
+            // io.emit("pushNotification", {
+            //     status: 1
+            // });
 
 
 
