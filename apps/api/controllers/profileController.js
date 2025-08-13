@@ -2805,7 +2805,8 @@ const profileController = {
                     const lastMessagetime = checkChat ? checkChat.createdAt : connect.createdAt;
                     const unreadCount = await ChatModel.countDocuments({
                         isRead: 0,
-                        toId: cognitoUserIdMy
+                        toId: cognitoUserIdMy,
+                        fromId: secondUser,
                     });
 
 
