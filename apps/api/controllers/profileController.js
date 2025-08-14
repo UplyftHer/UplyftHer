@@ -4231,11 +4231,10 @@ const profileController = {
             console.log("date",date);
             console.log("safeSlot",safeSlot);
             let checkAlreadyBook = await BookMeetingsModel.findOne({
-                //cognitoUserId: cognitoUserIdMy,
-                cognitoUserIdMenter: cognitoUserId,
-                day: dayOfWeek,
-                date,
-                slot:safeSlot,
+                cognitoUserIdMenter: { $eq: cognitoUserId },
+                day: { $eq: dayOfWeek },
+                date: { $eq: date },
+                slot: { $eq: safeSlot },
             });
 
             console.log("checkAlreadyBook",checkAlreadyBook);
@@ -4606,11 +4605,11 @@ const profileController = {
             if (!profile) return res.json({ status: 0, message: "Invalid cognitoUserId" });
 
             let checkAlreadyBook = await BookMeetingsModel.findOne({
-                cognitoUserId: cognitoUserIdMy,
-                cognitoUserIdMenter: cognitoUserId,
-                day: dayOfWeek,
-                date,
-                slot:safeSlot,
+                cognitoUserId: { $eq: cognitoUserIdMy },
+                cognitoUserIdMenter: { $eq: cognitoUserId },
+                day: { $eq: dayOfWeek },
+                date: { $eq: date },
+                slot: { $eq: safeSlot },
             });
 
             if (checkAlreadyBook) {
